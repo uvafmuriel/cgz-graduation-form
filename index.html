@@ -1447,11 +1447,16 @@
         <div id="timeline-items"></div>
       </div>
 
-      <hr class="divider">
-      <div style="margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
-        <span class="sub-label" style="display:inline;">Event layout map</span>
-      <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;height:500px;color:#888780;font-size:14px;border:1px solid #e4e2dc;border-radius:10px;margin-top:8px;">Select a location above to load the site map.</div>
-      <div id="map-container" style="display:none;height:500px;width:100%;border-radius:10px;border:1px solid #e4e2dc;margin-top:8px;"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Event layout map
+      </div>
+
+      <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;height:500px;color:#888780;font-size:14px;border:1px solid #e4e2dc;border-radius:10px;">Select a location above to load the site map.</div>
+      <div id="map-container" style="display:none;height:500px;width:100%;border-radius:10px;border:1px solid #e4e2dc;"></div>
 
       <div id="map-tools" style="display:none;">
         <div class="pin-toolbar" id="pin-toolbar"></div>
@@ -1469,8 +1474,13 @@
         </div>
         <div id="pin-list" style="margin-top:10px;"></div>
       </div>
+    </div>
 
-      <hr class="divider">
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Additional notes for FM
+      </div>
       <p class="sub-label">Additional notes for FM staff</p>
       <textarea id="fm-notes" placeholder="Any other details, special timing, or access requirements…" style="min-height:60px;"></textarea>
     </div>
