@@ -815,6 +815,26 @@
     .pin-list-name { font-weight: 500; }
     .pin-list-note { color: #888780; font-size: 12px; }
     .pin-list-remove { margin-left: auto; cursor: pointer; color: #c0392b; font-size: 16px; padding: 0 4px; }
+
+    /* Summary modal */
+    .summary-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .summary-modal.open { display:flex; }
+    .summary-modal-inner { background:#fff; border-radius:12px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto; padding:24px; }
+    .summary-modal h2 { color:#232D4B; font-size:18px; margin-bottom:4px; }
+    .summary-modal .sub { color:#5a5957; font-size:13px; margin-bottom:16px; }
+    .summary-row { padding:6px 0; border-bottom:0.5px solid #eceae4; font-size:13px; display:flex; gap:10px; }
+    .summary-row .k { color:#888780; width:160px; flex-shrink:0; }
+    .summary-row .v { color:#1a1a18; font-weight:500; }
+    .summary-section-title { color:#232D4B; font-size:13px; font-weight:600; margin:16px 0 6px; border-bottom:2px solid #E57200; padding-bottom:3px; display:inline-block; }
+    .summary-modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .summary-badge { display:inline-block; font-size:11px; padding:1px 8px; border-radius:99px; font-weight:500; }
+    .summary-badge.ok { background:#eaf3e0; color:#2e5a10; }
+    .summary-badge.no { background:#fdecea; color:#c0392b; }
+    .summary-badge.warn { background:#fde8d8; color:#8B3A00; }
+    /* FM Review banner */
+    .fm-banner { display:none; background:#232D4B; color:#fff; padding:10px 16px; border-radius:8px; margin-bottom:12px; font-size:14px; }
+    .fm-banner.show { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .fm-banner button { background:#E57200; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -846,6 +866,11 @@
     </div>
 
     <!-- ── ORGANIZER INFO ── -->
+    <div class="fm-banner" id="fm-banner">
+      <div><strong>FM Review Mode</strong> — The organizer's layout is loaded. Add suggestions, then send back.</div>
+      <button type="button" onclick="sendBackToOrganizer()">Send back with edits</button>
+    </div>
+
     <div class="form-section">
       <div class="section-title">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -1874,6 +1899,34 @@
     }
 
     // ── Submit ──
+    function getMapPinData() {
+      if (typeof pins === 'undefined' || !pins.length) return 'None';
+      return pins.map(p => p.label + (p.note ? ' (' + p.note + ')' : '')).join(', ');
+    }
+
+    function getExtraContactsData() {
+      const rows = document.querySelectorAll('#extra-contacts-list .extra-contact-row');
+      if (!rows.length) return [];
+      return Array.from(rows).map(r => {
+        const inputs = r.querySelectorAll('input');
+        return {
+          name:  inputs[0] ? inputs[0].value.trim() : '',
+          role:  inputs[1] ? inputs[1].value.trim() : '',
+          email: inputs[2] ? inputs[2].value.trim() : '',
+          phone: inputs[3] ? inputs[3].value.trim() : ''
+        };
+      }).filter(c => c.name || c.email || c.phone);
+    }
+
+    function getDayDetailsData() {
+      const rows = document.querySelectorAll('#day-details-container .day-detail-row');
+      if (!rows.length) return [];
+      return Array.from(rows).map(r => {
+        const inputs = r.querySelectorAll('input, textarea');
+        return Array.from(inputs).map(i => i.value.trim()).filter(Boolean).join(' | ');
+      }).filter(Boolean);
+    }
+
     async function submitForm() {
       const required = ['org-name','org-dept','org-email','worktag','event-name','event-location','event-type'];
       // Date validation depends on single vs multi-day
@@ -1900,7 +1953,7 @@
       }
 
       // Capture map screenshot, then show summary
-      const mapWrap = document.getElementById('map-canvas-wrap');
+      const mapWrap = document.getElementById('map-container');
       if (mapWrap && typeof html2canvas !== 'undefined' && pins.length > 0) {
         try {
           const canvas = await html2canvas(mapWrap, { useCORS: true, scale: 2, backgroundColor: null });
@@ -1935,7 +1988,7 @@
         fmServices:       getServices(),
         fmNotes:          document.getElementById('fm-notes').value.trim(),
         // Power
-        powerNotes:       document.getElementById('power-notes').value.trim(),
+        powerNotes:       document.getElementById('power-notes') ? document.getElementById('power-notes').value.trim() : '',
         // Setup
         setupTime:        document.getElementById('setup-time').value,
         teardownTime:     document.getElementById('teardown-time').value,
@@ -1978,16 +2031,6 @@
         chairsVendorSupply:document.getElementById('chairs-vendor-supply').value.trim(),
         chairsPrefVendors:getCheckedVals('chairs-pref-vendor'),
         // Waste & custodial
-        wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
-        portabathNotes:   document.getElementById('portabath-notes') ? document.getElementById('portabath-notes').value.trim() : '',
-        custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
-        majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
-               // Waste & custodial
-        wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
-        portabathNotes:   document.getElementById('portabath-notes') ? document.getElementById('portabath-notes').value.trim() : '',
-        custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
-        majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
-         // Waste & custodial
         wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
         portabathNotes:   document.getElementById('portabath-notes') ? document.getElementById('portabath-notes').value.trim() : '',
         custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
@@ -2079,62 +2122,8 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function toggleSignage(checked) {
-      document.getElementById('signage-section').classList.toggle('show', checked);
-    }
-
     // ── Request another with same organizer info ──
-    function requestAnotherSame() {
-      const saved = {
-        name:    document.getElementById('org-name').value,
-        dept:    document.getElementById('org-dept').value,
-        email:   document.getElementById('org-email').value,
-        phone:   document.getElementById('org-phone').value,
-        worktag: document.getElementById('worktag').value,
-      };
-      resetForm();
-      document.getElementById('org-name').value    = saved.name;
-      document.getElementById('org-dept').value    = saved.dept;
-      document.getElementById('org-email').value   = saved.email;
-      document.getElementById('org-phone').value   = saved.phone;
-      document.getElementById('worktag').value     = saved.worktag;
-      document.getElementById('event-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      document.getElementById('event-name').focus();
-    }
-
-    function requestAnother() {
-      resetForm();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function toggleSignage(checked) {
-      document.getElementById('signage-section').classList.toggle('show', checked);
-    }
-
     // ── Request another with same organizer info ──
-    function requestAnotherSame() {
-      const saved = {
-        name:    document.getElementById('org-name').value,
-        dept:    document.getElementById('org-dept').value,
-        email:   document.getElementById('org-email').value,
-        phone:   document.getElementById('org-phone').value,
-        worktag: document.getElementById('worktag').value,
-      };
-      resetForm();
-      document.getElementById('org-name').value    = saved.name;
-      document.getElementById('org-dept').value    = saved.dept;
-      document.getElementById('org-email').value   = saved.email;
-      document.getElementById('org-phone').value   = saved.phone;
-      document.getElementById('worktag').value     = saved.worktag;
-      document.getElementById('event-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      document.getElementById('event-name').focus();
-    }
-
-    function requestAnother() {
-      resetForm();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
     // ── Reset ──
     function resetForm() {
       document.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea').forEach(el => { el.value = ''; el.classList.remove('error'); });
@@ -2502,47 +2491,6 @@
         pins.map(p=>'<div class="pin-list-item"><div class="pin-list-dot" style="background:'+p.color+'"></div><span class="pin-list-name">'+p.label+(p.isRect?' (area)':'')+'</span>'+(p.note?'<span class="pin-list-note"> — '+p.note+'</span>':'')+'<span class="pin-list-remove" onclick="removePin('+p.id+')">×</span></div>').join('');
     }
 
-    async function submitForm() {
-      const req=['org-name','org-email','event-location']; let err=null;
-      req.forEach(id=>{ const el=document.getElementById(id); if(!el.value.trim()){el.classList.add('error');if(!err)err=el;}else el.classList.remove('error'); });
-      if(err){ err.focus(); err.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-      let mapShot='';
-      if(map&&pins.length){ try{ const canvas=await html2canvas(document.getElementById('map-container'),{useCORS:true,scale:2}); mapShot=canvas.toDataURL('image/png'); }catch(e){} }
-      let fileData='',fileName=''; const fi=document.getElementById('confirmation-file');
-      if(fi.files.length){ fileName=fi.files[0].name; fileData=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(fi.files[0]);}); }
-      const payload={
-        organizerName:document.getElementById('org-name').value.trim(),
-        email:document.getElementById('org-email').value.trim(),
-        location:document.getElementById('event-location').value,
-        confirmationText:document.getElementById('confirmation-text').value.trim(),
-        confirmationFile:fileName, confirmationData:fileData,
-        powerNotes:document.getElementById('power-notes').value.trim(),
-        fmNotes:document.getElementById('fm-notes').value.trim(),
-        pinData:pins.map(p=>p.label+(p.note?' ('+p.note+')':'')).join(', ')||'None',
-        mapScreenshot:mapShot,
-        submittedAt:new Date().toLocaleString('en-US',{timeZone:'America/New_York'}),
-        reviewLink:getReviewLink(),
-      };
-      document.querySelector('.btn-submit').disabled=true;
-      document.getElementById('error-banner').style.display='none';
-      try {
-        const res=await fetch(POWER_AUTOMATE_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
-        if(!res.ok)throw new Error();
-        document.getElementById('success-msg').style.display='block';
-        document.getElementById('success-msg').scrollIntoView({behavior:'smooth'});
-      } catch{ document.getElementById('error-banner').style.display='block'; }
-      finally{ document.querySelector('.btn-submit').disabled=false; }
-    }
-    function resetForm() {
-      document.querySelectorAll('input:not([type=file]),select,textarea').forEach(el=>{el.value='';el.classList.remove('error');});
-      document.getElementById('confirmation-file').value='';
-      document.getElementById('map-placeholder').style.display='flex';
-      document.getElementById('map-container').style.display='none';
-      document.getElementById('map-tools').style.display='none';
-      if(map){map.remove();map=null;} pins=[];markers=[];customPins=[];
-      document.getElementById('success-msg').style.display='none';
-      document.getElementById('error-banner').style.display='none';
-    }
     document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',()=>el.classList.remove('error')));
 
     // ── FM Review Mode ──
@@ -2571,7 +2519,7 @@
       try {
         const data = JSON.parse(decodeURIComponent(hash.slice(8)));
         // Show FM banner
-        document.getElementById('fm-banner').classList.add('show');
+        var _fmb = document.getElementById('fm-banner'); if(_fmb) _fmb.classList.add('show');
         // Set organizer info
         if(data.org) document.getElementById('org-name').value = data.org;
         if(data.email) document.getElementById('org-email').value = data.email;
@@ -2683,6 +2631,34 @@
       <div class="modal-footer">
         <button class="btn-back" onclick="closeSummary()">← Go back &amp; edit</button>
         <button class="btn-confirm" onclick="confirmSubmit()">Confirm &amp; submit</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Summary Modal -->
+  <div class="summary-modal" id="summary-modal">
+    <div class="summary-modal-inner">
+      <h2>Review your request</h2>
+      <div class="sub">Check the details below, then confirm to submit to FM.</div>
+      <div id="summary-body"></div>
+      <div class="summary-modal-actions">
+        <button type="button" class="btn-reset" onclick="closeSummary()">Go back</button>
+        <button type="button" class="btn-submit" onclick="confirmSubmit()" style="padding:11px 26px;">Confirm &amp; submit</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Summary Modal -->
+  <div class="summary-modal" id="summary-modal">
+    <div class="summary-modal-inner">
+      <h2>Review your request</h2>
+      <div class="sub">Check the details below, then confirm to submit to FM.</div>
+      <div id="summary-body"></div>
+      <div class="summary-modal-actions">
+        <button type="button" class="btn-reset" onclick="closeSummary()">Go back</button>
+        <button type="button" class="btn-submit" onclick="confirmSubmit()" style="padding:11px 26px;">Confirm &amp; submit</button>
       </div>
     </div>
   </div>
