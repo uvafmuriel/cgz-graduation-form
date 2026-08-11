@@ -944,7 +944,7 @@
         <div class="field-group">
           <label class="field-label">Event duration</label>
           <div class="radio-group" style="margin-top:2px;">
-            <label class="radio-btn" onclick="setEventDuration('single')"><input type="radio" name="event-duration" checked> Single day</label>
+            <label class="radio-btn selected" onclick="setEventDuration('single')"><input type="radio" name="event-duration" checked> Single day</label>
             <label class="radio-btn" onclick="setEventDuration('multi')"><input type="radio" name="event-duration"> Multi-day</label>
           </div>
         </div>
@@ -1905,9 +1905,11 @@
       eventDurationMode = mode;
       document.getElementById('single-day-fields').style.display = mode === 'single' ? '' : 'none';
       document.getElementById('multi-day-fields').style.display = mode === 'multi' ? '' : 'none';
-      // Update radio button visual state
+      // Update radio button visual state (toggle .selected on the pill labels)
       document.querySelectorAll('input[name="event-duration"]').forEach((r, i) => {
-        r.checked = (i === 0 && mode === 'single') || (i === 1 && mode === 'multi');
+        const isThis = (i === 0 && mode === 'single') || (i === 1 && mode === 'multi');
+        r.checked = isThis;
+        r.closest('.radio-btn').classList.toggle('selected', isThis);
       });
     }
 
