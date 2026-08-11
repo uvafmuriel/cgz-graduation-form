@@ -1206,8 +1206,8 @@
             <input type="hidden" id="food-power" value="">
             <div id="food-power-notes-section" class="conditional">
               <div class="field-group">
-                <label class="field-label" for="food-power-notes">Describe power / water needs</label>
-                <textarea id="food-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+                <label class="field-label" for="food-power-notes-2">Describe power / water needs</label>
+                <textarea id="food-power-notes-2" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
               </div>
             </div>
 
@@ -1615,6 +1615,11 @@
   <script>
     const POWER_AUTOMATE_URL = "https://default7b3480c7370748738b77e216733a65.ac.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f38e9d483f4625a6739d146588a32a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=VU0Th2HD46yJzCwiikF4TL-qxNJ1kWYo7y6ThgnMGcc";
 
+    // ── Safe localStorage wrappers (fail gracefully if storage blocked) ──
+    function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+    function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+    function lsRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
     // ── Service toggle (checkbox + panel) ──
     function toggleService(key) {
       const cb = document.getElementById('svc-' + key);
@@ -1730,7 +1735,7 @@
     let pinHistory = [];
     function pushPinHistory() {
       pinHistory.push(JSON.stringify(pins));
-      document.getElementById('undo-btn').disabled = false;
+      var _ub=document.getElementById('undo-btn'); if(_ub) _ub.disabled = false;
     }
     function undoLastPin() {
       if (!pinHistory.length) return;
@@ -1743,7 +1748,7 @@
       }
       renderPinList();
       buildToolbar();
-      if (!pins.length) document.getElementById('undo-btn').disabled = true;
+      if (!pins.length) { var _ub2=document.getElementById('undo-btn'); if(_ub2) _ub2.disabled = true; }
     }
 
     // ── Pin count badges on toolbar ──
@@ -2214,13 +2219,19 @@
     // ── Request ID generator ──
     function generateRequestId() {
       const year = new Date().getFullYear();
-      const stored = localStorage.getItem('cgz_counter_' + year);
+      const stored = lsGet('cgz_counter_' + year);
       const counter = stored ? parseInt(stored) + 1 : 1;
-      localStorage.setItem('cgz_counter_' + year, counter);
+      lsSet('cgz_counter_' + year, counter);
       return 'CGZ-' + year + '-' + String(counter).padStart(4, '0');
     }
 
     // ── Complexity check ──
+    function toggleRainBackup() {
+      const val = document.getElementById('rain-plan').value;
+      const section = document.getElementById('rain-backup-section');
+      if (section) section.style.display = (val === 'backup' || val === 'indoor') ? 'block' : 'none';
+    }
+
     function getComplexity() {
       const services = ['svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-pa','svc-waste','svc-portabath','svc-barrier'];
       const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
@@ -2309,11 +2320,11 @@
       const data = getDraftData();
       // Only save if something meaningful is filled
       if (!data['org-name'] && !data['event-name']) return;
-      localStorage.setItem('cgz_draft', JSON.stringify(data));
+      lsSet('cgz_draft', JSON.stringify(data));
     }
 
     function loadDraft() {
-      const raw = localStorage.getItem('cgz_draft');
+      const raw = lsGet('cgz_draft');
       if (!raw) return;
       const data = JSON.parse(raw);
       // First pass: restore all field values
@@ -2339,7 +2350,7 @@
     }
 
     function clearDraft() {
-      localStorage.removeItem('cgz_draft');
+      lsRemove('cgz_draft');
       document.getElementById('draft-banner').style.display = 'none';
     }
 
@@ -2350,7 +2361,7 @@
 
     // Check for draft on load
     window.addEventListener('load', function() {
-      if (localStorage.getItem('cgz_draft')) {
+      if (lsGet('cgz_draft')) {
         document.getElementById('draft-banner').style.display = 'flex';
       }
     });
@@ -2707,32 +2718,5 @@
   </div>
 
 
-  <!-- Summary Modal -->
-  <div class="summary-modal" id="summary-modal">
-    <div class="summary-modal-inner">
-      <h2>Review your request</h2>
-      <div class="sub">Check the details below, then confirm to submit to FM.</div>
-      <div id="summary-body"></div>
-      <div class="summary-modal-actions">
-        <button type="button" class="btn-reset" onclick="closeSummary()">Go back</button>
-        <button type="button" class="btn-submit" onclick="confirmSubmit()" style="padding:11px 26px;">Confirm &amp; submit</button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Summary Modal -->
-  <div class="summary-modal" id="summary-modal">
-    <div class="summary-modal-inner">
-      <h2>Review your request</h2>
-      <div class="sub">Check the details below, then confirm to submit to FM.</div>
-      <div id="summary-body"></div>
-      <div class="summary-modal-actions">
-        <button type="button" class="btn-reset" onclick="closeSummary()">Go back</button>
-        <button type="button" class="btn-submit" onclick="confirmSubmit()" style="padding:11px 26px;">Confirm &amp; submit</button>
-      </div>
-    </div>
-  </div>
-
-</body>
+  </body>
 </html>
