@@ -767,33 +767,6 @@
     }
 
     /* ── Footer ── */
-    .pin-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; margin-bottom: 8px; }
-    .pin-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border: 1px solid #d0cec7; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; color: #3d3c3a; transition: all 0.15s; user-select: none; }
-    .pin-btn:hover { border-color: #232D4B; background: #EEF3FA; }
-    .pin-btn.active { border-color: #232D4B; background: #232D4B; color: #fff; }
-    .pin-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .pin-count { background: rgba(35,45,75,0.15); border-radius: 99px; font-size: 10px; padding: 1px 6px; margin-left: 2px; }
-    .pin-btn.active .pin-count { background: rgba(255,255,255,0.3); }
-    .custom-pin-row { display: flex; gap: 6px; margin-bottom: 10px; }
-    .custom-pin-row input { flex: 1; font-size: 13px; padding: 5px 9px; }
-    .custom-pin-row button { padding: 5px 12px; background: #232D4B; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; }
-    .map-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-    .map-actions button { font-size: 12px; font-family: inherit; cursor: pointer; border-radius: 8px; padding: 5px 14px; }
-    .btn-undo { background: none; border: 1px solid #d0cec7; color: #5a5957; }
-    .btn-clear { background: none; border: none; color: #c0392b; text-decoration: underline; padding: 5px 8px; }
-    .pin-list { margin-top: 10px; }
-    .pin-list-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #888780; margin-bottom: 6px; }
-    .pin-list-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-bottom: 0.5px solid #eceae4; }
-    .pin-list-item:last-child { border-bottom: none; }
-    .pin-list-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .pin-list-name { font-weight: 500; }
-    .pin-list-note { color: #888780; font-size: 12px; }
-    .pin-list-remove { margin-left: auto; cursor: pointer; color: #c0392b; font-size: 16px; padding: 0 4px; }
-    .fm-banner { display:none; background:#232D4B; color:#fff; padding:10px 16px; border-radius:8px; margin-bottom:12px; font-size:14px; }
-    .fm-banner.show { display:flex; align-items:center; justify-content:space-between; }
-    .fm-banner button { background:#E57200; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; }
-    #map-container { height: 500px; width: 100%; border-radius: 10px; border: 1px solid #e4e2dc; margin-top: 8px; }
-    .map-no-location { display: flex; align-items: center; justify-content: center; height: 500px; color: #888780; }
     .site-footer {
       max-width: 720px;
       margin: 2rem auto 0;
@@ -908,38 +881,596 @@
         </div>
         <div class="field-group">
           <label class="field-label" for="event-location">Location <span class="req-tag">required</span></label>
-          <select id="event-location" onchange="loadMap()">
-            <option value="">Select a location...</option>
-            <option>Amphitheater</option>
-            <option>Homer Flat</option>
-            <option>The Lawn</option>
-            <option>Pavilion I</option>
-            <option>Pavilion II</option>
-            <option>Pavilion III</option>
-            <option>Pavilion IV</option>
-            <option>Pavilion V</option>
-            <option>Pavilion VI</option>
-            <option>Pavilion VII</option>
-            <option>Pavilion VIII</option>
-            <option>Pavilion IX</option>
-            <option>Pavilion X</option>
-            <option>Rotunda</option>
-          </select>
+          <select id="event-location" onchange="loadMap(); checkRotunda();">
+          <option value="">Select a location...</option>
+          <option>Amphitheater</option>
+          <option>Homer Flat</option>
+          <option>The Lawn</option>
+          <option>Pavilion I</option>
+          <option>Pavilion II</option>
+          <option>Pavilion III</option>
+          <option>Pavilion IV</option>
+          <option>Pavilion V</option>
+          <option>Pavilion VI</option>
+          <option>Pavilion VII</option>
+          <option>Pavilion VIII</option>
+          <option>Pavilion IX</option>
+          <option>Pavilion X</option>
+          <option>Rotunda</option>
+        </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Event duration</label>
+          <div class="radio-group" style="margin-top:2px;">
+            <label class="radio-btn" onclick="setEventDuration('single')"><input type="radio" name="event-duration" checked> Single day</label>
+            <label class="radio-btn" onclick="setEventDuration('multi')"><input type="radio" name="event-duration"> Multi-day</label>
+          </div>
+        </div>
+      </div>
+      <div id="single-day-fields">
+        <div class="field-row three">
+          <div class="field-group">
+            <label class="field-label" for="event-date">Event date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-start">Start time</label>
+            <input type="time" id="event-start">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-end">End time</label>
+            <input type="time" id="event-end">
+          </div>
+        </div>
+      </div>
+      <div id="multi-day-fields" style="display:none;">
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="event-date-start">Start date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date-start">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-date-end">End date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date-end">
+          </div>
+        </div>
+        <div id="day-details-container"></div>
+        <button type="button" onclick="addDayDetail()" style="margin-top:8px; background:#232D4B; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:inherit; font-weight:500; cursor:pointer;">+ Add day details</button>
+        <div style="font-size:12px; color:#888780; margin-top:4px;">Specify different services, times, or notes for individual days.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="event-attendance">Expected attendance</label>
+          <input type="number" id="event-attendance" placeholder="# of people" min="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="event-type">Event type</label>
+          <input type="text" id="event-type" value="Graduation" readonly style="background:#f5f4f0; color:#232D4B; font-weight:600; cursor:default;">
+        </div>
+      </div>
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label" for="event-desc">Brief event description</label>
+          <textarea id="event-desc" placeholder="Describe the event, any special activities, or notes about access and setup…"></textarea>
         </div>
       </div>
 
+      <hr class="divider">
+
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label">Rain plan</label>
+          <select id="rain-plan" onchange="toggleRainBackup()">
+            <option value="">Select…</option>
+            <option value="rain-or-shine">Proceeds rain or shine</option>
+            <option value="indoor-backup">Has indoor backup location</option>
+            <option value="cancel">Will cancel if rain</option>
+          </select>
+          <div id="rain-backup-section" class="conditional" style="margin-top:8px;">
+            <input type="text" id="rain-backup-location" placeholder="Indoor backup location name">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="note-box info" id="rotunda-note">
+        Rotunda events require notifying Sher Winston. FM will coordinate on your behalf once this request is received.
+      </div>
+    </div>
+
+    <!-- ── FM SERVICES ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        FM services needed
+      </div>
+      <p class="sub-label">Select all that apply. Additional questions will appear based on your selections.</p>
+
+      <div class="service-grid">
+
+        <!-- Event Setup & Takedown -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-setup-card">
+            <input type="checkbox" id="svc-setup" value="Event setup & takedown" onchange="toggleService('setup')">
+            <div>
+              <div class="item-label">Event setup &amp; takedown</div>
+              <div class="item-sub">Staffing &amp; HVAC coordination</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-setup">
+            <div class="followup-title">Setup details</div>
+            <div class="field-row" style="margin-bottom:0;">
+              <div class="field-group">
+                <label class="field-label" for="setup-time">Setup start time</label>
+                <input type="time" id="setup-time">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="teardown-time">Teardown end time</label>
+                <input type="time" id="teardown-time">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tents -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-tent-card">
+            <input type="checkbox" id="svc-tent" value="Tents" onchange="toggleService('tent')">
+            <div>
+              <div class="item-label">Tents</div>
+              <div class="item-sub">Permit &amp; Fire Safety approval required</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-tent">
+            <div class="followup-title">Tent details</div>
+
+            <p class="sub-label" style="margin-bottom:4px;">Tent permit obtained?</p>
+            <div class="note-box" style="margin-bottom:8px; font-size:12px;">Download the <a href="https://fire.safety.virginia.edu/sites/fire_safety/files/2025-06/UVA%20Tent%20Instructions%202025.pdf" target="_blank" style="color:#232D4B; font-weight:500;">UVA Tent Permit Instructions &amp; Application (PDF)</a> for instructions and the application form.</div>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','yes')" data-group="tent-permit" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','no')" data-group="tent-permit" data-val="no">No</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','inprogress')" data-group="tent-permit" data-val="inprogress">In progress</span>
+            </div>
+            <input type="hidden" id="tent-permit" value="">
+
+            <p class="sub-label" style="margin-bottom:6px;">Fire &amp; Safety approval obtained?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','yes')" data-group="tent-safety" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','no')" data-group="tent-safety" data-val="no">No</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','inprogress')" data-group="tent-safety" data-val="inprogress">In progress</span>
+            </div>
+            <input type="hidden" id="tent-safety" value="">
+
+            <div id="tent-safety-warning" class="note-box warning" style="display:none; margin-bottom:12px;">
+              Fire &amp; Safety approval is required before FM can confirm tent support. Please contact UVA Fire Prevention at (434) 924-3311.
+            </div>
+
+            <hr class="divider" style="margin: 10px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group" style="margin-bottom:0;">
+              <label class="radio-btn" onclick="selectVendorFlow('tent','yes')"><input type="radio" name="tent-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('tent','no')"><input type="radio" name="tent-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="tent-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="tent-vendor-name">Vendor name</label>
+                  <input type="text" id="tent-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="tent-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="tent-vendor-supply" placeholder="e.g. 40x60 tent, sidewalls">
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-power','yes')" data-group="tent-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-power','no')" data-group="tent-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="tent-power" value="">
+            <div id="tent-power-notes-section" class="conditional">
+              <div class="field-group">
+                <label class="field-label" for="tent-power-notes">Describe power / water needs</label>
+                <textarea id="tent-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Food Trucks -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-food-card">
+            <input type="checkbox" id="svc-food" value="Food trucks &amp; catering" onchange="toggleService('food')">
+            <div>
+              <div class="item-label">Food trucks &amp; catering</div>
+              <div class="item-sub">License, kitchen &amp; alcohol verification</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-food">
+            <div class="followup-title">Food trucks &amp; catering details</div>
+
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="food-truck-count">How many food trucks / caterers?</label>
+                <input type="number" id="food-truck-count" placeholder="e.g. 3" min="1">
+              </div>
+            </div>
+
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="food-vendor-name">Caterer / food truck vendor name</label>
+                <input type="text" id="food-vendor-name" placeholder="e.g. Bodo's Catering, Moe's Southwest">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="food-vendor-contact">Vendor contact info</label>
+                <input type="text" id="food-vendor-contact" placeholder="Phone or email">
+              </div>
+            </div>
+            <div class="field-group" style="margin-bottom:12px;">
+              <label class="field-label" for="food-vendor-details">Vendor details / what they're providing</label>
+              <textarea id="food-vendor-details" placeholder="e.g. 2 food trucks serving BBQ and tacos, 1 coffee cart, need water hookup for dishwashing…" style="min-height:50px;"></textarea>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Do the trucks have an on-board kitchen?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','yes')" data-group="food-kitchen" data-val="yes">Yes — all</span>
+              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','some')" data-group="food-kitchen" data-val="some">Some do</span>
+              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','no')" data-group="food-kitchen" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="food-kitchen" value="">
+
+
+
+            <div id="food-license-section" class="conditional">
+              <div class="note-box warning" style="margin-bottom:10px; line-height:1.6;">
+                <strong>Trucks with a kitchen require Fire &amp; Safety approval and an operating license</strong> before they can operate on Grounds. Trucks <em>without</em> a kitchen do not require a permit.<br>
+                <span style="font-size:12px;">View the <a href="https://fire.safety.virginia.edu/food-trucks" target="_blank" style="color:#7A3D00; font-weight:600;">UVA approved food truck list</a>. If trucks use open flame, an <a href="https://fire.safety.virginia.edu/request-permission-open-burnopen-flame" target="_blank" style="color:#7A3D00; font-weight:600;">open burn/open flame permit</a> is also required.</span>
+              </div>
+              <p class="sub-label" style="margin-bottom:6px;">Fire &amp; Safety operating license obtained for trucks with a kitchen?</p>
+              <div class="status-group" style="margin-bottom:0;">
+                <span class="status-pill" onclick="selectStatus(this,'food-license','yes')" data-group="food-license" data-val="yes">Yes</span>
+                <span class="status-pill" onclick="selectStatus(this,'food-license','no')" data-group="food-license" data-val="no">No</span>
+                <span class="status-pill" onclick="selectStatus(this,'food-license','inprogress')" data-group="food-license" data-val="inprogress">In progress</span>
+              </div>
+              <input type="hidden" id="food-license" value="">
+              <div id="food-license-warning" class="note-box warning" style="display:none; margin-top:10px;">
+                A Fire &amp; Safety operating license is required before FM can confirm support for trucks with a kitchen. Contact UVA Fire Prevention at (434) 924-3311.
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:4px;">Power &amp; water needs for food trucks</p>
+            <div class="note-box info" style="margin-bottom:8px; font-size:12px;">
+              If any trucks need power or water connections, make sure <strong>Power &amp; water connections</strong> is selected above. Describe the specific needs for each truck in that section.
+            </div>
+            <div class="field-group" style="margin-bottom:12px;">
+              <label class="field-label" for="food-power-notes">Power / water notes for food trucks</label>
+              <textarea id="food-power-notes" placeholder="e.g. Truck 1 needs 30-amp 240V, Truck 2 needs water hookup…" style="min-height:55px;"></textarea>
+            </div>
+
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'food-power','yes')" data-group="food-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'food-power','no')" data-group="food-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="food-power" value="">
+            <div id="food-power-notes-section" class="conditional">
+              <div class="field-group">
+                <label class="field-label" for="food-power-notes">Describe power / water needs</label>
+                <textarea id="food-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will alcohol be provided or sold at the event?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'alcohol','yes')" data-group="alcohol" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'alcohol','no')" data-group="alcohol" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="alcohol" value="">
+
+            <div id="alcohol-section" class="conditional">
+              <p class="sub-label" style="margin-bottom:6px;">Has University Police (UPD) approved the gathering?</p>
+              <div class="status-group" style="margin-bottom:12px;">
+                <span class="status-pill" onclick="selectStatus(this,'upd-approval','yes')" data-group="upd-approval" data-val="yes">Yes</span>
+                <span class="status-pill" onclick="selectStatus(this,'upd-approval','no')" data-group="upd-approval" data-val="no">No</span>
+                <span class="status-pill" onclick="selectStatus(this,'upd-approval','inprogress')" data-group="upd-approval" data-val="inprogress">In progress</span>
+              </div>
+              <input type="hidden" id="upd-approval" value="">
+              <div id="upd-warning" class="note-box warning" style="display:none; margin-bottom:12px;">
+                UPD approval is required for events serving or selling alcohol. Please contact UVA University Police to obtain approval before submitting.
+              </div>
+              <p class="sub-label" style="margin-bottom:6px;">Who is staffing security for the event?</p>
+              <div class="status-group" style="margin-bottom:0;">
+                <span class="status-pill" onclick="selectStatus(this,'security-staff','upd')" data-group="security-staff" data-val="upd">UPD</span>
+                <span class="status-pill" onclick="selectStatus(this,'security-staff','rmc')" data-group="security-staff" data-val="rmc">RMC</span>
+                <span class="status-pill" onclick="selectStatus(this,'security-staff','both')" data-group="security-staff" data-val="both">Both UPD &amp; RMC</span>
+                <span class="status-pill" onclick="selectStatus(this,'security-staff','none')" data-group="security-staff" data-val="none">Not yet determined</span>
+              </div>
+              <input type="hidden" id="security-staff" value="">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stages / Platforms -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-stage-card">
+            <input type="checkbox" id="svc-stage" value="Stages & platforms" onchange="toggleService('stage')">
+            <div>
+              <div class="item-label">Stages &amp; platforms</div>
+              <div class="item-sub">Vendor sourcing &amp; power coordination</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-stage">
+            <div class="followup-title">Stage details</div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Power needed at the stage?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'stage-power','yes')" data-group="stage-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'stage-power','no')" data-group="stage-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="stage-power" value="">
+            <div id="stage-power-note" class="note-box info" style="display:none; margin-bottom:12px;">
+              Please also select <strong>Power &amp; water connections</strong> above and describe the stage power requirements in the notes field.
+            </div>
+
+            <hr class="divider" style="margin:10px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group">
+              <label class="radio-btn" onclick="selectVendorFlow('stage','yes')"><input type="radio" name="stage-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('stage','no')"><input type="radio" name="stage-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="stage-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="stage-vendor-name">Vendor name</label>
+                  <input type="text" id="stage-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="stage-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="stage-vendor-supply" placeholder="e.g. 24x24 stage, stairs, skirting">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Chairs & Tables -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-chairs-card">
+            <input type="checkbox" id="svc-chairs" value="Chairs & tables" onchange="toggleService('chairs')">
+            <div>
+              <div class="item-label">Chairs &amp; tables</div>
+              <div class="item-sub">Rental sourcing &amp; delivery</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-chairs">
+            <div class="followup-title">Chairs &amp; tables details</div>
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="chairs-qty">Estimated chairs needed</label>
+                <input type="number" id="chairs-qty" placeholder="e.g. 100" min="0">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="tables-qty">Estimated tables needed</label>
+                <input type="number" id="tables-qty" placeholder="e.g. 20" min="0">
+              </div>
+            </div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group">
+              <label class="radio-btn" onclick="selectVendorFlow('chairs','yes')"><input type="radio" name="chairs-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('chairs','no')"><input type="radio" name="chairs-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="chairs-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="chairs-vendor-name">Vendor name</label>
+                  <input type="text" id="chairs-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="chairs-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="chairs-vendor-supply" placeholder="e.g. 100 folding chairs, 20 6ft tables">
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'chairs-power','yes')" data-group="chairs-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'chairs-power','no')" data-group="chairs-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="chairs-power" value="">
+            <div id="chairs-power-notes-section" class="conditional">
+              <div class="field-group">
+                <label class="field-label" for="chairs-power-notes">Describe power / water needs</label>
+                <textarea id="chairs-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PA System / Amplified Sound -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-pa-card">
+            <input type="checkbox" id="svc-pa" value="PA system / amplified sound" onchange="toggleService('pa')">
+            <div>
+              <div class="item-label">PA system / amplified sound</div>
+              <div class="item-sub">Speakers, live music, DJ</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-pa">
+            <div class="followup-title">PA system &amp; sound details</div>
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="pa-type">Type of sound</label>
+                <select id="pa-type">
+                  <option value="">Select…</option>
+                  <option value="speakers">PA / speakers only</option>
+                  <option value="live-music">Live music</option>
+                  <option value="dj">DJ</option>
+                  <option value="speakers-and-live">PA / speakers + live music</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="pa-vendor">Sound vendor / provider</label>
+                <input type="text" id="pa-vendor" placeholder="e.g. Spectrum Integrators, The South Live">
+              </div>
+            </div>
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'pa-power','yes')" data-group="pa-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'pa-power','no')" data-group="pa-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="pa-power" value="">
+            <div class="field-group">
+              <label class="field-label" for="pa-notes">Sound &amp; power details</label>
+              <textarea id="pa-notes" placeholder="e.g. Need 2 power drops for DJ booth and monitor speakers, sound check at 2pm…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waste & Recycling -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-waste-card">
+            <input type="checkbox" id="svc-waste" value="Waste & recycling" onchange="toggleService('waste')">
+            <div>
+              <div class="item-label">Waste &amp; recycling</div>
+              <div class="item-sub">Bins &amp; servicing</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-waste">
+            <div class="followup-title">Waste &amp; recycling details</div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Would you like to request zero waste status for this event?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'zero-waste','yes')" data-group="zero-waste" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'zero-waste','no')" data-group="zero-waste" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="zero-waste" value="">
+
+            <div id="zero-waste-section" class="conditional">
+              <div class="note-box warning" style="margin-bottom:10px; line-height:1.6;">
+                Zero waste events must be requested <strong>at least 10 business days</strong> before the event date. Submit your application through the <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=x4A0ewc3c0iLd-IWczplrDIGqOCnXy9HnyGTU7Oc9slURUkxN0E4QVlTWlNVNkFPNDA2Qkg4UkFPUS4u" target="_blank" style="color:#7A3D00; font-weight:600;">UVA Sustainability Zero Waste Event Form</a>.
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="waste-notes">Notes on placement or quantity</label>
+              <textarea id="waste-notes" placeholder="e.g. Recycling bins at each tent, extra trash cans near food area…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portable Bathrooms & Custodial — major events only -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-portabath-card">
+            <input type="checkbox" id="svc-portabath" value="Portable bathrooms & custodial staff" onchange="toggleService('portabath')">
+            <div>
+              <div class="item-label">Portable bathrooms &amp; custodial staff</div>
+              <div class="item-sub">Major events only — porta-johns, on-site staff, restroom monitoring</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-portabath">
+            <div class="followup-title">Portable bathrooms &amp; custodial details</div>
+            <div class="field-group" style="margin-bottom:12px;">
+              <label class="field-label" for="portabath-notes">Portable bathroom needs</label>
+              <textarea id="portabath-notes" placeholder="e.g. 6 units near Homer Flat entrance, ADA accessible required…" style="min-height:55px;"></textarea>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="custodial-notes">Custodial staff needs</label>
+              <textarea id="custodial-notes" placeholder="e.g. Restroom monitoring, post-event cleanup…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Steel Barriers & Signs — major events only -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-barrier-card">
+            <input type="checkbox" id="svc-barrier" value="Steel railing barriers & signage" onchange="toggleService('barrier')">
+            <div>
+              <div class="item-label">Steel railing barriers &amp; signs</div>
+              <div class="item-sub" id="barrier-sub">Crowd control barriers &amp; event signage — major events</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-barrier">
+            <div class="followup-title">Barriers &amp; signage details</div>
+            <div id="barrier-major-warn" class="note-box warning" style="margin-bottom:10px; display:none;">
+              Steel railing barriers are coordinated for large, major UVA events. Please confirm your event qualifies above.
+            </div>
+            <p class="sub-label" style="margin-bottom:6px;">Select all that apply:</p>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="barrier-services" value="Steel railing barriers" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Steel railing barriers</div><div class="item-sub">Bike rack style crowd control barriers</div></div>
+              </label>
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="barrier-services" value="Signage" onchange="this.closest('.service-item').classList.toggle('checked',this.checked); toggleSignage(this.checked)">
+                <div><div class="item-label">Signage</div><div class="item-sub">Event signs &amp; wayfinding</div></div>
+              </label>
+            </div>
+            <div id="signage-section" class="conditional">
+              <div class="note-box info" style="margin-bottom:10px; font-size:13px;">
+                Submit a signage request through the <a href="https://customerportal.fm.virginia.edu/customerrequest/request/signage" target="_blank" style="color:#232D4B; font-weight:500;">FM Customer Portal — Signage Request</a>. Note any signage needs below so FM can coordinate.
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="barrier-notes">Describe barrier &amp; signage needs</label>
+              <textarea id="barrier-notes" placeholder="e.g. Perimeter around stage, wayfinding signs from parking lot to Homer Flat…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end service-grid -->
+
+      <hr class="divider">
+
+      <!-- Timeline section injected by JS -->
+      <div class="timeline-section" id="timeline-section">
+        <div class="section-title" style="border-bottom:2px solid #E57200; padding-bottom:6px; margin-bottom:12px;">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#232D4B;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Pre-event checklist
+        </div>
+        <p class="sub-label" style="margin-bottom:8px;">Based on your selected services, complete these steps before your event:</p>
+        <div id="timeline-items"></div>
+      </div>
+
+      <hr class="divider">
+      <div style="margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+        <span class="sub-label" style="display:inline;">Event layout map</span>
       <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;height:500px;color:#888780;font-size:14px;border:1px solid #e4e2dc;border-radius:10px;margin-top:8px;">Select a location above to load the site map.</div>
-      <div id="map-container" style="display:none;"></div>
+      <div id="map-container" style="display:none;height:500px;width:100%;border-radius:10px;border:1px solid #e4e2dc;margin-top:8px;"></div>
 
       <div id="map-tools" style="display:none;">
         <div class="pin-toolbar" id="pin-toolbar"></div>
         <div id="pin-hint" style="font-size:12px;color:#E57200;font-weight:500;min-height:18px;margin-bottom:4px;"></div>
-        <div class="custom-pin-row"><input type="text" id="custom-pin-input" placeholder="Custom resource label (e.g. DJ Booth)"><button onclick="addCustomPin()">+ Add</button></div>
-        <div class="map-actions"><button class="btn-undo" onclick="undoPin()">↩ Undo</button><button id="btn-finish" onclick="finishPolygon()" style="display:none;background:#E57200;color:#fff;border:none;font-weight:600;">Finish shape</button><button class="btn-clear" onclick="clearPins()">Clear all</button><span style="flex:1;"></span><span id="pin-counter" style="font-size:12px;color:#888780;"></span></div>
-        <div class="pin-list" id="pin-list"></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <input type="text" id="custom-pin-input" placeholder="Custom resource label (e.g. DJ Booth)" style="flex:1;font-size:13px;padding:5px 9px;border:1px solid #d0cec7;border-radius:8px;">
+          <button onclick="addCustomPin()" style="padding:5px 12px;background:#232D4B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">+ Add</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+          <button onclick="undoPin()" style="font-size:12px;font-family:inherit;cursor:pointer;border-radius:8px;padding:5px 14px;background:none;border:1px solid #d0cec7;color:#5a5957;">↩ Undo</button>
+          <button id="btn-finish" onclick="finishPolygon()" style="display:none;background:#E57200;color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Finish shape</button>
+          <button onclick="clearPins()" style="font-size:12px;font-family:inherit;cursor:pointer;background:none;border:none;color:#c0392b;text-decoration:underline;padding:5px 8px;">Clear all</button>
+          <span style="flex:1;"></span>
+          <span id="pin-counter" style="font-size:12px;color:#888780;"></span>
+        </div>
+        <div id="pin-list" style="margin-top:10px;"></div>
       </div>
 
-<hr class="divider">
+      <hr class="divider">
       <p class="sub-label">Additional notes for FM staff</p>
       <textarea id="fm-notes" placeholder="Any other details, special timing, or access requirements…" style="min-height:60px;"></textarea>
     </div>
@@ -2059,7 +2590,7 @@
           mapShot = canvas.toDataURL('image/png');
           // Open image in new tab so FM can save/copy it
           const w = window.open('');
-          w.document.write('<html><head><title>Layout with FM edits</title></he' + 'ad><body style="margin:0;background:#f3f1ec;padding:20px;font-family:sans-serif;">');
+          w.document.write('<html><head><title>Layout with FM edits</title></head><body style="margin:0;background:#f3f1ec;padding:20px;font-family:sans-serif;">');
           w.document.write('<h2 style="color:#232D4B;">Event Layout with FM Edits</h2>');
           w.document.write('<p style="color:#5a5957;">Location: '+loc+'</p>');
           w.document.write('<p style="color:#5a5957;">Right-click the image below to save, then attach to your email reply.</p>');
