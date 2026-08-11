@@ -1899,13 +1899,69 @@
     }
 
     // ── Submit ──
+    // ── Event duration toggle ──
+    var eventDurationMode = 'single';
+    function setEventDuration(mode) {
+      eventDurationMode = mode;
+      document.getElementById('single-day-fields').style.display = mode === 'single' ? '' : 'none';
+      document.getElementById('multi-day-fields').style.display = mode === 'multi' ? '' : 'none';
+      // Update radio button visual state
+      document.querySelectorAll('input[name="event-duration"]').forEach((r, i) => {
+        r.checked = (i === 0 && mode === 'single') || (i === 1 && mode === 'multi');
+      });
+    }
+
+    // ── Extra contacts ──
+    function addExtraContact() {
+      const container = document.getElementById('extra-contacts-container');
+      const row = document.createElement('div');
+      row.className = 'extra-contact-row';
+      row.style.cssText = 'display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:center;';
+      row.innerHTML = '<input type="text" placeholder="Name" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="text" placeholder="Role (e.g. day-of coordinator)" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="email" placeholder="Email" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="tel" placeholder="Phone" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<button type="button" onclick="this.parentElement.remove()" style="background:#fdecea;color:#c0392b;border:none;border-radius:8px;padding:7px 12px;font-size:16px;cursor:pointer;line-height:1;">×</button>';
+      container.appendChild(row);
+    }
+
+    // ── Multi-day details ──
+    function addDayDetail() {
+      const container = document.getElementById('day-details-container');
+      const count = container.querySelectorAll('.day-detail-row').length + 1;
+      const row = document.createElement('div');
+      row.className = 'day-detail-row';
+      row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:flex-start;';
+      row.innerHTML = '<div style="flex:1;"><input type="text" placeholder="Day ' + count + ' — date or label" style="width:100%;font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;margin-bottom:6px;">' +
+        '<textarea placeholder="Services, times, or notes for this day" style="width:100%;font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;min-height:48px;font-family:inherit;"></textarea></div>' +
+        '<button type="button" onclick="this.parentElement.remove()" style="background:#fdecea;color:#c0392b;border:none;border-radius:8px;padding:7px 12px;font-size:16px;cursor:pointer;line-height:1;">×</button>';
+      container.appendChild(row);
+    }
+
+    // ── Print summary ──
+    function printSummary() {
+      const body = document.getElementById('summary-body');
+      if (!body) return;
+      const w = window.open('', '', 'width=800,height=900');
+      w.document.write('<html><head><title>CGZ Graduation Event Request</title>');
+      w.document.write('<style>body{font-family:-apple-system,Segoe UI,Arial,sans-serif;font-size:13px;color:#1a1a18;padding:30px;max-width:700px;} h1{color:#232D4B;font-size:18px;} .summary-row{padding:5px 0;border-bottom:0.5px solid #ddd;display:flex;gap:10px;} .k{color:#888;width:160px;flex-shrink:0;} .v{font-weight:500;} .summary-section-title{color:#232D4B;font-weight:600;margin:14px 0 6px;border-bottom:2px solid #E57200;display:inline-block;} .summary-badge{font-size:11px;padding:1px 7px;border-radius:99px;background:#eee;}</style>');
+      w.document.write('</he' + 'ad><body>');
+      w.document.write('<h1>CGZ Graduation Event Support Request</h1>');
+      w.document.write(body.innerHTML);
+      w.document.write('</bo' + 'dy></html>');
+      w.document.close();
+      w.print();
+    }
+
+
+
     function getMapPinData() {
       if (typeof pins === 'undefined' || !pins.length) return 'None';
       return pins.map(p => p.label + (p.note ? ' (' + p.note + ')' : '')).join(', ');
     }
 
     function getExtraContactsData() {
-      const rows = document.querySelectorAll('#extra-contacts-list .extra-contact-row');
+      const rows = document.querySelectorAll('#extra-contacts-container .extra-contact-row');
       if (!rows.length) return [];
       return Array.from(rows).map(r => {
         const inputs = r.querySelectorAll('input');
@@ -2611,14 +2667,7 @@
   </div>
 
   <!-- ── FLOAT POPUP ── -->
-  <div id="map-float-popup">
-    <div id="map-float-popup-title" style="font-size:12px;font-weight:600;color:#232D4B;margin-bottom:4px;"></div>
-    <input type="text" id="map-float-note" placeholder="Add a note (optional)">
-    <div class="popup-actions">
-      <button class="popup-btn save" onclick="saveFloatPopup()">Save</button>
-      <button class="popup-btn delete" onclick="deleteFloatPopup()">Remove</button>
-    </div>
-  </div>
+  
 
   <!-- ── SUMMARY MODAL ── -->
   <div class="modal-overlay" id="summary-modal">
