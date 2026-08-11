@@ -1125,123 +1125,6 @@
         </div>
 
         <!-- Food Trucks -->
-        <div class="svc-wrap">
-          <label class="service-item" id="svc-food-card">
-            <input type="checkbox" id="svc-food" value="Food trucks &amp; catering" onchange="toggleService('food')">
-            <div>
-              <div class="item-label">Food trucks &amp; catering</div>
-              <div class="item-sub">License, kitchen &amp; alcohol verification</div>
-            </div>
-          </label>
-          <div class="followup-panel" id="panel-food">
-            <div class="followup-title">Food trucks &amp; catering details</div>
-
-            <div class="field-row" style="margin-bottom:12px;">
-              <div class="field-group">
-                <label class="field-label" for="food-truck-count">How many food trucks / caterers?</label>
-                <input type="number" id="food-truck-count" placeholder="e.g. 3" min="1">
-              </div>
-            </div>
-
-            <div class="field-row" style="margin-bottom:12px;">
-              <div class="field-group">
-                <label class="field-label" for="food-vendor-name">Caterer / food truck vendor name</label>
-                <input type="text" id="food-vendor-name" placeholder="e.g. Bodo's Catering, Moe's Southwest">
-              </div>
-              <div class="field-group">
-                <label class="field-label" for="food-vendor-contact">Vendor contact info</label>
-                <input type="text" id="food-vendor-contact" placeholder="Phone or email">
-              </div>
-            </div>
-            <div class="field-group" style="margin-bottom:12px;">
-              <label class="field-label" for="food-vendor-details">Vendor details / what they're providing</label>
-              <textarea id="food-vendor-details" placeholder="e.g. 2 food trucks serving BBQ and tacos, 1 coffee cart, need water hookup for dishwashing…" style="min-height:50px;"></textarea>
-            </div>
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Do the trucks have an on-board kitchen?</p>
-            <div class="status-group" style="margin-bottom:12px;">
-              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','yes')" data-group="food-kitchen" data-val="yes">Yes — all</span>
-              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','some')" data-group="food-kitchen" data-val="some">Some do</span>
-              <span class="status-pill" onclick="selectStatus(this,'food-kitchen','no')" data-group="food-kitchen" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="food-kitchen" value="">
-
-
-
-            <div id="food-license-section" class="conditional">
-              <div class="note-box warning" style="margin-bottom:10px; line-height:1.6;">
-                <strong>Trucks with a kitchen require Fire &amp; Safety approval and an operating license</strong> before they can operate on Grounds. Trucks <em>without</em> a kitchen do not require a permit.<br>
-                <span style="font-size:12px;">View the <a href="https://fire.safety.virginia.edu/food-trucks" target="_blank" style="color:#7A3D00; font-weight:600;">UVA approved food truck list</a>. If trucks use open flame, an <a href="https://fire.safety.virginia.edu/request-permission-open-burnopen-flame" target="_blank" style="color:#7A3D00; font-weight:600;">open burn/open flame permit</a> is also required.</span>
-              </div>
-              <p class="sub-label" style="margin-bottom:6px;">Fire &amp; Safety operating license obtained for trucks with a kitchen?</p>
-              <div class="status-group" style="margin-bottom:0;">
-                <span class="status-pill" onclick="selectStatus(this,'food-license','yes')" data-group="food-license" data-val="yes">Yes</span>
-                <span class="status-pill" onclick="selectStatus(this,'food-license','no')" data-group="food-license" data-val="no">No</span>
-                <span class="status-pill" onclick="selectStatus(this,'food-license','inprogress')" data-group="food-license" data-val="inprogress">In progress</span>
-              </div>
-              <input type="hidden" id="food-license" value="">
-              <div id="food-license-warning" class="note-box warning" style="display:none; margin-top:10px;">
-                A Fire &amp; Safety operating license is required before FM can confirm support for trucks with a kitchen. Contact UVA Fire Prevention at (434) 924-3311.
-              </div>
-            </div>
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:4px;">Power &amp; water needs for food trucks</p>
-            <div class="note-box info" style="margin-bottom:8px; font-size:12px;">
-              If any trucks need power or water connections, make sure <strong>Power &amp; water connections</strong> is selected above. Describe the specific needs for each truck in that section.
-            </div>
-            <div class="field-group" style="margin-bottom:12px;">
-              <label class="field-label" for="food-power-notes">Power / water notes for food trucks</label>
-              <textarea id="food-power-notes" placeholder="e.g. Truck 1 needs 30-amp 240V, Truck 2 needs water hookup…" style="min-height:55px;"></textarea>
-            </div>
-
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
-            <div class="status-group" style="margin-bottom:10px;">
-              <span class="status-pill" onclick="selectStatus(this,'food-power','yes')" data-group="food-power" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'food-power','no')" data-group="food-power" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="food-power" value="">
-            <div id="food-power-notes-section" class="conditional">
-              <div class="field-group">
-                <label class="field-label" for="food-power-notes-2">Describe power / water needs</label>
-                <textarea id="food-power-notes-2" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
-              </div>
-            </div>
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Will alcohol be provided or sold at the event?</p>
-            <div class="status-group" style="margin-bottom:12px;">
-              <span class="status-pill" onclick="selectStatus(this,'alcohol','yes')" data-group="alcohol" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'alcohol','no')" data-group="alcohol" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="alcohol" value="">
-
-            <div id="alcohol-section" class="conditional">
-              <p class="sub-label" style="margin-bottom:6px;">Has University Police (UPD) approved the gathering?</p>
-              <div class="status-group" style="margin-bottom:12px;">
-                <span class="status-pill" onclick="selectStatus(this,'upd-approval','yes')" data-group="upd-approval" data-val="yes">Yes</span>
-                <span class="status-pill" onclick="selectStatus(this,'upd-approval','no')" data-group="upd-approval" data-val="no">No</span>
-                <span class="status-pill" onclick="selectStatus(this,'upd-approval','inprogress')" data-group="upd-approval" data-val="inprogress">In progress</span>
-              </div>
-              <input type="hidden" id="upd-approval" value="">
-              <div id="upd-warning" class="note-box warning" style="display:none; margin-bottom:12px;">
-                UPD approval is required for events serving or selling alcohol. Please contact UVA University Police to obtain approval before submitting.
-              </div>
-              <p class="sub-label" style="margin-bottom:6px;">Who is staffing security for the event?</p>
-              <div class="status-group" style="margin-bottom:0;">
-                <span class="status-pill" onclick="selectStatus(this,'security-staff','upd')" data-group="security-staff" data-val="upd">UPD</span>
-                <span class="status-pill" onclick="selectStatus(this,'security-staff','rmc')" data-group="security-staff" data-val="rmc">RMC</span>
-                <span class="status-pill" onclick="selectStatus(this,'security-staff','both')" data-group="security-staff" data-val="both">Both UPD &amp; RMC</span>
-                <span class="status-pill" onclick="selectStatus(this,'security-staff','none')" data-group="security-staff" data-val="none">Not yet determined</span>
-              </div>
-              <input type="hidden" id="security-staff" value="">
-            </div>
-          </div>
-        </div>
-
         <!-- Stages / Platforms -->
         <div class="svc-wrap">
           <label class="service-item" id="svc-stage-card">
@@ -1416,60 +1299,39 @@
         </div>
 
         <!-- Portable Bathrooms & Custodial — major events only -->
-        <div class="svc-wrap">
-          <label class="service-item" id="svc-portabath-card">
-            <input type="checkbox" id="svc-portabath" value="Portable bathrooms & custodial staff" onchange="toggleService('portabath')">
-            <div>
-              <div class="item-label">Portable bathrooms &amp; custodial staff</div>
-              <div class="item-sub">Major events only — porta-johns, on-site staff, restroom monitoring</div>
-            </div>
-          </label>
-          <div class="followup-panel" id="panel-portabath">
-            <div class="followup-title">Portable bathrooms &amp; custodial details</div>
-            <div class="field-group" style="margin-bottom:12px;">
-              <label class="field-label" for="portabath-notes">Portable bathroom needs</label>
-              <textarea id="portabath-notes" placeholder="e.g. 6 units near Homer Flat entrance, ADA accessible required…" style="min-height:55px;"></textarea>
-            </div>
-            <div class="field-group">
-              <label class="field-label" for="custodial-notes">Custodial staff needs</label>
-              <textarea id="custodial-notes" placeholder="e.g. Restroom monitoring, post-event cleanup…" style="min-height:55px;"></textarea>
-            </div>
-          </div>
-        </div>
-
         <!-- Steel Barriers & Signs — major events only -->
         <div class="svc-wrap">
-          <label class="service-item" id="svc-barrier-card">
-            <input type="checkbox" id="svc-barrier" value="Steel railing barriers & signage" onchange="toggleService('barrier')">
+          <label class="service-item" id="svc-signs-card">
+            <input type="checkbox" id="svc-signs" value="Signs & fixtures" onchange="toggleService('signs')">
             <div>
-              <div class="item-label">Steel railing barriers &amp; signs</div>
-              <div class="item-sub" id="barrier-sub">Crowd control barriers &amp; event signage — major events</div>
+              <div class="item-label">Signs &amp; fixtures</div>
+              <div class="item-sub">Wooden crosses, Hubba shop signs, lectern &amp; podium</div>
             </div>
           </label>
-          <div class="followup-panel" id="panel-barrier">
-            <div class="followup-title">Barriers &amp; signage details</div>
-            <div id="barrier-major-warn" class="note-box warning" style="margin-bottom:10px; display:none;">
-              Steel railing barriers are coordinated for large, major UVA events. Please confirm your event qualifies above.
-            </div>
+          <div class="followup-panel" id="panel-signs">
+            <div class="followup-title">Signs &amp; fixtures needed</div>
             <p class="sub-label" style="margin-bottom:6px;">Select all that apply:</p>
             <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
               <label class="service-item" style="border-radius:6px;">
-                <input type="checkbox" name="barrier-services" value="Steel railing barriers" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
-                <div><div class="item-label">Steel railing barriers</div><div class="item-sub">Bike rack style crowd control barriers</div></div>
+                <input type="checkbox" name="signs-services" value="Wooden crosses" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Wooden crosses</div><div class="item-sub">Ceremonial wooden cross signage</div></div>
               </label>
               <label class="service-item" style="border-radius:6px;">
-                <input type="checkbox" name="barrier-services" value="Signage" onchange="this.closest('.service-item').classList.toggle('checked',this.checked); toggleSignage(this.checked)">
-                <div><div class="item-label">Signage</div><div class="item-sub">Event signs &amp; wayfinding</div></div>
+                <input type="checkbox" name="signs-services" value="Hubba shop signs" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Hubba shop signs</div><div class="item-sub">Signs produced by the Hubba shop</div></div>
+              </label>
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Lectern" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Lectern</div><div class="item-sub">Speaking lectern</div></div>
+              </label>
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Podium" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Podium</div><div class="item-sub">Raised platform / podium</div></div>
               </label>
             </div>
-            <div id="signage-section" class="conditional">
-              <div class="note-box info" style="margin-bottom:10px; font-size:13px;">
-                Submit a signage request through the <a href="https://customerportal.fm.virginia.edu/customerrequest/request/signage" target="_blank" style="color:#232D4B; font-weight:500;">FM Customer Portal — Signage Request</a>. Note any signage needs below so FM can coordinate.
-              </div>
-            </div>
             <div class="field-group">
-              <label class="field-label" for="barrier-notes">Describe barrier &amp; signage needs</label>
-              <textarea id="barrier-notes" placeholder="e.g. Perimeter around stage, wayfinding signs from parking lot to Homer Flat…" style="min-height:55px;"></textarea>
+              <label class="field-label" for="signs-notes">Describe signs &amp; fixtures needs</label>
+              <textarea id="signs-notes" placeholder="e.g. 2 wooden crosses flanking the stage, lectern with mic at center, wayfinding signs from parking…" style="min-height:55px;"></textarea>
             </div>
           </div>
         </div>
@@ -1661,7 +1523,7 @@
         const n = document.getElementById('stage-power-note'); if (n) n.style.display = (val === 'yes') ? 'block' : 'none';
       }
       // Per-service power/water toggle
-      ['tent','food','chairs','pa'].forEach(svc => {
+      ['tent','chairs'].forEach(svc => {
         if (group === svc + '-power') {
           const sec = document.getElementById(svc + '-power-notes-section');
           if (sec) sec.classList.toggle('show', val === 'yes');
@@ -1720,7 +1582,7 @@
     // ── Collect checked services ──
     function getServices() {
       const services = [];
-      ['power','setup','tent','food','stage','chairs','waste','portabath','barrier'].forEach(key => {
+      ['power','setup','tent','stage','chairs','waste','pa','signs'].forEach(key => {
         const cb = document.getElementById('svc-' + key);
         if (cb && cb.checked) services.push(cb.value);
       });
@@ -1791,9 +1653,9 @@
 
       const services = [];
       [{id:'svc-power',label:'Power & water'},{id:'svc-setup',label:'Setup & takedown'},
-       {id:'svc-tent',label:'Tents'},{id:'svc-food',label:'Food trucks & catering'},
+       {id:'svc-tent',label:'Tents'},
        {id:'svc-stage',label:'Stages & platforms'},{id:'svc-chairs',label:'Chairs & tables'},
-       {id:'svc-waste',label:'Waste, recycling & custodial'},{id:'svc-barrier',label:'Barriers & signs'}
+       {id:'svc-waste',label:'Waste, recycling & custodial'},{id:'svc-signs',label:'Signs & fixtures'}
       ].forEach(s => { const el = document.getElementById(s.id); if (el && el.checked) services.push(s.label); });
 
       const statusBadge = (val, labels) => {
@@ -1852,19 +1714,6 @@
       }
 
       // Food trucks
-      const foodCb = document.getElementById('svc-food');
-      if (foodCb && foodCb.checked) {
-        html += `<div class="summary-section">
-          <div class="summary-section-title">Food trucks & catering</div>
-          <div class="summary-row"><span class="summary-key">Truck count</span><span class="summary-val">${val('food-truck-count') || '—'}</span></div>
-          <div class="summary-row"><span class="summary-key">On-board kitchen</span><span class="summary-val">${statusBadge(val('food-kitchen'),{yes:'Yes',no:'No',some:'Some do'})}</span></div>
-          <div class="summary-row"><span class="summary-key">Fire & Safety license</span><span class="summary-val">${statusBadge(val('food-license'),{yes:'Obtained',no:'Not obtained',inprogress:'In progress'})}</span></div>
-          <div class="summary-row"><span class="summary-key">Alcohol served/sold</span><span class="summary-val">${statusBadge(val('alcohol'),{yes:'Yes',no:'No'})}</span></div>
-          ${val('alcohol')==='yes' ? `<div class="summary-row"><span class="summary-key">UPD approval</span><span class="summary-val">${statusBadge(val('upd-approval'),{yes:'Approved',no:'Not approved',inprogress:'In progress'})}</span></div>
-          <div class="summary-row"><span class="summary-key">Security staffing</span><span class="summary-val">${val('security-staff') || '—'}</span></div>` : ''}
-        </div>`;
-      }
-
       // Map layout
       if (pins.length > 0) {
         const pinList = pins.map(p => p.label + (p.note ? ' — ' + p.note : '')).join(', ');
@@ -2063,10 +1912,6 @@
         tentVendorSupply: document.getElementById('tent-vendor-supply').value.trim(),
         tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
-        foodTruckCount:   document.getElementById('food-truck-count').value,
-        foodKitchen:      document.getElementById('food-kitchen').value,
-        foodLicense:      document.getElementById('food-license').value,
-        foodPowerNotes:   document.getElementById('food-power-notes') ? document.getElementById('food-power-notes').value.trim() : '',
         // Stage
         // PA system
         paType:           document.getElementById('pa-type') ? document.getElementById('pa-type').value : '',
@@ -2075,13 +1920,9 @@
         paNotes:          document.getElementById('pa-notes') ? document.getElementById('pa-notes').value.trim() : '',
         paPowerNotes:     document.getElementById('pa-power-notes') ? document.getElementById('pa-power-notes').value.trim() : '',
         // Food vendor
-        foodVendorName:   document.getElementById('food-vendor-name') ? document.getElementById('food-vendor-name').value.trim() : '',
-        foodVendorContact:document.getElementById('food-vendor-contact') ? document.getElementById('food-vendor-contact').value.trim() : '',
-        foodVendorDetails:document.getElementById('food-vendor-details') ? document.getElementById('food-vendor-details').value.trim() : '',
         // Per-service power
         tentPowerNeeded:  document.getElementById('tent-power') ? document.getElementById('tent-power').value : '',
         tentPowerNotes:   document.getElementById('tent-power-notes') ? document.getElementById('tent-power-notes').value.trim() : '',
-        foodPowerNeeded:  document.getElementById('food-power') ? document.getElementById('food-power').value : '',
         chairsPowerNeeded:document.getElementById('chairs-power') ? document.getElementById('chairs-power').value : '',
         chairsPowerNotes: document.getElementById('chairs-power-notes') ? document.getElementById('chairs-power-notes').value.trim() : '',
         stagePower:       document.getElementById('stage-power').value,
@@ -2096,17 +1937,15 @@
         chairsPrefVendors:getCheckedVals('chairs-pref-vendor'),
         // Waste & custodial
         wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
-        portabathNotes:   document.getElementById('portabath-notes') ? document.getElementById('portabath-notes').value.trim() : '',
         custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
         majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
+        signsServices:    Array.from(document.querySelectorAll('input[name="signs-services"]:checked')).map(c=>c.value).join(', '),
+        signsNotes:       document.getElementById('signs-notes') ? document.getElementById('signs-notes').value.trim() : '',
         wasteNotes:       document.getElementById('waste-notes').value.trim(),
         // Alcohol & security
-        alcoholServed:    document.getElementById('alcohol').value,
-        updApproval:      document.getElementById('upd-approval').value,
-        securityStaff:    document.getElementById('security-staff').value,
-        // Barriers & signage
-        barrierServices:  Array.from(document.querySelectorAll('input[name="barrier-services"]:checked')).map(c=>c.value).join(', '),
-        barrierNotes:     document.getElementById('barrier-notes').value.trim(),
+        alcoholServed:    document.getElementById('alcohol') ? document.getElementById('alcohol').value : '',
+        updApproval:      document.getElementById('upd-approval') ? document.getElementById('upd-approval').value : '',
+        securityStaff:    document.getElementById('security-staff') ? document.getElementById('security-staff').value : '',
         // Parking
         parkingUse:       document.getElementById('parking-use').value,
         parkingType:      document.getElementById('parking-type').value,
@@ -2160,7 +1999,8 @@
     }
 
     function toggleSignage(checked) {
-      document.getElementById('signage-section').classList.toggle('show', checked);
+      const el = document.getElementById('signage-section');
+      if (el) el.classList.toggle('show', checked);
     }
 
     // ── Request another with same organizer info ──
@@ -2233,15 +2073,15 @@
     }
 
     function getComplexity() {
-      const services = ['svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-pa','svc-waste','svc-portabath','svc-barrier'];
+      const services = ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'];
       const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
 
       // Escalating flags — any of these bump the level up
       const hasAlcohol   = document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
-      const hasPortabath = document.getElementById('svc-portabath') && document.getElementById('svc-portabath').checked;
+      
       const attEl        = document.getElementById('event-attendance');
       const bigCrowd     = attEl && parseInt(attEl.value, 10) >= 500;
-      const flags        = [hasAlcohol, hasPortabath, bigCrowd].filter(Boolean).length;
+      const flags        = [hasAlcohol, bigCrowd].filter(Boolean).length;
 
       // Base tier from service count
       let level;
@@ -2259,7 +2099,6 @@
     // ── Timeline builder ──
     const TIMELINE_RULES = [
       { service:'svc-tent',  when:'4+ weeks out', what:'Submit tent permit & Fire Safety applications (tent, open flame if applicable)', color:'#8B1A1A' },
-      { service:'svc-food',  when:'3+ weeks out', what:'Confirm food truck Fire & Safety licenses and vendor arrangements', color:'#E57200' },
       { general: true,       when:'2+ weeks out', what:'Submit this form, finalize event layout, and confirm all vendors', color:'#5a8a2e' },
       { general: true,       when:'1 week out',   what:'Follow up with FM to confirm services, approvals, and setup schedule', color:'#232D4B' },
     ];
@@ -2288,7 +2127,7 @@
     }
 
     // Hook timeline update to all service checkboxes
-    ['svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-pa','svc-waste','svc-portabath','svc-barrier'].forEach(id => {
+    ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', updateTimeline);
     });
@@ -2303,14 +2142,14 @@
         'event-name','event-location','event-date','event-start','event-end',
         'event-attendance','event-type','event-desc','fm-notes',
         'tent-permit','tent-safety','tent-vendor-name','tent-vendor-supply',
-        'food-truck-count','food-kitchen','food-license','alcohol','upd-approval','security-staff',
+        'alcohol','upd-approval','security-staff',
         'stage-power','stage-vendor-name','stage-vendor-supply',
         'chairs-qty','tables-qty','chairs-vendor-name','chairs-vendor-supply',
-        'waste-notes','barrier-notes','power-notes','parking-use','parking-type','parking-approval','parking-notes'];
+        'waste-notes','signs-notes','power-notes','parking-use','parking-type','parking-approval','parking-notes'];
       const data = {};
       fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
       // Checkboxes
-      ['svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-pa','svc-waste','svc-portabath','svc-barrier'].forEach(id => {
+      ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
         const el = document.getElementById(id); if (el) data[id] = el.checked;
       });
       return data;
@@ -2338,7 +2177,7 @@
         }
       });
       // Second pass: call toggleService for each checked service so panels + full-width open correctly
-      ['power','setup','tent','food','stage','chairs','waste','portabath','barrier'].forEach(key => {
+      ['power','setup','tent','stage','chairs','waste','pa','signs'].forEach(key => {
         const cb = document.getElementById('svc-' + key);
         if (cb && cb.checked) toggleService(key);
       });
