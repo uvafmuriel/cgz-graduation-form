@@ -231,6 +231,7 @@
       padding: 3px 10px; border-radius: 99px;
       font-size: 12px; font-weight: 600;
     }
+    .complexity-moderate { background:#fff4e0; color:#7A3D00; }
     .complexity-high { background: #fdecea; color: #7b1a13; border: 1px solid #e08080; }
     .complexity-standard { background: #eaf3e0; color: #2e5a10; border: 1px solid #7ab54a; }
 
@@ -1827,7 +1828,7 @@
           <div class="summary-row"><span class="summary-key">Time</span><span class="summary-val">${timeStr}</span></div>
           <div class="summary-row"><span class="summary-key">Expected attendance</span><span class="summary-val">${val('event-attendance') || '—'}</span></div>
           <div class="summary-row"><span class="summary-key">Event type</span><span class="summary-val">${val('event-type') || '—'}</span></div>
-          <div class="summary-row"><span class="summary-key">Complexity</span><span class="summary-val"><span class="complexity-badge ${getComplexity()==='High Complexity'?'complexity-high':'complexity-standard'}">${getComplexity()==='High Complexity'?'⚠ High Complexity':'✓ Standard'}</span></span></div>
+          <div class="summary-row"><span class="summary-key">Complexity</span><span class="summary-val">${(()=>{const c=getComplexity();const cls=c==='High'?'complexity-high':(c==='Moderate'?'complexity-moderate':'complexity-standard');const icon=c==='High'?'⚠':(c==='Moderate'?'●':'✓');return '<span class="complexity-badge '+cls+'">'+icon+' '+c+' Complexity</span>';})()}</span></div>
         </div>
         <div class="summary-section">
           <div class="summary-section-title">FM Services</div>
@@ -2132,12 +2133,16 @@
         if (!res.ok) throw new Error();
         document.getElementById('success-msg').style.display = 'block';
         document.getElementById('success-request-id').textContent = window._currentRequestId || '';
-        const cx = window._currentComplexity || 'Standard';
+        const cx = window._currentComplexity || 'Low';
         const cxEl = document.getElementById('success-complexity');
         if (cxEl) {
-          cxEl.innerHTML = cx === 'High Complexity'
-            ? '⚠ <strong>High Complexity</strong> — FM will prioritize coordination for this event.'
-            : '✓ Standard complexity event.';
+          if (cx === 'High') {
+            cxEl.innerHTML = '⚠ <strong>High Complexity</strong> — FM will prioritize coordination for this event.';
+          } else if (cx === 'Moderate') {
+            cxEl.innerHTML = '● <strong>Moderate Complexity</strong> — FM will coordinate the requested services.';
+          } else {
+            cxEl.innerHTML = '✓ <strong>Low Complexity</strong> — straightforward setup.';
+          }
         }
         clearDraft();
         document.getElementById('success-msg').scrollIntoView({ behavior:'smooth' });
@@ -2217,12 +2222,27 @@
 
     // ── Complexity check ──
     function getComplexity() {
-      const services = ['svc-power','svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-waste','svc-barrier'];
-      const checkedCount = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
-      const hasAlcohol  = document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
-      const hasParking  = document.getElementById('parking-use') && document.getElementById('parking-use').value === 'yes';
-      const isMajor     = document.getElementById('event-type') && document.getElementById('event-type').value === 'Major Event';
-      return (checkedCount >= 4 || hasAlcohol || hasParking || isMajor) ? 'High Complexity' : 'Standard';
+      const services = ['svc-setup','svc-tent','svc-food','svc-stage','svc-chairs','svc-pa','svc-waste','svc-portabath','svc-barrier'];
+      const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
+
+      // Escalating flags — any of these bump the level up
+      const hasAlcohol   = document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
+      const hasPortabath = document.getElementById('svc-portabath') && document.getElementById('svc-portabath').checked;
+      const attEl        = document.getElementById('event-attendance');
+      const bigCrowd     = attEl && parseInt(attEl.value, 10) >= 500;
+      const flags        = [hasAlcohol, hasPortabath, bigCrowd].filter(Boolean).length;
+
+      // Base tier from service count
+      let level;
+      if (count <= 2)      level = 1;   // Low
+      else if (count <= 5) level = 2;   // Moderate
+      else                 level = 3;   // High
+
+      // Each flag bumps up a tier, capped at High
+      level = Math.min(3, level + (flags > 0 ? 1 : 0));
+      if (flags >= 2) level = 3;
+
+      return ['Low', 'Moderate', 'High'][level - 1];
     }
 
     // ── Timeline builder ──
