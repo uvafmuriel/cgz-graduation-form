@@ -1066,6 +1066,10 @@
           </label>
           <div class="followup-panel" id="panel-tent">
             <div class="followup-title">Tent details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="tent-qty">Number of tents</label>
+              <input type="number" min="1" id="tent-qty" placeholder="Qty" style="width:100%;">
+            </div>
 
             <p class="sub-label" style="margin-bottom:4px;">Tent permit obtained?</p>
             <div class="note-box" style="margin-bottom:8px; font-size:12px;">Download the <a href="https://fire.safety.virginia.edu/sites/fire_safety/files/2025-06/UVA%20Tent%20Instructions%202025.pdf" target="_blank" style="color:#232D4B; font-weight:500;">UVA Tent Permit Instructions &amp; Application (PDF)</a> for instructions and the application form.</div>
@@ -1136,6 +1140,10 @@
           </label>
           <div class="followup-panel" id="panel-stage">
             <div class="followup-title">Stage details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="stage-qty">Number of stages</label>
+              <input type="number" min="1" id="stage-qty" placeholder="Qty" style="width:100%;">
+            </div>
 
             <p class="sub-label" style="margin-bottom:6px;">Power needed at the stage?</p>
             <div class="status-group" style="margin-bottom:12px;">
@@ -1180,6 +1188,10 @@
           </label>
           <div class="followup-panel" id="panel-chairs">
             <div class="followup-title">Chairs &amp; tables details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="chairs-qty">Number of chairs</label>
+              <input type="number" min="1" id="chairs-qty" placeholder="Qty" style="width:100%;">
+            </div>
             <div class="field-row" style="margin-bottom:12px;">
               <div class="field-group">
                 <label class="field-label" for="chairs-qty">Estimated chairs needed</label>
@@ -1237,6 +1249,10 @@
           </label>
           <div class="followup-panel" id="panel-pa">
             <div class="followup-title">PA system &amp; sound details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="pa-qty">Number of PA/sound setups</label>
+              <input type="number" min="1" id="pa-qty" placeholder="Qty" style="width:100%;">
+            </div>
             <div class="field-row" style="margin-bottom:12px;">
               <div class="field-group">
                 <label class="field-label" for="pa-type">Type of sound</label>
@@ -1316,18 +1332,22 @@
                 <input type="checkbox" name="signs-services" value="Wooden crosses" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
                 <div><div class="item-label">Wooden crosses</div><div class="item-sub">Ceremonial wooden cross signage</div></div>
               </label>
+              <input type="number" min="1" id="crosses-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
               <label class="service-item" style="border-radius:6px;">
                 <input type="checkbox" name="signs-services" value="Hubba shop signs" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
                 <div><div class="item-label">Hubba shop signs</div><div class="item-sub">Signs produced by the Hubba shop</div></div>
               </label>
+              <input type="number" min="1" id="hubba-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
               <label class="service-item" style="border-radius:6px;">
                 <input type="checkbox" name="signs-services" value="Lectern" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
                 <div><div class="item-label">Lectern</div><div class="item-sub">Speaking lectern</div></div>
               </label>
+              <input type="number" min="1" id="lectern-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
               <label class="service-item" style="border-radius:6px;">
                 <input type="checkbox" name="signs-services" value="Podium" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
                 <div><div class="item-label">Podium</div><div class="item-sub">Raised platform / podium</div></div>
               </label>
+              <input type="number" min="1" id="podium-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
             </div>
             <div class="field-group">
               <label class="field-label" for="signs-notes">Describe signs &amp; fixtures needs</label>
@@ -1652,11 +1672,21 @@
       const checked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c=>c.value).join(', ') || 'None';
 
       const services = [];
+      const qtyMap = { 'svc-tent':'tent-qty', 'svc-stage':'stage-qty', 'svc-chairs':'chairs-qty', 'svc-pa':'pa-qty' };
       [{id:'svc-power',label:'Power & water'},{id:'svc-setup',label:'Setup & takedown'},
        {id:'svc-tent',label:'Tents'},
        {id:'svc-stage',label:'Stages & platforms'},{id:'svc-chairs',label:'Chairs & tables'},
+       {id:'svc-pa',label:'PA / Sound'},
        {id:'svc-waste',label:'Waste, recycling & custodial'},{id:'svc-signs',label:'Signs & fixtures'}
-      ].forEach(s => { const el = document.getElementById(s.id); if (el && el.checked) services.push(s.label); });
+      ].forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el && el.checked) {
+          let lbl = s.label;
+          const qEl = qtyMap[s.id] ? document.getElementById(qtyMap[s.id]) : null;
+          if (qEl && qEl.value) lbl += ' (×' + qEl.value + ')';
+          services.push(lbl);
+        }
+      });
 
       const statusBadge = (val, labels) => {
         if (!val || val === '—') return '<span class="summary-badge warn">Not answered</span>';
@@ -1941,6 +1971,14 @@
         majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
         signsServices:    Array.from(document.querySelectorAll('input[name="signs-services"]:checked')).map(c=>c.value).join(', '),
         signsNotes:       document.getElementById('signs-notes') ? document.getElementById('signs-notes').value.trim() : '',
+        tentQty:          document.getElementById('tent-qty') ? document.getElementById('tent-qty').value : '',
+        stageQty:         document.getElementById('stage-qty') ? document.getElementById('stage-qty').value : '',
+        chairsQty:        document.getElementById('chairs-qty') ? document.getElementById('chairs-qty').value : '',
+        paQty:            document.getElementById('pa-qty') ? document.getElementById('pa-qty').value : '',
+        crossesQty:       document.getElementById('crosses-qty') ? document.getElementById('crosses-qty').value : '',
+        hubbaQty:         document.getElementById('hubba-qty') ? document.getElementById('hubba-qty').value : '',
+        lecternQty:       document.getElementById('lectern-qty') ? document.getElementById('lectern-qty').value : '',
+        podiumQty:        document.getElementById('podium-qty') ? document.getElementById('podium-qty').value : '',
         wasteNotes:       document.getElementById('waste-notes').value.trim(),
         // Alcohol & security
         alcoholServed:    document.getElementById('alcohol') ? document.getElementById('alcohol').value : '',
