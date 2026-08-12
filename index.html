@@ -885,6 +885,7 @@
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
 </head>
 <body>
 
@@ -2497,9 +2498,20 @@
       if(map){ map.remove(); map=null; } pins=[]; markers=[]; clearPolyTemp();
       setTimeout(function(){
         map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false });
+        // Light base layer under the FM buildings
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',{
           maxZoom:21
         }).addTo(map);
+        // UVA FM GIS building footprints (authoritative facility outlines)
+        if (typeof L.esri !== 'undefined') {
+          try {
+            L.esri.featureLayer({
+              url: 'https://fm-atlas.eservices.virginia.edu/server/rest/services/Public/PublicFacilitiesSearch/MapServer/0',
+              style: function(){ return { color:'#232D4B', weight:1.2, fillColor:'#8ea3c7', fillOpacity:0.18 }; },
+              interactive: false
+            }).addTo(map);
+          } catch(err) { /* fall back to base tiles only */ }
+        }
         map.setView([v.lat, v.lng], v.zoom);
         map.invalidateSize();
         map.on('click',function(e){ handleMapClick(e); });
