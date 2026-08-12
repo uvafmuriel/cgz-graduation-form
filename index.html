@@ -910,7 +910,7 @@
   </header>
   <div class="accent-bar"></div>
 
-  <div class="progress-wrap">
+  <div class="progress-wrap" id="progress-wrap">
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
     <div class="progress-label" id="progress-label">0% complete</div>
   </div>
@@ -1480,6 +1480,11 @@
     }
 
     // Close the list when clicking outside
+    
+    // Keep the progress bar in sync with any field change
+    document.addEventListener('input', function(){ updateProgress(); });
+    document.addEventListener('change', function(){ updateProgress(); });
+
     document.addEventListener('click', function(ev) {
       const combo = document.getElementById('dept-combo');
       if (combo && !combo.contains(ev.target)) closeDeptList();
@@ -1489,8 +1494,37 @@
 
     function escHtml(t) { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
 
+    
+    function updateProgress() {
+      const wrap = document.getElementById('progress-wrap');
+      if (!wrap) return;
+      // Milestones: department, contact (name+email), location, date. Map/equipment optional.
+      const checks = [
+        { done: !!document.getElementById('dept-select').value, label: 'department' },
+        { done: !!document.getElementById('org-name').value.trim() && !!document.getElementById('org-email').value.trim(), label: 'your contact info' },
+        { done: !!document.getElementById('worktag').value.trim(), label: 'work order / worktag' },
+        { done: !!document.getElementById('event-location').value, label: 'a location' },
+        { done: (function(){ const single=document.getElementById('single-day-fields'); const vis = single && single.style.display!=='none'; return vis ? !!document.getElementById('event-date').value : !!(document.getElementById('event-date-start')||{}).value; })(), label: 'event date' }
+      ];
+      const total = checks.length;
+      const done = checks.filter(c => c.done).length;
+      const pct = Math.round((done/total)*100);
+      const fill = document.getElementById('progress-fill');
+      const label = document.getElementById('progress-label');
+      if (fill) fill.style.width = pct + '%';
+      if (label) {
+        if (pct === 100) { label.textContent = 'All set — ready to review & submit'; label.style.color = '#2e5a10'; }
+        else {
+          const next = checks.find(c => !c.done);
+          label.textContent = pct + '% complete' + (next ? ' — next: ' + next.label : '');
+          label.style.color = '#7a3d00';
+        }
+      }
+    }
+
     function revealGated(show) {
       document.querySelectorAll('.dept-gated').forEach(el => { el.style.display = show ? '' : 'none'; });
+      updateProgress();
       // Leaflet maps render blank if they were initialized while hidden — force a resize once visible
       if (show && typeof map !== 'undefined' && map) {
         setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 150);
@@ -1667,6 +1701,7 @@
       if (group === 'upd-approval') {
         document.getElementById('upd-warning').style.display = (val === 'no') ? 'block' : 'none';
       }
+          if(typeof updateProgress==='function') updateProgress();
     }
 
     // ── Vendor flow (yes/no radio) ──
@@ -2048,7 +2083,6 @@
         rainChanges:      document.getElementById('rain-changes') ? document.getElementById('rain-changes').value.trim() : '',
         parkingRequested: document.getElementById('parking-requested') ? document.getElementById('parking-requested').value : '',
         tentPermit:       document.getElementById('tent-permit').value,
-        tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
         // Stage
         // PA system
@@ -2059,13 +2093,7 @@
         paPowerNotes:     document.getElementById('pa-power-notes') ? document.getElementById('pa-power-notes').value.trim() : '',
         // Food vendor
         // Per-service power
-        tentPowerNeeded:  document.getElementById('tent-power') ? document.getElementById('tent-power').value : '',
-        tentPowerNotes:   document.getElementById('tent-power-notes') ? document.getElementById('tent-power-notes').value.trim() : '',
-        chairsPowerNeeded:document.getElementById('chairs-power') ? document.getElementById('chairs-power').value : '',
-        chairsPowerNotes: document.getElementById('chairs-power-notes') ? document.getElementById('chairs-power-notes').value.trim() : '',
-        stagePrefVendors: getCheckedVals('stage-pref-vendor'),
         // Chairs
-        chairsPrefVendors:getCheckedVals('chairs-pref-vendor'),
         // Waste & custodial
         wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
         custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
@@ -2699,6 +2727,9 @@
 
     // Load review data on page load
     loadFromURL();
+
+    // Initial progress state
+    if(typeof updateProgress==='function') updateProgress();
 </script>
   <!-- ── FOOTER ── -->
   <div class="site-footer">
