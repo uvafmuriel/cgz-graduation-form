@@ -1024,16 +1024,13 @@
         <button type="button" onclick="addDayDetail()" style="margin-top:8px; background:#232D4B; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:inherit; font-weight:500; cursor:pointer;">+ Add day details</button>
         <div style="font-size:12px; color:#888780; margin-top:4px;">Specify different services, times, or notes for individual days.</div>
       </div>
-      <div class="field-row">
+      <div class="field-row full">
         <div class="field-group">
           <label class="field-label" for="event-attendance">Expected attendance</label>
           <input type="number" id="event-attendance" placeholder="# of people" min="0">
         </div>
-        <div class="field-group">
-          <label class="field-label" for="event-type">Event type</label>
-          <input type="text" id="event-type" value="Graduation" readonly style="background:#f5f4f0; color:#232D4B; font-weight:600; cursor:default;">
-        </div>
       </div>
+      <input type="hidden" id="event-type" value="Graduation">
       <div class="field-row full">
         <div class="field-group">
           <label class="field-label" for="event-desc">Brief event description</label>
@@ -1043,29 +1040,12 @@
 
       <hr class="divider">
 
-      <div class="field-row full">
-        <div class="field-group">
-          <label class="field-label">Rain plan</label>
-          <select id="rain-plan" onchange="toggleRainBackup()">
-            <option value="">Select…</option>
-            <option value="rain-or-shine">Proceeds rain or shine</option>
-            <option value="indoor-backup">Has indoor backup location</option>
-            <option value="cancel">Will cancel if rain</option>
-          </select>
-          <div id="rain-backup-section" class="conditional" style="margin-top:8px;">
-            <input type="text" id="rain-backup-location" placeholder="Indoor backup location name">
-          </div>
-        </div>
-
-      </div>
-
       <div class="note-box info" id="rotunda-note">
         Rotunda events require notifying Sher Winston. FM will coordinate on your behalf once this request is received.
       </div>
     </div>
 
     <!-- ── FM SERVICES ── -->
-    </div>
 
     <div class="form-section">
       <div class="section-title">
@@ -1458,7 +1438,8 @@
         '</div>' +
         '<p class="sub-label" style="margin-bottom:8px;font-weight:600;">Planned venues by weather scenario</p>' +
         '<div class="weather-cards">' + weatherCards + '</div>' +
-        '<div class="weather-notice">\u2601 Graduation is planned months ahead, so a live forecast isn\'t available yet. Plan for all three scenarios — pick which venue(s) to lay out on the map using the buttons above.</div>';
+        '<div class="weather-notice">\u2601 Plan for all three weather scenarios — pick which venue(s) to lay out on the map using the buttons above.</div>' +
+        '<div class="field-group" style="margin-top:12px;"><label class="field-label" for="rain-notes">Weather / rain plan notes (optional)</label><textarea id="rain-notes" placeholder="Any notes about weather contingencies, backup timing, or decisions still to be made…" style="min-height:50px;"></textarea></div>';
       ref.style.display = 'block';
     }
 
@@ -1977,6 +1958,7 @@
         setupTime:        document.getElementById('setup-time').value,
         teardownTime:     document.getElementById('teardown-time').value,
         // Tent
+        rainNotes:        document.getElementById('rain-notes') ? document.getElementById('rain-notes').value.trim() : '',
         tentPermit:       document.getElementById('tent-permit').value,
         tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
@@ -2024,8 +2006,6 @@
         eventDateStart:   document.getElementById('event-date-start') ? document.getElementById('event-date-start').value : '',
         eventDateEnd:     document.getElementById('event-date-end') ? document.getElementById('event-date-end').value : '',
         dayDetails:       getDayDetailsData(),
-        rainPlan:         document.getElementById('rain-plan') ? document.getElementById('rain-plan').value : '',
-        rainBackup:       document.getElementById('rain-backup-location') ? document.getElementById('rain-backup-location').value.trim() : '',
         submittedAt:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
       };
 
@@ -2131,12 +2111,6 @@
     }
 
     // ── Complexity check ──
-    function toggleRainBackup() {
-      const val = document.getElementById('rain-plan').value;
-      const section = document.getElementById('rain-backup-section');
-      if (section) section.style.display = (val === 'backup' || val === 'indoor') ? 'block' : 'none';
-    }
-
     function getComplexity() {
       const services = ['svc-setup','svc-pa','svc-waste','svc-signs'];
       const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
