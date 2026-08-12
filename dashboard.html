@@ -236,7 +236,7 @@ function render(){
 
   c.innerHTML=
     '<div class="zone-head"><div><h2>'+esc(zoneName)+'</h2><div class="sub">'+subs.length+' request'+(subs.length>1?'s':'')+' &middot; '+att.toLocaleString()+' total expected attendance</div></div>'+
-    '<div class="toolbar"><button class="btn" onclick="openGameplan()">Build schedule / gameplan</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
+    '<div class="toolbar"><button class="btn" onclick="clickBuild()">Build schedule / gameplan</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
     // cards
     '<div class="cards">'+
       card('Requests',subs.length,'in '+esc(zoneName))+
@@ -397,6 +397,11 @@ function windows(s){
   return {evStart,evEnd,setupStart:sStart,setupEnd:sEnd,teardownStart:tStart,teardownEnd:tEnd};
 }
 
+function clickBuild(){
+  var b=document.getElementById('errbar');
+  if(b){b.style.display='block';b.style.background='#2e7d54';b.textContent='CLICK REGISTERED - opening gameplan...';}
+  try{ openGameplan(); }catch(e){ if(b){b.style.background='#c0392b';b.textContent='openGameplan threw: '+e.message;} }
+}
 function openGameplan(){
   try{
   document.getElementById('gpOverlay').style.display='flex';
