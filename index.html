@@ -849,18 +849,18 @@
     .ref-pill .q { color: #f4a259; font-weight: 700; margin-left: 3px; }
     .ref-adnote { margin-top: 12px; background: rgba(255,255,255,0.08); border-left: 3px solid #E57200; padding: 9px 12px; font-size: 12px; border-radius: 0 6px 6px 0; line-height: 1.45; }
     .ref-adnote .lbl { display: block; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #f4a259; font-weight: 700; margin-bottom: 3px; }
-    .weather-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .weather-card { border: 1px solid #e4e2dc; border-radius: 8px; padding: 12px; background: #fbfaf8; }
-    .weather-card .wc-tag { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .weather-card.fair .wc-tag { color: #2e7d54; }
-    .weather-card.inclement .wc-tag { color: #b8860b; }
-    .weather-card.severe .wc-tag { color: #c0392b; }
-    .weather-card .wc-venue { font-size: 13px; font-weight: 600; color: #232D4B; margin-bottom: 8px; min-height: 34px; }
-    .weather-card .wc-map-btn { width: 100%; font-size: 12px; padding: 6px; border-radius: 6px; border: 1px solid #232D4B; background: #fff; color: #232D4B; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .weather-card .wc-map-btn:hover { background: #232D4B; color: #fff; }
-    .weather-card .wc-map-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #ccc; color: #999; }
-    .weather-card .wc-offmap { font-size: 11px; color: #888780; text-align: center; padding: 6px; font-style: italic; }
-    .weather-notice { background: #fff4e0; border: 1px solid #f4d9a8; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #7A3D00; margin-bottom: 14px; }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     .equip-picker { margin-top: 4px; }
     .equip-cat { margin-bottom: 16px; }
     .equip-cat h5 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #888780; margin: 0 0 8px; padding-bottom: 5px; border-bottom: 1px dashed #e4e2dc; }
@@ -882,6 +882,9 @@
     .dept-option:hover, .dept-option.active { background: #f0f3f9; }
     .dept-option.zone-tag { color: #888780; font-size: 11px; float: right; font-weight: normal; }
     .dept-list-empty { padding: 12px; font-size: 13px; color: #888780; text-align: center; }
+
+    .rain-plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 560px) { .rain-plan-grid { grid-template-columns: 1fr; } }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -1535,23 +1538,6 @@
         : '';
 
       // Weather scenario cards
-      const scenarios = [
-        { key: 'fair_loc',      tag: 'Fair weather',  cls: 'fair' },
-        { key: 'inclement_loc', tag: 'Inclement',     cls: 'inclement' },
-        { key: 'severe_loc',    tag: 'Severe',        cls: 'severe' }
-      ];
-      let resolvedFair = s.fair_loc;
-      const weatherCards = scenarios.map(sc => {
-        let venue = s[sc.key] || '';
-        if (venue.toUpperCase() === 'SAME') venue = resolvedFair;
-        if (!venue) return '<div class="weather-card ' + sc.cls + '"><span class="wc-tag">' + sc.tag + '</span><div class="wc-venue">Not on record</div><div class="wc-offmap">—</div></div>';
-        const mapped = VENUE_MAP[venue];
-        const btn = mapped
-          ? '<button type="button" class="wc-map-btn" onclick="addVenueToMap(\'' + mapped.replace(/'/g, "\\'") + '\')">Add to map</button>'
-          : '<div class="wc-offmap">Off-map venue<br>(indoor / other zone)</div>';
-        return '<div class="weather-card ' + sc.cls + '"><span class="wc-tag">' + sc.tag + '</span><div class="wc-venue">' + escHtml(venue) + '</div>' + btn + '</div>';
-      }).join('');
-
       ref.innerHTML =
         '<div class="ref-panel">' +
           '<span class="ref-tag">2026 request on record</span>' +
@@ -1561,25 +1547,14 @@
           '<div class="ref-equip">' + equipPills + '</div>' +
           adNote +
         '</div>' +
-        '<p class="sub-label" style="margin-bottom:8px;font-weight:600;">Planned venues by weather scenario</p>' +
-        '<div class="weather-cards">' + weatherCards + '</div>' +
-        '<div class="weather-notice">\u2601 Plan for all three weather scenarios — pick which venue(s) to lay out on the map using the buttons above.</div>' +
-        '<div class="field-group" style="margin-top:12px;"><label class="field-label" for="rain-notes">Weather / rain plan notes (optional)</label><textarea id="rain-notes" placeholder="Any notes about weather contingencies, backup timing, or decisions still to be made…" style="min-height:50px;"></textarea></div>';
+        '<p class="sub-label" style="margin-bottom:4px;font-weight:600;">Weather / rain plan</p>' +
+        '<p class="field-hint" style="font-size:12px;color:#888780;margin-bottom:10px;">If weather forces a change from your normal fair-weather setup, describe the backup plan below. Leave blank if your plan is the same rain or shine.</p>' +
+        '<div class="rain-plan-grid">' +
+          '<div class="field-group"><label class="field-label" for="rain-location">Backup location</label><input type="text" id="rain-location" placeholder="e.g. Old Cabell Hall"></div>' +
+          '<div class="field-group"><label class="field-label" for="rain-time">Backup time (if different)</label><input type="text" id="rain-time" placeholder="e.g. same time, or 2:00 PM"></div>' +
+        '</div>' +
+        '<div class="field-group" style="margin-top:10px;"><label class="field-label" for="rain-changes">Resource / staffing changes from fair-weather plan</label><textarea id="rain-changes" placeholder="Describe any differences in equipment, setup, or staffing needed for the backup plan…" style="min-height:60px;"></textarea></div>';
       ref.style.display = 'block';
-    }
-
-    // Add a venue to the map (uses the multi-location system if present, else the single map)
-    function addVenueToMap(venueName) {
-      // If multi-location addLocation exists, use it
-      if (typeof addLocation === 'function') {
-        addLocation(venueName);
-        const mapSection = document.getElementById('locations-container') || document.getElementById('map-container');
-        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        // single-map fallback: set the event-location dropdown
-        const locSel = document.getElementById('event-location');
-        if (locSel) { locSel.value = venueName; if (typeof loadMap === 'function') loadMap(); }
-      }
     }
 
     // ── Equipment prefill (renders Ken's catalog into a checklist, prefilled from dept 2026 data) ──
@@ -1906,6 +1881,17 @@
             '</div>';
         }
       }
+      
+      const rLoc = (document.getElementById('rain-location')||{}).value || '';
+      const rTime = (document.getElementById('rain-time')||{}).value || '';
+      const rChg = (document.getElementById('rain-changes')||{}).value || '';
+      if (rLoc || rTime || rChg) {
+        html += '<div class="summary-section"><div class="summary-section-title">Weather / rain plan</div>' +
+          (rLoc ? '<div class="summary-row"><span class="summary-key">Backup location</span><span class="summary-val">' + escHtml(rLoc) + '</span></div>' : '') +
+          (rTime ? '<div class="summary-row"><span class="summary-key">Backup time</span><span class="summary-val">' + escHtml(rTime) + '</span></div>' : '') +
+          (rChg ? '<div class="summary-row"><span class="summary-key">Changes</span><span class="summary-val">' + escHtml(rChg) + '</span></div>' : '') +
+          '</div>';
+      }
       return html;
     }
 
@@ -2083,7 +2069,9 @@
         setupTime:        document.getElementById('setup-time').value,
         teardownTime:     document.getElementById('teardown-time').value,
         // Tent
-        rainNotes:        document.getElementById('rain-notes') ? document.getElementById('rain-notes').value.trim() : '',
+        rainLocation:     document.getElementById('rain-location') ? document.getElementById('rain-location').value.trim() : '',
+        rainTime:         document.getElementById('rain-time') ? document.getElementById('rain-time').value.trim() : '',
+        rainChanges:      document.getElementById('rain-changes') ? document.getElementById('rain-changes').value.trim() : '',
         tentPermit:       document.getElementById('tent-permit').value,
         tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
