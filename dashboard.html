@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CGZ Graduation Requests — FM Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#232D4B; --navy-700:#1a2138; --orange:#E57200; --orange-soft:#f4a259;
+    --paper:#f6f5f1; --card:#ffffff; --ink:#1b2333; --muted:#6b7280; --line:#e5e3dc;
+    --low:#2e7d54; --mod:#c98a1a; --high:#c0392b;
+    --shadow:0 1px 3px rgba(30,40,70,.06),0 4px 16px rgba(30,40,70,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.5}
+  /* Masthead */
+  .masthead{background:var(--navy);color:#fff;padding:0}
+  .masthead-inner{max-width:1280px;margin:0 auto;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand-mark{width:38px;height:38px;border:2px solid var(--orange);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-weight:700;font-size:17px;color:var(--orange)}
+  .brand h1{font-family:Georgia,serif;font-size:19px;font-weight:600;letter-spacing:.01em}
+  .brand p{font-size:12px;color:#aeb8cc;margin-top:1px}
+  .mast-meta{display:flex;gap:26px;text-align:right}
+  .mast-meta .stat b{display:block;font-size:22px;font-weight:700;color:#fff;font-family:Georgia,serif;line-height:1}
+  .mast-meta .stat span{font-size:11px;color:#aeb8cc;text-transform:uppercase;letter-spacing:.08em}
+  .accent{height:4px;background:linear-gradient(90deg,var(--orange),var(--orange-soft))}
+  /* Zone tabs */
+  .tabbar{background:var(--navy-700);position:sticky;top:0;z-index:30}
+  .tabbar-inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+  .tab{padding:13px 18px;color:#c4cbdb;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;font-family:inherit;display:flex;align-items:center;gap:8px}
+  .tab:hover{color:#fff}
+  .tab.active{color:#fff;border-bottom-color:var(--orange)}
+  .tab .cnt{background:rgba(255,255,255,.14);border-radius:100px;padding:1px 8px;font-size:11px;font-weight:700}
+  .tab.active .cnt{background:var(--orange)}
+  .tab.cs-tab{color:#f4c99a}
+  .tab.cs-tab.active{color:#fff}
+  /* Layout */
+  .wrap{max-width:1280px;margin:0 auto;padding:24px 20px 60px}
+  .zone-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .zone-head h2{font-family:Georgia,serif;font-size:24px;color:var(--navy);font-weight:600}
+  .zone-head .sub{font-size:13px;color:var(--muted)}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .btn:hover{border-color:var(--navy);background:var(--navy);color:#fff}
+  .btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.primary:hover{background:var(--navy-700)}
+  /* Cards */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .card .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+  .card .val{font-family:Georgia,serif;font-size:30px;font-weight:700;color:var(--navy);margin-top:6px;line-height:1}
+  .card .foot{font-size:12px;color:var(--muted);margin-top:6px}
+  .card.accent-l{border-left:4px solid var(--orange)}
+  /* Two-col */
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:22px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+  .panel h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .panel h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+  .chart-box{position:relative;height:240px}
+  /* Resource totals */
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
+  .res-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+  .res-row:last-child,.res-row:nth-last-child(2){border-bottom:none}
+  .res-row .rn{font-size:13px;color:var(--ink)}
+  .res-row .rv{font-family:Georgia,serif;font-weight:700;color:var(--navy);font-size:16px}
+  /* Table */
+  .tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:#fafaf7;text-align:left;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;border-bottom:2px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+  thead th:hover{color:var(--navy)}
+  thead th .arr{opacity:.4;font-size:9px;margin-left:3px}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr:hover{background:#faf9f5}
+  tbody tr:last-child td{border-bottom:none}
+  .rid{font-family:"SF Mono",Menlo,monospace;font-size:12px;color:var(--navy);font-weight:600}
+  .dept-cell{font-weight:600;color:var(--navy)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:700}
+  .pill.low{background:#e6f4ec;color:var(--low)}
+  .pill.moderate{background:#fbf1dd;color:var(--mod)}
+  .pill.high{background:#fbe6e3;color:var(--high)}
+  .pill.na{background:#eee;color:#999}
+  .flag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;font-weight:600;margin-right:4px}
+  .flag.warn{background:#fbe6e3;color:var(--high)}
+  .flag.ok{background:#e6f4ec;color:var(--low)}
+  .flag.pend{background:#fbf1dd;color:var(--mod)}
+  .empty{text-align:center;padding:60px 20px;color:var(--muted)}
+  .empty svg{width:40px;height:40px;opacity:.3;margin-bottom:12px}
+  /* Detail expand */
+  .detail-row td{background:#faf9f5;padding:0}
+  .detail-inner{padding:16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px 28px}
+  .detail-inner .dl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:2px}
+  .detail-inner .dv{font-size:13px;color:var(--ink);margin-bottom:8px}
+  .caret{transition:transform .2s;display:inline-block}
+  .caret.open{transform:rotate(90deg)}
+  .loading{text-align:center;padding:80px 20px;color:var(--muted)}
+  .spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (max-width:900px){.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr 1fr}}
+  @media (max-width:560px){.cards{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr}.mast-meta{display:none}}
+  @media print{
+    .tabbar,.toolbar,.masthead .mast-meta{display:none}
+    .zone-section{display:block !important;page-break-after:always}
+    body{background:#fff}
+    .panel,.card,.tbl-wrap{box-shadow:none;border:1px solid #ccc}
+    .detail-row{display:none}
+  }
+</style>
+</head>
+<body>
+  <div class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <div class="brand-mark">FM</div>
+        <div>
+          <h1>Graduation Requests</h1>
+          <p>Central Grounds Zone &middot; Facilities Management</p>
+        </div>
+      </div>
+      <div class="mast-meta">
+        <div class="stat"><b id="m-total">—</b><span>Requests</span></div>
+        <div class="stat"><b id="m-chairs">—</b><span>Chairs</span></div>
+        <div class="stat"><b id="m-high">—</b><span>High complexity</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="accent"></div>
+  <div class="tabbar"><div class="tabbar-inner" id="tabbar"></div></div>
+
+  <div class="wrap" id="content">
+    <div class="loading"><div class="spinner"></div>Loading requests…</div>
+  </div>
+
+<script>
+/* ============================================================
+   DATA SOURCE — the ONE place to change when moving to Azure.
+   Today: returns embedded sample data.
+   Later: replace the body with:
+     const r = await fetch('https://<your-azure-endpoint>/api/requests');
+     return await r.json();
+   Nothing else in this file needs to change.
+   ============================================================ */
+async function loadData(){
+  const SAMPLE = [{"requestId": "CGZ-2026-0001", "department": "Nursing", "departmentZone": "CGZ", "departmentDay": "Friday", "organizerName": "David Park", "email": "contact1@virginia.edu", "phone": "(434) 555-8359", "workOrderWorktag": "PG-0087236", "eventName": "Nursing \u2014 Final Exercises 2027", "location": "Rotunda", "eventDate": "2027-05-18", "startTime": "9:00 AM", "endTime": "11:00 AM", "attendance": 1500, "equipment": "Chairs (standard) x1200, 8' Tables x2, Linens x2, Tent x1", "equipmentObj": {"Chairs (standard)": 1200, "8' Tables": 2, "Linens": 2, "Tent": 1}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Memorial Gym", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "yes", "tentPermit": "no", "complexity": "Moderate", "submittedAt": "2026-08-02T09:24:00"}, {"requestId": "CGZ-2026-0002", "department": "Commerce School", "departmentZone": "Hubba", "departmentDay": "Sunday", "organizerName": "Robert Hayes", "email": "contact2@virginia.edu", "phone": "(434) 555-6635", "workOrderWorktag": "PG-0089131", "eventName": "Commerce School \u2014 Final Exercises 2027", "location": "Rotunda", "eventDate": "2027-05-15", "startTime": "9:00 AM", "endTime": "4:00 PM", "attendance": 400, "equipment": "8' Tables x2, Linens x2", "equipmentObj": {"8' Tables": 2, "Linens": 2}, "fmServices": "Event setup & takedown", "rainLocation": "", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-11T17:56:00"}, {"requestId": "CGZ-2026-0003", "department": "Architecture", "departmentZone": "JPJ ceremonies", "departmentDay": "Sunday", "organizerName": "James Chen", "email": "contact3@virginia.edu", "phone": "(434) 555-4814", "workOrderWorktag": "PG-0023238", "eventName": "Architecture \u2014 Final Exercises 2027", "location": "Pavilion I", "eventDate": "2027-05-17", "startTime": "1:00 PM", "endTime": "12:00 PM", "attendance": 1500, "equipment": "Tent x50, 6' Tables x1, Chairs (white) x100", "equipmentObj": {"Tent": 50, "6' Tables": 1, "Chairs (white)": 100}, "fmServices": "Signs & fixtures", "rainLocation": "Old Cabell Hall", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "no", "tentPermit": "no", "complexity": "High", "submittedAt": "2026-08-05T09:38:00"}, {"requestId": "CGZ-2026-0004", "department": "Slavic Languages", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "David Park", "email": "contact4@virginia.edu", "phone": "(434) 555-3677", "workOrderWorktag": "PG-0070589", "eventName": "Slavic Languages \u2014 Final Exercises 2027", "location": "Pavilion I", "eventDate": "2027-05-16", "startTime": "1:00 PM", "endTime": "4:00 PM", "attendance": 1500, "equipment": "Chairs (standard) x20, 8' Tables x2, Linens x2", "equipmentObj": {"Chairs (standard)": 20, "8' Tables": 2, "Linens": 2}, "fmServices": "PA system / amplified sound, Waste & recycling", "rainLocation": "Memorial Gym", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-06T14:17:00"}, {"requestId": "CGZ-2026-0005", "department": "Engineering: Biomedical Engineering Reception", "departmentZone": "CGZ", "departmentDay": "Sunday", "organizerName": "David Park", "email": "contact5@virginia.edu", "phone": "(434) 555-6155", "workOrderWorktag": "PG-0037869", "eventName": "Engineering: Biomedical Engineering Reception \u2014 Final Exercises 2027", "location": "Homer Flat", "eventDate": "2027-05-15", "startTime": "2:00 PM", "endTime": "12:00 PM", "attendance": 1500, "equipment": "8' Tables x4, Linens x4", "equipmentObj": {"8' Tables": 4, "Linens": 4}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Old Cabell Hall", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "yes", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-12T16:34:00"}, {"requestId": "CGZ-2026-0006", "department": "Engineering: Aerospace & Mechanical", "departmentZone": "CGZ", "departmentDay": "Sunday", "organizerName": "Priya Nair", "email": "contact6@virginia.edu", "phone": "(434) 555-7543", "workOrderWorktag": "PG-0057447", "eventName": "Engineering: Aerospace & Mechanical \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-17", "startTime": "10:00 AM", "endTime": "4:00 PM", "attendance": 400, "equipment": "Chairs (standard) x2625, 8' Tables x8, Linens x8", "equipmentObj": {"Chairs (standard)": 2625, "8' Tables": 8, "Linens": 8}, "fmServices": "Event setup & takedown", "rainLocation": "", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-03T14:38:00"}, {"requestId": "CGZ-2026-0007", "department": "Education and Human Development", "departmentZone": "JPJ ceremonies", "departmentDay": "Saturday", "organizerName": "Emily Turner", "email": "contact7@virginia.edu", "phone": "(434) 555-1188", "workOrderWorktag": "PG-0099166", "eventName": "Education and Human Development \u2014 Final Exercises 2027", "location": "Homer Flat", "eventDate": "2027-05-18", "startTime": "9:00 AM", "endTime": "4:00 PM", "attendance": 800, "equipment": "Stage / riser x4", "equipmentObj": {"Stage / riser": 4}, "fmServices": "Signs & fixtures", "rainLocation": "Memorial Gym", "rainChanges": "", "parkingRequested": "no", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-03T15:00:00"}, {"requestId": "CGZ-2026-0008", "department": "Computer Science (College of Arts & Sciences)", "departmentZone": "JPJ ceremonies", "departmentDay": "Saturday", "organizerName": "Maria Lopez", "email": "contact8@virginia.edu", "phone": "(434) 555-7126", "workOrderWorktag": "PG-0031174", "eventName": "Computer Science (College of Arts & Sciences) \u2014 Final Exercises 2027", "location": "Pavilion VIII", "eventDate": "2027-05-16", "startTime": "9:00 AM", "endTime": "4:00 PM", "attendance": 250, "equipment": "Table skirts x2, 8' Tables x1, Chairs (white) x200", "equipmentObj": {"Table skirts": 2, "8' Tables": 1, "Chairs (white)": 200}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "", "rainChanges": "", "parkingRequested": "no", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-04T08:15:00"}, {"requestId": "CGZ-2026-0009", "department": "Cognitive Science", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "James Chen", "email": "contact9@virginia.edu", "phone": "(434) 555-8962", "workOrderWorktag": "PG-0019071", "eventName": "Cognitive Science \u2014 Final Exercises 2027", "location": "Pavilion VIII", "eventDate": "2027-05-15", "startTime": "10:00 AM", "endTime": "11:00 AM", "attendance": 1500, "equipment": "Chairs (standard) x3400, 8' Tables x4, Linens x4, Tent x1", "equipmentObj": {"Chairs (standard)": 3400, "8' Tables": 4, "Linens": 4, "Tent": 1}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Old Cabell Hall", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-09T11:45:00"}, {"requestId": "CGZ-2026-0010", "department": "Math", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "Priya Nair", "email": "contact10@virginia.edu", "phone": "(434) 555-7118", "workOrderWorktag": "PG-0067422", "eventName": "Math \u2014 Final Exercises 2027", "location": "Pavilion VIII", "eventDate": "2027-05-17", "startTime": "2:00 PM", "endTime": "11:00 AM", "attendance": 120, "equipment": "Chairs (standard) x1200, 8' Tables x2, Linens x2, Tent x1", "equipmentObj": {"Chairs (standard)": 1200, "8' Tables": 2, "Linens": 2, "Tent": 1}, "fmServices": "PA system / amplified sound, Waste & recycling", "rainLocation": "", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "yes", "tentPermit": "no", "complexity": "High", "submittedAt": "2026-08-04T08:04:00"}, {"requestId": "CGZ-2026-0011", "department": "Classics Dept", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "David Park", "email": "contact11@virginia.edu", "phone": "(434) 555-2104", "workOrderWorktag": "PG-0014117", "eventName": "Classics Dept \u2014 Final Exercises 2027", "location": "Rotunda", "eventDate": "2027-05-15", "startTime": "9:00 AM", "endTime": "4:00 PM", "attendance": 120, "equipment": "Chairs (standard) x200, 8' Tables x3, Linens x3", "equipmentObj": {"Chairs (standard)": 200, "8' Tables": 3, "Linens": 3}, "fmServices": "Signs & fixtures", "rainLocation": "", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-12T17:36:00"}, {"requestId": "CGZ-2026-0012", "department": "Music", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "David Park", "email": "contact12@virginia.edu", "phone": "(434) 555-8749", "workOrderWorktag": "PG-0063354", "eventName": "Music \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-18", "startTime": "9:00 AM", "endTime": "11:00 AM", "attendance": 1500, "equipment": "Stage / riser x1", "equipmentObj": {"Stage / riser": 1}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Memorial Gym", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "no", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-12T08:43:00"}, {"requestId": "CGZ-2026-0013", "department": "Global Public Health (undergrad)", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "Sarah Mitchell", "email": "contact13@virginia.edu", "phone": "(434) 555-7596", "workOrderWorktag": "PG-0054473", "eventName": "Global Public Health (undergrad) \u2014 Final Exercises 2027", "location": "Amphitheater", "eventDate": "2027-05-15", "startTime": "10:00 AM", "endTime": "11:00 AM", "attendance": 120, "equipment": "Chairs (standard) x100, 8' Tables x2, Linens x2", "equipmentObj": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Old Cabell Hall", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "yes", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-08T11:55:00"}, {"requestId": "CGZ-2026-0014", "department": "Art", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "Tom Bradley", "email": "contact14@virginia.edu", "phone": "(434) 555-2604", "workOrderWorktag": "PG-0016630", "eventName": "Art \u2014 Final Exercises 2027", "location": "Homer Flat", "eventDate": "2027-05-15", "startTime": "9:00 AM", "endTime": "11:00 AM", "attendance": 2200, "equipment": "Chairs (standard) x100, 8' Tables x2, Linens x2", "equipmentObj": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "fmServices": "PA system / amplified sound, Waste & recycling", "rainLocation": "Old Cabell Hall", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "no", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-04T14:57:00"}, {"requestId": "CGZ-2026-0015", "department": "Sociology", "departmentZone": "Hubba", "departmentDay": "Saturday", "organizerName": "Maria Lopez", "email": "contact15@virginia.edu", "phone": "(434) 555-7209", "workOrderWorktag": "PG-0010282", "eventName": "Sociology \u2014 Final Exercises 2027", "location": "Pavilion I", "eventDate": "2027-05-15", "startTime": "1:00 PM", "endTime": "12:00 PM", "attendance": 250, "equipment": "8' Tables x3, Linens x3", "equipmentObj": {"8' Tables": 3, "Linens": 3}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-04T08:37:00"}, {"requestId": "CGZ-2026-0016", "department": "Statistics", "departmentZone": "North Grounds", "departmentDay": "Saturday", "organizerName": "Robert Hayes", "email": "contact16@virginia.edu", "phone": "(434) 555-1936", "workOrderWorktag": "PG-0016572", "eventName": "Statistics \u2014 Final Exercises 2027", "location": "Pavilion VIII", "eventDate": "2027-05-15", "startTime": "2:00 PM", "endTime": "4:00 PM", "attendance": 2200, "equipment": "Chairs (standard) x1400, 8' Tables x2, Linens x2", "equipmentObj": {"Chairs (standard)": 1400, "8' Tables": 2, "Linens": 2}, "fmServices": "PA system / amplified sound, Waste & recycling", "rainLocation": "", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-02T17:04:00"}, {"requestId": "CGZ-2026-0017", "department": "Economics", "departmentZone": "Hubba", "departmentDay": "Saturday", "organizerName": "Priya Nair", "email": "contact17@virginia.edu", "phone": "(434) 555-2964", "workOrderWorktag": "PG-0084668", "eventName": "Economics \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-16", "startTime": "9:00 AM", "endTime": "4:00 PM", "attendance": 50, "equipment": "8' Tables x2, Linens x2", "equipmentObj": {"8' Tables": 2, "Linens": 2}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "Memorial Gym", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "yes", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-12T13:15:00"}, {"requestId": "CGZ-2026-0018", "department": "Psychology", "departmentZone": "McCormick", "departmentDay": "Saturday", "organizerName": "Priya Nair", "email": "contact18@virginia.edu", "phone": "(434) 555-3144", "workOrderWorktag": "PG-0098039", "eventName": "Psychology \u2014 Final Exercises 2027", "location": "Homer Flat", "eventDate": "2027-05-17", "startTime": "1:00 PM", "endTime": "12:00 PM", "attendance": 250, "equipment": "Chairs (standard) x2200, 8' Tables x4, Linens x4, Stage / riser x1", "equipmentObj": {"Chairs (standard)": 2200, "8' Tables": 4, "Linens": 4, "Stage / riser": 1}, "fmServices": "Event setup & takedown", "rainLocation": "", "rainChanges": "Move chairs indoors, reduce to 200", "parkingRequested": "", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-02T09:34:00"}, {"requestId": "CGZ-2026-0019", "department": "Law School Reception", "departmentZone": "North Grounds", "departmentDay": "SUNDAY", "organizerName": "David Park", "email": "contact19@virginia.edu", "phone": "(434) 555-7054", "workOrderWorktag": "PG-0047353", "eventName": "Law School Reception \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-15", "startTime": "2:00 PM", "endTime": "4:00 PM", "attendance": 1500, "equipment": "Table skirts x100, Round Tables x200", "equipmentObj": {"Table skirts": 100, "Round Tables": 200}, "fmServices": "Signs & fixtures", "rainLocation": "", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "Moderate", "submittedAt": "2026-08-11T09:56:00"}, {"requestId": "CGZ-2026-0020", "department": "Middle Eastern & South Asian Languages & Culture", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "Emily Turner", "email": "contact20@virginia.edu", "phone": "(434) 555-2891", "workOrderWorktag": "PG-0024029", "eventName": "Middle Eastern & South Asian Languages & Culture \u2014 Final Exercises 2027", "location": "Homer Flat", "eventDate": "2027-05-16", "startTime": "10:00 AM", "endTime": "12:00 PM", "attendance": 250, "equipment": "8' Tables x2, Linens x2", "equipmentObj": {"8' Tables": 2, "Linens": 2}, "fmServices": "PA system / amplified sound, Waste & recycling", "rainLocation": "Memorial Gym", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-05T16:31:00"}, {"requestId": "CGZ-2026-0021", "department": "SCPS reception", "departmentZone": "Unassigned", "departmentDay": "May 15, 2026", "organizerName": "Robert Hayes", "email": "contact21@virginia.edu", "phone": "(434) 555-3143", "workOrderWorktag": "PG-0093507", "eventName": "SCPS reception \u2014 Final Exercises 2027", "location": "Rotunda", "eventDate": "2027-05-15", "startTime": "10:00 AM", "endTime": "4:00 PM", "attendance": 400, "equipment": "Chairs (standard) x2, Chairs (white) x200, Stage / riser x50", "equipmentObj": {"Chairs (standard)": 2, "Chairs (white)": 200, "Stage / riser": 50}, "fmServices": "Event setup & takedown, PA system / amplified sound", "rainLocation": "", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-03T16:02:00"}, {"requestId": "CGZ-2026-0022", "department": "Philosophy", "departmentZone": "CGZ", "departmentDay": "Saturday", "organizerName": "Maria Lopez", "email": "contact22@virginia.edu", "phone": "(434) 555-8041", "workOrderWorktag": "PG-0026704", "eventName": "Philosophy \u2014 Final Exercises 2027", "location": "Amphitheater", "eventDate": "2027-05-17", "startTime": "1:00 PM", "endTime": "12:00 PM", "attendance": 2200, "equipment": "Chairs (standard) x150, 8' Tables x3, Linens x3", "equipmentObj": {"Chairs (standard)": 150, "8' Tables": 3, "Linens": 3}, "fmServices": "Event setup & takedown", "rainLocation": "Memorial Gym", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-11T09:22:00"}, {"requestId": "CGZ-2026-0023", "department": "Engineering: Engineering Science & Material Science & Engineering", "departmentZone": "CGZ", "departmentDay": "Sunday", "organizerName": "Maria Lopez", "email": "contact23@virginia.edu", "phone": "(434) 555-4878", "workOrderWorktag": "PG-0031299", "eventName": "Engineering: Engineering Science & Material Science & Engineering \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-18", "startTime": "2:00 PM", "endTime": "11:00 AM", "attendance": 120, "equipment": "8' Tables x5, Linens x5", "equipmentObj": {"8' Tables": 5, "Linens": 5}, "fmServices": "Signs & fixtures", "rainLocation": "", "rainChanges": "", "parkingRequested": "", "tentPermit": "", "complexity": "Low", "submittedAt": "2026-08-05T10:50:00"}, {"requestId": "CGZ-2026-0024", "department": "Engineering: Computer & Electrical Engineering", "departmentZone": "CGZ", "departmentDay": "Sunday", "organizerName": "Priya Nair", "email": "contact24@virginia.edu", "phone": "(434) 555-1634", "workOrderWorktag": "PG-0071694", "eventName": "Engineering: Computer & Electrical Engineering \u2014 Final Exercises 2027", "location": "The Lawn", "eventDate": "2027-05-15", "startTime": "10:00 AM", "endTime": "12:00 PM", "attendance": 250, "equipment": "Chairs (standard) x1950, 8' Tables x9, Linens x12, Stage / riser x1", "equipmentObj": {"Chairs (standard)": 1950, "8' Tables": 9, "Linens": 12, "Stage / riser": 1}, "fmServices": "Signs & fixtures", "rainLocation": "Old Cabell Hall", "rainChanges": "", "parkingRequested": "yes", "tentPermit": "", "complexity": "High", "submittedAt": "2026-08-04T14:21:00"}];
+  return SAMPLE;
+}
+
+const RESOURCE_ITEMS = ['Chairs (standard)','Chairs (white)',"8' Tables","6' Tables",'Round Tables','Linens','Stage / riser','Stage skirts','Table skirts','Tent'];
+let ALL=[], ZONES=[], activeZone='__ALL__', sortState={};
+
+/* ---- Work Order tracking (demo: localStorage; with Azure: PATCH /api/requests/:id) ---- */
+function getWOStore(){ try{ return JSON.parse(localStorage.getItem('cgz_wo')||'{}'); }catch(e){ return {}; } }
+function getWO(id){ return getWOStore()[id]||''; }
+function setWO(id,wo){ const s=getWOStore(); if(wo){s[id]=wo;}else{delete s[id];} localStorage.setItem('cgz_wo',JSON.stringify(s)); }
+
+
+
+function esc(s){const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+
+function parseEquip(sub){
+  if(sub.equipmentObj && typeof sub.equipmentObj==='object') return sub.equipmentObj;
+  // parse "Chairs (standard) x1200, Tent x1"
+  const out={};
+  (sub.equipment||'').split(',').forEach(p=>{
+    const m=p.trim().match(/^(.*?)\s*x\s*(\d+)$/i);
+    if(m) out[m[1].trim()]=Number(m[2]);
+  });
+  return out;
+}
+
+async function init(){
+  try{ ALL = await loadData(); }
+  catch(e){ document.getElementById('content').innerHTML='<div class="empty">Could not load requests. '+esc(e.message)+'</div>'; return; }
+  ALL.forEach(s=>s._eq=parseEquip(s));
+  const zset=[...new Set(ALL.map(s=>s.departmentZone||'Unassigned'))].sort();
+  ZONES=zset;
+  buildTabs();
+  // masthead totals
+  document.getElementById('m-total').textContent=ALL.length;
+  let chairs=0,high=0;
+  ALL.forEach(s=>{chairs+=(s._eq['Chairs (standard)']||0)+(s._eq['Chairs (white)']||0); if((s.complexity||'').toLowerCase()==='high')high++;});
+  document.getElementById('m-chairs').textContent=chairs.toLocaleString();
+  document.getElementById('m-high').textContent=high;
+  render();
+}
+
+function buildTabs(){
+  const bar=document.getElementById('tabbar');
+  const incompleteCount=ALL.filter(s=>!getWO(s.requestId)).length;
+  const tabs=[{id:'__ALL__',name:'All Zones',count:ALL.length},{id:'__CS__',name:'Customer Service',count:incompleteCount,cs:true}]
+    .concat(ZONES.map(z=>({id:z,name:z,count:ALL.filter(s=>(s.departmentZone||'Unassigned')===z).length})));
+  bar.innerHTML=tabs.map(t=>
+    '<button class="tab'+(t.id===activeZone?' active':'')+(t.cs?' cs-tab':'')+'" onclick="setZone(\''+t.id.replace(/'/g,"\\'")+'\')">'+(t.cs?'\u2713 ':'')+esc(t.name)+' <span class="cnt">'+t.count+'</span></button>'
+  ).join('');
+}
+function setZone(z){activeZone=z;buildTabs();render();window.scrollTo({top:0,behavior:'smooth'});}
+
+function subsForZone(){
+  if(activeZone==='__ALL__') return ALL;
+  return ALL.filter(s=>(s.departmentZone||'Unassigned')===activeZone);
+}
+
+function render(){
+  if(activeZone==='__CS__'){ renderCS(); return; }
+  const subs=subsForZone();
+  const zoneName=activeZone==='__ALL__'?'All Zones':activeZone;
+  const c=document.getElementById('content');
+  if(!subs.length){ c.innerHTML='<div class="zone-head"><h2>'+esc(zoneName)+'</h2></div><div class="tbl-wrap"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 17V7h4a3 3 0 010 6H9"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg><div>No requests submitted for this zone yet.</div></div></div>'; return; }
+
+  // aggregates
+  let chairs=0,tables=0,tents=0,att=0; const comp={Low:0,Moderate:0,High:0}; const res={};
+  RESOURCE_ITEMS.forEach(i=>res[i]=0);
+  subs.forEach(s=>{
+    Object.entries(s._eq).forEach(([k,v])=>{ if(res[k]!=null)res[k]+=Number(v)||0; });
+    chairs+=(s._eq['Chairs (standard)']||0)+(s._eq['Chairs (white)']||0);
+    tables+=(s._eq["8' Tables"]||0)+(s._eq["6' Tables"]||0)+(s._eq['Round Tables']||0);
+    tents+=(s._eq['Tent']||0);
+    att+=Number(s.attendance)||0;
+    const k=(s.complexity||'').charAt(0).toUpperCase()+(s.complexity||'').slice(1).toLowerCase();
+    if(comp[k]!=null)comp[k]++;
+  });
+
+  c.innerHTML=
+    '<div class="zone-head"><div><h2>'+esc(zoneName)+'</h2><div class="sub">'+subs.length+' request'+(subs.length>1?'s':'')+' &middot; '+att.toLocaleString()+' total expected attendance</div></div>'+
+    '<div class="toolbar"><button class="btn" onclick="openGameplan()">Build schedule / gameplan</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
+    // cards
+    '<div class="cards">'+
+      card('Requests',subs.length,'in '+esc(zoneName))+
+      card('Chairs needed',chairs.toLocaleString(),'standard + white')+
+      card('Tables needed',tables.toLocaleString(),'all types')+
+      card('Tents',tents,'permits may apply')+
+    '</div>'+
+    // charts row
+    '<div class="grid2">'+
+      '<div class="panel"><h3><span class="dot"></span>Requests by date</h3><div class="chart-box"><canvas id="chDate"></canvas></div></div>'+
+      '<div class="panel"><h3><span class="dot"></span>Complexity mix</h3><div class="chart-box"><canvas id="chComp"></canvas></div></div>'+
+    '</div>'+
+    // resource totals
+    '<div class="panel" style="margin-bottom:22px"><h3><span class="dot"></span>Resource roll-up — everything this zone needs</h3><div class="res-grid">'+
+      RESOURCE_ITEMS.map(i=>'<div class="res-row"><span class="rn">'+esc(i)+'</span><span class="rv">'+(res[i]||0).toLocaleString()+'</span></div>').join('')+
+    '</div></div>'+
+    // table
+    '<div class="tbl-wrap"><div class="tbl-scroll"><table id="reqTable"><thead><tr>'+
+      th('requestId','Request')+th('department','Department')+th('eventDate','Date')+th('location','Location')+
+      th('attendance','Attend.')+th('complexity','Complexity')+'<th>Flags</th><th></th>'+
+    '</tr></thead><tbody id="reqBody"></tbody></table></div></div>';
+
+  drawCharts(subs,comp);
+  renderRows(subs);
+}
+
+function card(lbl,val,foot){return '<div class="card accent-l"><div class="lbl">'+esc(lbl)+'</div><div class="val">'+esc(val)+'</div><div class="foot">'+esc(foot)+'</div></div>';}
+function th(key,label){const s=sortState[key];const a=s==='asc'?'▲':s==='desc'?'▼':'⇅';return '<th onclick="sortBy(\''+key+'\')">'+esc(label)+'<span class="arr">'+a+'</span></th>';}
+
+function sortBy(key){
+  const cur=sortState[key];sortState={};sortState[key]=cur==='asc'?'desc':'asc';
+  render();
+}
+
+function renderRows(subs){
+  const body=document.getElementById('reqBody');
+  const key=Object.keys(sortState)[0];
+  let rows=[...subs];
+  if(key){
+    const dir=sortState[key]==='asc'?1:-1;
+    rows.sort((a,b)=>{
+      let va=a[key],vb=b[key];
+      if(key==='attendance'){va=Number(va)||0;vb=Number(vb)||0;return (va-vb)*dir;}
+      va=(va||'').toString().toLowerCase();vb=(vb||'').toString().toLowerCase();
+      return va<vb?-dir:va>vb?dir:0;
+    });
+  }
+  body.innerHTML=rows.map((s,i)=>{
+    const cx=(s.complexity||'na').toLowerCase();
+    const flags=[];
+    if(s.tentPermit==='no' && (s._eq['Tent']||0)>0) flags.push('<span class="flag warn">Tent permit needed</span>');
+    if(s.tentPermit==='inprogress') flags.push('<span class="flag pend">Permit in progress</span>');
+    if(s.parkingRequested==='no') flags.push('<span class="flag pend">Parking not requested</span>');
+    if(Number(s.attendance)>=1000) flags.push('<span class="flag warn">Large crowd</span>');
+    if(!flags.length) flags.push('<span class="flag ok">Clear</span>');
+    return '<tr>'+
+      '<td class="rid">'+esc(s.requestId)+'</td>'+
+      '<td class="dept-cell">'+esc(s.department)+'</td>'+
+      '<td>'+esc(s.eventDate||s.departmentDay||'—')+'</td>'+
+      '<td>'+esc(s.location||'—')+'</td>'+
+      '<td>'+(Number(s.attendance)||0).toLocaleString()+'</td>'+
+      '<td><span class="pill '+cx+'">'+esc(s.complexity||'—')+'</span></td>'+
+      '<td>'+flags.join('')+'</td>'+
+      '<td><button class="btn" style="padding:4px 10px" onclick="toggleDetail(this,'+i+')"><span class="caret">▶</span></button></td>'+
+    '</tr>'+
+    '<tr class="detail-row" style="display:none" id="det'+i+'"><td colspan="8"><div class="detail-inner">'+
+      dl('Organizer',s.organizerName)+dl('Email',s.email)+dl('Phone',s.phone)+
+      dl('Work order / worktag',s.workOrderWorktag)+dl('Event',s.eventName)+dl('Time',(s.startTime||'')+' – '+(s.endTime||''))+
+      dl('Equipment',s.equipment||'—')+dl('FM services',s.fmServices||'—')+dl('Ceremony day',s.departmentDay||'—')+
+      dl('Rain backup',s.rainLocation||'Same rain or shine')+dl('Rain changes',s.rainChanges||'—')+dl('Parking requested',s.parkingRequested==='yes'?'Yes':s.parkingRequested==='no'?'No':'—')+
+    '</div></td></tr>';
+  }).join('');
+}
+function dl(l,v){return '<div><div class="dl">'+esc(l)+'</div><div class="dv">'+esc(v||'—')+'</div></div>';}
+function toggleDetail(btn,i){
+  const d=document.getElementById('det'+i);const c=btn.querySelector('.caret');
+  const open=d.style.display==='none';
+  d.style.display=open?'table-row':'none';c.classList.toggle('open',open);
+}
+
+
+function renderCS(){
+  const c=document.getElementById('content');
+  const incomplete=ALL.filter(s=>!getWO(s.requestId));
+  const complete=ALL.filter(s=>getWO(s.requestId));
+  c.innerHTML=
+    '<div class="zone-head"><div><h2>Customer Service</h2><div class="sub">Create AiM Work Orders from incoming worktags. Paste the WO number to mark a request complete.</div></div>'+
+    '<div class="toolbar"><button class="btn" onclick="window.print()">Print worklist</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
+    '<div class="cards" style="grid-template-columns:repeat(3,1fr)">'+
+      card('Incoming (all)',ALL.length,'total requests')+
+      card('Needs Work Order',incomplete.length,'not yet in AiM')+
+      card('Completed',complete.length,'WO created')+
+    '</div>'+
+    csSection('Incomplete — needs a Work Order created',incomplete,false)+
+    '<div style="height:22px"></div>'+
+    csSection('Completed — Work Order created',complete,true);
+}
+
+function csSection(title,list,done){
+  if(!list.length) return '<div class="panel"><h3><span class="dot"></span>'+esc(title)+'</h3><div style="color:var(--muted);font-size:13px;padding:8px 0">Nothing here right now.</div></div>';
+  return '<div class="tbl-wrap"><div style="padding:14px 18px;background:'+(done?'#f2f8f4':'#fff8ef')+';border-bottom:1px solid var(--line);font-weight:700;color:var(--navy);font-size:13px;text-transform:uppercase;letter-spacing:.05em">'+esc(title)+' ('+list.length+')</div><div class="tbl-scroll"><table><thead><tr>'+
+    '<th>Worktag</th><th>Department</th><th>Date</th><th>Location</th><th>Services (reference for phases)</th><th>Cost note</th><th style="min-width:180px">AiM Work Order #</th>'+
+    '</tr></thead><tbody>'+
+    list.map(s=>{
+      const wo=getWO(s.requestId);
+      const costNote=s.rainChanges||s.fmNotes||'—';
+      return '<tr>'+
+        '<td class="rid" style="font-size:13px;font-weight:700">'+esc(s.workOrderWorktag||'—')+'</td>'+
+        '<td class="dept-cell">'+esc(s.department)+'<div style="font-size:11px;color:var(--muted);font-weight:400">'+esc(s.requestId)+'</div></td>'+
+        '<td>'+esc(s.eventDate||s.departmentDay||'—')+'</td>'+
+        '<td>'+esc(s.location||'—')+'</td>'+
+        '<td style="max-width:240px;font-size:12px">'+esc(s.fmServices||'—')+'</td>'+
+        '<td style="font-size:12px;max-width:160px">'+esc(costNote)+'</td>'+
+        '<td>'+
+          (done
+            ? '<span class="pill low" style="font-family:monospace">'+esc(wo)+'</span> <button class="btn" style="padding:3px 8px;font-size:11px" onclick="reopenWO(\''+s.requestId+'\')">Undo</button>'
+            : '<div style="display:flex;gap:6px"><input type="text" id="wo_'+s.requestId+'" placeholder="e.g. 4276543" style="flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-family:monospace;font-size:13px"><button class="btn primary" style="padding:7px 12px" onclick="saveWO(\''+s.requestId+'\')">Save</button></div>')+
+        '</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div></div>';
+}
+
+function saveWO(id){
+  const el=document.getElementById('wo_'+id);
+  const v=(el.value||'').trim();
+  if(!v){ el.style.borderColor='#c0392b'; el.focus(); return; }
+  setWO(id,v);
+  buildTabs(); renderCS();
+}
+function reopenWO(id){ setWO(id,''); buildTabs(); renderCS(); }
+
+
+/* ===================== GAMEPLAN BUILDER ===================== */
+function parseTime(t){ // "9:00 AM" -> minutes from midnight
+  if(!t) return null;
+  const m=String(t).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+  if(!m) return null;
+  let h=+m[1], min=+m[2];
+  if(m[3]){ const ap=m[3].toUpperCase(); if(ap==='PM'&&h!==12)h+=12; if(ap==='AM'&&h===12)h=0; }
+  return h*60+min;
+}
+function fmtTime(mins){
+  if(mins==null) return '—';
+  let h=Math.floor(mins/60), m=mins%60; const ap=h>=12?'PM':'AM'; let hh=h%12; if(hh===0)hh=12;
+  return hh+':'+String(m).padStart(2,'0')+' '+ap;
+}
+// Derive setup/event/teardown windows for a submission
+function windows(s){
+  const evStart=parseTime(s.startTime), evEnd=parseTime(s.endTime);
+  const setup=parseTime(s.setupTime);
+  const teardown=parseTime(s.teardownTime);
+  // Defaults if not provided: setup = 2h before event, teardown = 1h after
+  const sStart = setup!=null?setup:(evStart!=null?evStart-120:null);
+  const sEnd = evStart!=null?evStart:null;
+  const tStart = evEnd!=null?evEnd:null;
+  const tEnd = teardown!=null?teardown:(evEnd!=null?evEnd+60:null);
+  return {evStart,evEnd,setupStart:sStart,setupEnd:sEnd,teardownStart:tStart,teardownEnd:tEnd};
+}
+
+function openGameplan(){
+  document.getElementById('gpOverlay').style.display='flex';
+  const locs=[...new Set(ALL.map(s=>s.location).filter(Boolean))].sort();
+  const zones=[...new Set(ALL.map(s=>s.departmentZone||'Unassigned'))].sort();
+  const f=document.getElementById('gpFilters');
+  f.innerHTML=
+    fg('Locations', multi('gpLoc',locs))+
+    fg('Resource types', multi('gpRes',RESOURCE_ITEMS))+
+    fg('Zones', multi('gpZone',zones))+
+    fg('Complexity', multi('gpComp',['Low','Moderate','High']))+
+    fg('Date from', '<div class="gp-date"><input type="date" id="gpFrom"><input type="date" id="gpTo"></div>')+
+    fg('&nbsp;', '<div style="font-size:12px;color:var(--muted);line-height:1.5">Filters combine. Empty = include all. Resource filter keeps only events needing at least one selected resource.</div>');
+  document.getElementById('gpResult').innerHTML='';
+}
+function fg(label,inner){ return '<div class="gp-fg"><label>'+label+'</label>'+inner+'</div>'; }
+function multi(id,opts){ return '<div class="gp-multi" id="'+id+'">'+opts.map(o=>'<label><input type="checkbox" value="'+esc(o)+'"> '+esc(o)+'</label>').join('')+'</div>'; }
+function closeGameplan(){ document.getElementById('gpOverlay').style.display='none'; }
+function getMulti(id){ return Array.from(document.querySelectorAll('#'+id+' input:checked')).map(c=>c.value); }
+
+function buildGameplan(){
+  const fLoc=getMulti('gpLoc'), fRes=getMulti('gpRes'), fZone=getMulti('gpZone'), fComp=getMulti('gpComp');
+  const from=document.getElementById('gpFrom').value, to=document.getElementById('gpTo').value;
+  let subs=ALL.filter(s=>{
+    if(fLoc.length && !fLoc.includes(s.location)) return false;
+    if(fZone.length && !fZone.includes(s.departmentZone||'Unassigned')) return false;
+    if(fComp.length && !fComp.includes((s.complexity||'').charAt(0).toUpperCase()+(s.complexity||'').slice(1).toLowerCase())) return false;
+    if(fRes.length && !fRes.some(r=>(s._eq[r]||0)>0)) return false;
+    if(from && (s.eventDate||'') < from) return false;
+    if(to && (s.eventDate||'') > to) return false;
+    return true;
+  });
+  const res=document.getElementById('gpResult');
+  if(!subs.length){ res.innerHTML='<div class="gp-empty">No events match those filters. Try widening them.</div>'; return; }
+
+  // sort by date then event start
+  subs.sort((a,b)=>{
+    const d=(a.eventDate||'').localeCompare(b.eventDate||''); if(d)return d;
+    return (parseTime(a.startTime)||0)-(parseTime(b.startTime)||0);
+  });
+
+  // Detect clashes: same location + overlapping full window (setup..teardown) on same date
+  subs.forEach(s=>{s._w=windows(s);s._clash=[];});
+  for(let i=0;i<subs.length;i++)for(let j=i+1;j<subs.length;j++){
+    const a=subs[i],b=subs[j];
+    if((a.eventDate||'')!==(b.eventDate||''))continue;
+    if(a.location!==b.location)continue;
+    const aS=a._w.setupStart??a._w.evStart, aE=a._w.teardownEnd??a._w.evEnd;
+    const bS=b._w.setupStart??b._w.evStart, bE=b._w.teardownEnd??b._w.evEnd;
+    if(aS!=null&&bS!=null&&aS<bE&&bS<aE){ a._clash.push(b.requestId); b._clash.push(a.requestId); }
+  }
+
+  const filterDesc=[
+    fLoc.length?fLoc.length+' location(s)':'all locations',
+    fRes.length?fRes.join(', '):'all resources',
+    fZone.length?fZone.join(', '):'all zones',
+    (from||to)?('dates '+(from||'…')+' to '+(to||'…')):'all dates'
+  ].join(' · ');
+
+  const clashCount=subs.filter(s=>s._clash.length).length;
+
+  res.innerHTML=
+    '<div class="gp-report-head"><h1>Operations Gameplan</h1><div class="meta">Filters: '+esc(filterDesc)+' &middot; '+subs.length+' events &middot; generated '+new Date().toLocaleString()+'</div>'+
+      '<button class="btn primary" style="margin-top:12px" onclick="window.print()">Print this gameplan</button></div>'+
+    (clashCount?'<div class="gp-warn"><b>\u26a0 '+clashCount+' event(s) overlap</b> on the same location and time (including setup/teardown). Check the timeline and resolve before the day.</div>':'')+
+    ganttView(subs)+
+    chronoView(subs)+
+    locationView(subs)+
+    crewView(subs,fRes);
+  res.scrollIntoView({behavior:'smooth'});
+}
+
+function ganttView(subs){
+  // group by date
+  const byDate={}; subs.forEach(s=>{(byDate[s.eventDate||'—']=byDate[s.eventDate||'—']||[]).push(s);});
+  let out='<div class="gp-sec"><h3>Timeline (setup \u2192 event \u2192 teardown)</h3>';
+  Object.keys(byDate).sort().forEach(date=>{
+    const list=byDate[date];
+    // scale: min setupStart to max teardownEnd
+    let lo=Infinity,hi=-Infinity;
+    list.forEach(s=>{const w=s._w; [w.setupStart,w.evStart,w.evEnd,w.teardownEnd].forEach(v=>{if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v);}});});
+    if(lo===Infinity){lo=8*60;hi=18*60;}
+    lo=Math.floor(lo/60)*60; hi=Math.ceil(hi/60)*60; const span=Math.max(hi-lo,60);
+    out+='<div style="font-weight:700;color:var(--navy);font-size:13px;margin:14px 0 8px">'+esc(date)+'</div><div class="gantt">';
+    list.forEach(s=>{
+      const w=s._w; const clash=s._clash.length>0;
+      function bar(a,b,cls,lbl){ if(a==null||b==null||b<=a)return ''; const L=((a-lo)/span*100).toFixed(2), W=((b-a)/span*100).toFixed(2); return '<div class="gantt-bar '+cls+(clash&&cls==='event'?' clash':'')+'" style="left:'+L+'%;width:'+W+'%">'+lbl+'</div>'; }
+      out+='<div class="gantt-row"><div class="gantt-lbl" title="'+esc(s.department)+'">'+esc(s.department)+'</div><div class="gantt-track">'+
+        bar(w.setupStart,w.setupEnd,'setup','Setup')+
+        bar(w.evStart,w.evEnd,'event',esc(s.location||''))+
+        bar(w.teardownStart,w.teardownEnd,'teardown','Down')+
+      '</div></div>';
+    });
+    // scale ticks
+    let ticks='<div class="gantt-scale">'; const steps=Math.min(span/60,8);
+    for(let t=0;t<=steps;t++){ticks+='<span>'+fmtTime(lo+t*(span/steps))+'</span>';}
+    ticks+='</div>';
+    out+=ticks+'</div>';
+  });
+  return out+'</div>';
+}
+
+function chronoView(subs){
+  let out='<div class="gp-sec"><h3>Chronological schedule</h3><table class="gp-tbl"><thead><tr><th>Date</th><th>Setup</th><th>Event</th><th>Teardown</th><th>Department</th><th>Location</th><th>Attend.</th><th>Key resources</th></tr></thead><tbody>';
+  subs.forEach(s=>{
+    const w=s._w;
+    const keyRes=Object.entries(s._eq).filter(([k,v])=>v>0).map(([k,v])=>k.replace(/\s*\(.*\)/,'')+' '+v).join(', ');
+    out+='<tr class="'+(s._clash.length?'clash':'')+'"><td>'+esc(s.eventDate||'—')+'</td>'+
+      '<td>'+fmtTime(w.setupStart)+'</td>'+
+      '<td>'+fmtTime(w.evStart)+'–'+fmtTime(w.evEnd)+'</td>'+
+      '<td>'+fmtTime(w.teardownEnd)+'</td>'+
+      '<td style="font-weight:600">'+esc(s.department)+'</td>'+
+      '<td>'+esc(s.location||'—')+(s._clash.length?' <span style="color:#c0392b;font-weight:700">\u26a0</span>':'')+'</td>'+
+      '<td>'+(Number(s.attendance)||0).toLocaleString()+'</td>'+
+      '<td style="font-size:11px">'+esc(keyRes||'—')+'</td></tr>';
+  });
+  return out+'</tbody></table></div>';
+}
+
+function locationView(subs){
+  const byLoc={}; subs.forEach(s=>{(byLoc[s.location||'—']=byLoc[s.location||'—']||[]).push(s);});
+  let out='<div class="gp-sec"><h3>By location</h3>';
+  Object.keys(byLoc).sort().forEach(loc=>{
+    out+='<div class="gp-loc-group"><h4>'+esc(loc)+' ('+byLoc[loc].length+' event'+(byLoc[loc].length>1?'s':'')+')</h4>'+
+      '<table class="gp-tbl"><thead><tr><th>Date</th><th>Time</th><th>Department</th><th>Setup by</th><th>Resources</th></tr></thead><tbody>';
+    byLoc[loc].forEach(s=>{
+      const w=s._w;
+      const rr=Object.entries(s._eq).filter(([k,v])=>v>0).map(([k,v])=>k.replace(/\s*\(.*\)/,'')+' '+v).join(', ');
+      out+='<tr class="'+(s._clash.length?'clash':'')+'"><td>'+esc(s.eventDate||'—')+'</td><td>'+fmtTime(w.evStart)+'–'+fmtTime(w.evEnd)+'</td><td style="font-weight:600">'+esc(s.department)+'</td><td>'+fmtTime(w.setupStart)+'</td><td style="font-size:11px">'+esc(rr||'—')+'</td></tr>';
+    });
+    out+='</tbody></table></div>';
+  });
+  return out+'</div>';
+}
+
+function crewView(subs,fRes){
+  // Resource totals + which events need each. If resource filter set, only those.
+  const items=fRes.length?fRes:RESOURCE_ITEMS;
+  let out='<div class="gp-sec"><h3>Crew pull-list (resource totals + where they go)</h3><table class="gp-tbl"><thead><tr><th>Resource</th><th>Total</th><th>Breakdown by event</th></tr></thead><tbody>';
+  items.forEach(it=>{
+    let total=0; const rows=[];
+    subs.forEach(s=>{const q=s._eq[it]||0; if(q>0){total+=q; rows.push(esc(s.department)+' ('+esc(s.location||'?')+'): '+q);}});
+    if(total>0) out+='<tr><td style="font-weight:600">'+esc(it)+'</td><td style="font-family:Georgia,serif;font-weight:700;color:var(--navy)">'+total.toLocaleString()+'</td><td style="font-size:11px">'+rows.join(' &middot; ')+'</td></tr>';
+  });
+  return out+'</tbody></table></div>';
+}
+
+let charts={};
+function drawCharts(subs,comp){
+  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});
+  // by date
+  const byDate={};subs.forEach(s=>{const d=s.eventDate||s.departmentDay||'—';byDate[d]=(byDate[d]||0)+1;});
+  const dates=Object.keys(byDate).sort();
+  charts.date=new Chart(document.getElementById('chDate'),{
+    type:'bar',
+    data:{labels:dates,datasets:[{data:dates.map(d=>byDate[d]),backgroundColor:'#E57200',borderRadius:5,maxBarThickness:44}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:'#eee'}},x:{grid:{display:false}}},responsive:true,maintainAspectRatio:false}
+  });
+  // complexity donut
+  charts.comp=new Chart(document.getElementById('chComp'),{
+    type:'doughnut',
+    data:{labels:['Low','Moderate','High'],datasets:[{data:[comp.Low,comp.Moderate,comp.High],backgroundColor:['#2e7d54','#c98a1a','#c0392b'],borderWidth:2,borderColor:'#fff'}]},
+    options:{plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:12}}}},cutout:'62%',responsive:true,maintainAspectRatio:false}
+  });
+}
+
+init();
+</script>
+
+  <!-- Gameplan builder modal -->
+  <div class="gp-overlay" id="gpOverlay" style="display:none">
+    <div class="gp-modal">
+      <div class="gp-head">
+        <h2>Build operations gameplan</h2>
+        <button class="gp-close" onclick="closeGameplan()">&times;</button>
+      </div>
+      <div class="gp-filters" id="gpFilters"></div>
+      <div class="gp-actions">
+        <button class="btn primary" onclick="buildGameplan()">Build schedule</button>
+        <span class="gp-hint" id="gpHint">Select filters, then build. Leave a filter empty to include all.</span>
+      </div>
+      <div class="gp-result" id="gpResult"></div>
+    </div>
+  </div>
+
+</body>
+</html>
