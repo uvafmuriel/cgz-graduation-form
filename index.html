@@ -836,6 +836,42 @@
     .fm-banner { display:none; background:#232D4B; color:#fff; padding:10px 16px; border-radius:8px; margin-bottom:12px; font-size:14px; }
     .fm-banner.show { display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .fm-banner button { background:#E57200; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; }
+
+    .dept-reference { margin-bottom: 18px; }
+    .ref-panel { background: #232D4B; color: #eef1f7; border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
+    .ref-panel h4 { color: #fff; font-size: 14px; margin: 0 0 10px; font-weight: 600; }
+    .ref-panel .ref-tag { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #f4a259; font-weight: 700; display:block; margin-bottom: 6px; }
+    .ref-loc-line { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.12); font-size: 13px; }
+    .ref-loc-line .k { flex: 0 0 110px; color: #b9c2d6; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+    .ref-loc-line .v { font-weight: 600; }
+    .ref-equip { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .ref-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); border-radius: 100px; padding: 4px 11px; font-size: 12px; }
+    .ref-pill .q { color: #f4a259; font-weight: 700; margin-left: 3px; }
+    .ref-adnote { margin-top: 12px; background: rgba(255,255,255,0.08); border-left: 3px solid #E57200; padding: 9px 12px; font-size: 12px; border-radius: 0 6px 6px 0; line-height: 1.45; }
+    .ref-adnote .lbl { display: block; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #f4a259; font-weight: 700; margin-bottom: 3px; }
+    .weather-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .weather-card { border: 1px solid #e4e2dc; border-radius: 8px; padding: 12px; background: #fbfaf8; }
+    .weather-card .wc-tag { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .weather-card.fair .wc-tag { color: #2e7d54; }
+    .weather-card.inclement .wc-tag { color: #b8860b; }
+    .weather-card.severe .wc-tag { color: #c0392b; }
+    .weather-card .wc-venue { font-size: 13px; font-weight: 600; color: #232D4B; margin-bottom: 8px; min-height: 34px; }
+    .weather-card .wc-map-btn { width: 100%; font-size: 12px; padding: 6px; border-radius: 6px; border: 1px solid #232D4B; background: #fff; color: #232D4B; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .weather-card .wc-map-btn:hover { background: #232D4B; color: #fff; }
+    .weather-card .wc-map-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #ccc; color: #999; }
+    .weather-card .wc-offmap { font-size: 11px; color: #888780; text-align: center; padding: 6px; font-style: italic; }
+    .weather-notice { background: #fff4e0; border: 1px solid #f4d9a8; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #7A3D00; margin-bottom: 14px; }
+    .equip-picker { margin-top: 4px; }
+    .equip-cat { margin-bottom: 16px; }
+    .equip-cat h5 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #888780; margin: 0 0 8px; padding-bottom: 5px; border-bottom: 1px dashed #e4e2dc; }
+    .equip-row { display: grid; grid-template-columns: 20px 1fr 110px; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; }
+    .equip-row:hover { background: #f5f6f8; }
+    .equip-row.sel { background: #eaf3e0; }
+    .equip-row input[type=checkbox] { width: 17px; height: 17px; accent-color: #E57200; cursor: pointer; }
+    .equip-row .en { font-size: 13px; }
+    .equip-row .en .esub { display: block; color: #888780; font-size: 11px; }
+    .equip-row .eprev { display: inline-block; margin-left: 6px; font-size: 11px; color: #888780; background: #f0eeea; border: 1px solid #e4e2dc; border-radius: 100px; padding: 1px 8px; }
+    .equip-row .eq-qty input { width: 100%; text-align: center; padding: 6px; font-size: 13px; border: 1px solid #d0cec7; border-radius: 6px; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -915,6 +951,17 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         Event details
       </div>
+
+      <div class="field-group" style="margin-bottom:16px;">
+        <label class="field-label" for="dept-select">Graduating department / program <span class="req-tag">required</span></label>
+        <select id="dept-select" onchange="onDeptSelect()">
+          <option value="">Select your department...</option>
+        </select>
+        <p class="field-hint" style="font-size:12px;color:#888780;margin-top:4px;">Selecting your department pre-fills last year's equipment and shows your planned venues. You can edit everything below.</p>
+      </div>
+
+      <div id="dept-reference" class="dept-reference" style="display:none;"></div>
+
       <div class="field-row">
         <div class="field-group">
           <label class="field-label" for="event-name">Event name <span class="req-tag">required</span></label>
@@ -1022,12 +1069,22 @@
     </div>
 
     <!-- ── FM SERVICES ── -->
+    </div>
+
     <div class="form-section">
       <div class="section-title">
         <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
         FM services needed
       </div>
       <p class="sub-label">Select all that apply. Additional questions will appear based on your selections.</p>
+
+      <div id="equip-block" style="display:none; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #e4e2dc;">
+        <p class="sub-label" style="font-weight:600; margin-bottom:6px;">Rental equipment</p>
+        <p class="field-hint" style="font-size:12px; color:#888780; margin-bottom:12px;">Pre-filled from your department's 2026 request. Adjust for 2027.</p>
+        <div id="equip-picker" class="equip-picker"></div>
+      </div>
+
+      <p class="sub-label" style="font-weight:600; margin-bottom:8px;">FM coordination &amp; other services</p>
 
       <div class="service-grid">
 
@@ -1489,6 +1546,147 @@
   <script>
     const POWER_AUTOMATE_URL = "https://default7b3480c7370748738b77e216733a65.ac.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f38e9d483f4625a6739d146588a32a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=VU0Th2HD46yJzCwiikF4TL-qxNJ1kWYo7y6ThgnMGcc";
 
+    // ── Ken's per-department 2026 data ──
+    const SCHOOLS = [{"name": "African and African-American Studies", "equip": {"Chairs (standard)": 60, "8' Tables": 5, "Linens": 5}, "ad_notes": ["60 discounted chairs, 5 discounted tables, 5 linens"], "wo_count": 1, "wos": [4276543], "fair_loc": "Minor Hall", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Architecture", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4250488], "fair_loc": "JPJ", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Sunday", "zone": "JPJ ceremonies"}, {"name": "Art", "equip": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "ad_notes": ["\u2159 of the amount reduced from labor on WO 4290821. This shifts \u2159 of 35% of labor cost to department since OME will cover 65% of the labor, and it applied to all departments scheduled to use the AFC for fair, inclement, or severe weather"], "wo_count": 1, "wos": [4289414], "fair_loc": "Culbreth Theater", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Biology", "equip": {"Chairs (standard)": 2200, "8' Tables": 4, "Linens": 4, "Stage / riser": 1}, "ad_notes": ["\u2159 of 2200 discounted chairs, 4 discounted tables and 4 linens + \u00bd of interpreter platform"], "wo_count": 1, "wos": [4291796], "fair_loc": "AFC", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "McCormick"}, {"name": "Chemistry", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["\u00bd of 2 discounted tables & linens to share with Sociology"], "wo_count": 1, "wos": [4294396], "fair_loc": "Old Cabell Hall", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "Hubba"}, {"name": "Classics Dept", "equip": {"Chairs (standard)": 200, "8' Tables": 3, "Linens": 3}, "ad_notes": ["200 discounted chairs + 3 discounted tables + 3 linens"], "wo_count": 1, "wos": [4275385], "fair_loc": "Garden IX", "inclement_loc": "GILMER 390", "severe_loc": "GILMER 390", "day": "Saturday", "zone": "CGZ"}, {"name": "Cognitive Science", "equip": {"Chairs (standard)": 3400, "8' Tables": 4, "Linens": 4, "Tent": 1}, "ad_notes": ["\u2153 of 1200 discounted chairs & 2 tables + 2 linens + \u00bc tent rental at Rotunda for fair weather setup PLUS \u2159 of 2200 discounted chairs, 2 discounted tables, and 2 linens at AFC for inclement weather setup"], "wo_count": 1, "wos": [4250458], "fair_loc": "Rotunda North Plaza", "inclement_loc": "AFC", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Commerce School", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["\u2153 of discounted cost of 2 tables and 2 linens. Split equipment cost 33/33/33 with Politics and Econ"], "wo_count": 1, "wos": [4290822], "fair_loc": "Lawn Stage", "inclement_loc": "JPJ", "severe_loc": "SAME", "day": "Sunday", "zone": "Hubba"}, {"name": "Computer Science (College of Arts & Sciences)", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4293773], "fair_loc": "JPJ", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "JPJ ceremonies"}, {"name": "Darden", "equip": {"Chairs (white)": 4400, "Round Tables": 90, "6' Tables": 42, "Stage / riser": 1, "Linens": 3, "Chairs (standard)": 1400, "8' Tables": 2}, "ad_notes": [], "wo_count": 1, "wos": [4289083], "fair_loc": "Darden", "inclement_loc": "SAME", "severe_loc": "NCRC", "day": "Saturday / Sunday (severe only)", "zone": "North Grounds"}, {"name": "Data Science", "equip": {"8' Tables": 4, "Linens": 4}, "ad_notes": ["\u00bd of 1 discounted tables & 1 linens shared with Biomedical Eng & 3 discounted tables + 3 linens"], "wo_count": 1, "wos": [4289526], "fair_loc": "Old Cabell Hall", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Sunday", "zone": "Hubba"}, {"name": "Donning of the Kente", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [], "fair_loc": "AFC", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Friday", "zone": "McCormick"}, {"name": "East Asian Languages and Cultures", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["2 discounted tables + 2 linens"], "wo_count": 1, "wos": [4252443], "fair_loc": "Nau 101", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Economics", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["\u2153 of discounted cost of 2 tables and 2 linens. Split equipment cost 33/33/33 with Politics and Commerce"], "wo_count": 1, "wos": [4289849], "fair_loc": "Lawn Stage", "inclement_loc": "JPJ", "severe_loc": "SAME", "day": "Saturday", "zone": "Hubba"}, {"name": "Education and Human Development", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4291496], "fair_loc": "JPJ", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "JPJ ceremonies"}, {"name": "Engineering: Aerospace & Mechanical", "equip": {"Chairs (standard)": 2625, "8' Tables": 8, "Linens": 8}, "ad_notes": ["Shift this cost to WO 4293751"], "wo_count": 1, "wos": [4293751, 4292007], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Biomedical Engineering (undergraduate and graduate)", "equip": {"8' Tables": 1, "Linens": 1}, "ad_notes": ["\u00bd of 1 discounted table + 1 linen"], "wo_count": 1, "wos": [4294399], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Biomedical Engineering Reception", "equip": {"8' Tables": 4, "Linens": 4}, "ad_notes": ["4 discounted tables + 4 linens"], "wo_count": 1, "wos": [4291128], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Chemical", "equip": {"8' Tables": 5, "Linens": 5}, "ad_notes": ["\u00bd of 5 tables + 5 linens"], "wo_count": 1, "wos": [4291795], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Civil & Environmental Eng", "equip": {"Chairs (standard)": 1950, "8' Tables": 9, "Linens": 12, "Stage / riser": 1}, "ad_notes": ["\u00bd of 1050 discounted chairs, 4 discounted tables, 4 linens, and 1 stage at Darden Court for fair weather PLUS \u00bc of 900 discounted chairs, 5 tables, and 8 linens at SRC for inclement/severe weather"], "wo_count": 1, "wos": [4292015], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Computer & Electrical Engineering", "equip": {"Chairs (standard)": 1950, "8' Tables": 9, "Linens": 12, "Stage / riser": 1}, "ad_notes": ["\u00bd of 1050 discounted chairs, 4 discounted tables, 4 linens, and 1 stage at Darden Court for fair weather PLUS \u00bc of 900 discounted chairs, 5 tables, and 8 linens at SRC for inclement/severe weather"], "wo_count": 1, "wos": [4292029], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Computer Science", "equip": {"Chairs (standard)": 2200, "8' Tables": 2, "Linens": 2}, "ad_notes": ["\u2159 of 2200 discounted chairs, 2 discounted tables and 2 linens at AFC in case of inclement weather"], "wo_count": 1, "wos": [4291498], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Engineering Science & Material Science & Engineering", "equip": {"8' Tables": 5, "Linens": 5}, "ad_notes": ["\u00bd of 5 tables + 5 linens"], "wo_count": 1, "wos": [4292039], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "Engineering: Systems Engineering", "equip": {"Chairs (standard)": 2625, "8' Tables": 8, "Linens": 8}, "ad_notes": [], "wo_count": 1, "wos": [4293766], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "AFC", "day": "Sunday", "zone": "CGZ"}, {"name": "English", "equip": {"Chairs (standard)": 1825, "8' Tables": 4, "Linens": 4}, "ad_notes": ["\u00bc of 1700 discounted chairs + \u00bd of 2 discounted tables + 2 linens + Hubba\u2019s podium cost at Amphitheater PLUS \u00bc of 1400 discounted chairs, 2 discounted tables, and 2 linens at NGRC for severe weather setup"], "wo_count": 2, "wos": [4289090, 4276519], "fair_loc": "Amphitheater", "inclement_loc": "Amphitheater", "severe_loc": "NGRC", "day": "Saturday", "zone": "CGZ"}, {"name": "French & Medieval Studies", "equip": {"Chairs (white)": 100, "Tent": 1}, "ad_notes": [], "wo_count": 1, "wos": [4250468], "fair_loc": "French House", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "Housing"}, {"name": "Germanic Languages", "equip": {"Chairs (standard)": 20, "8' Tables": 2, "Linens": 2}, "ad_notes": ["20 discounted chairs + 2 discounted tables + 2 linens"], "wo_count": 1, "wos": [4275349], "fair_loc": "Garden II (lower)", "inclement_loc": "NCH 236", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Global Public Health (undergrad)", "equip": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "ad_notes": ["1/4 of 100 chairs, 2 tables, 2 linens"], "wo_count": 1, "wos": [4276522], "fair_loc": "Culbreth Theater", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "History (Undergraduate)", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [], "fair_loc": "", "inclement_loc": "", "severe_loc": "", "day": "", "zone": ""}, {"name": "History Reception (Graduate)", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4275399], "fair_loc": "South Lawn Dean's Commons, 2rd Floor", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Joint Commissioning ROTC", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4291615], "fair_loc": "Old Cabell Hall", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Friday", "zone": "Hubba"}, {"name": "Law School", "equip": {"Chairs (standard)": 3500, "8' Tables": 7, "Stage skirts": 1, "Table skirts": 1, "Stage / riser": 3}, "ad_notes": ["3500 chairs + 7 tables + stages + skirting"], "wo_count": 2, "wos": [4247699, 4289110], "fair_loc": "Law Lawn", "inclement_loc": "JPJ", "severe_loc": "SAME", "day": "SUNDAY", "zone": "North Grounds"}, {"name": "Law School Reception", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4289113], "fair_loc": "Law Lawn", "inclement_loc": "JPJ", "severe_loc": "SAME", "day": "SUNDAY", "zone": "North Grounds"}, {"name": "Master's of Public Health & Clinical Research", "equip": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "ad_notes": ["1/4 of 100 chairs, 2 tables, 2 linens"], "wo_count": 1, "wos": [4276536], "fair_loc": "", "inclement_loc": "", "severe_loc": "", "day": "", "zone": ""}, {"name": "Math", "equip": {"Chairs (standard)": 1200, "8' Tables": 2, "Linens": 2, "Tent": 1}, "ad_notes": ["\u2153 of 1200 discounted chairs & 2 tables + 2 linens + \u00bc tent rental"], "wo_count": 1, "wos": [4293768], "fair_loc": "Rotunda North Plaza", "inclement_loc": "Warner 209", "severe_loc": "Warner 209", "day": "Saturday", "zone": "CGZ"}, {"name": "Media Studies", "equip": {"Chairs (standard)": 1825, "8' Tables": 4, "Linens": 4}, "ad_notes": ["Shift this cost to WO 4289093", "\u00bc of 1700 discounted chairs + \u00bd of 2 discounted tables + 2 linens + Hubba\u2019s podium cost at Amphitheater PLUS \u00bc of 1400 discounted chairs, 2 discounted tables, and 2 linens at NGRC for severe weather setup"], "wo_count": 2, "wos": [4293747, 4289093], "fair_loc": "Amphitheater", "inclement_loc": "SAME", "severe_loc": "NGRC", "day": "Saturday", "zone": "CGZ"}, {"name": "Middle Eastern & South Asian Languages & Culture", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["2 discounted tables + 2 linens"], "wo_count": 1, "wos": [4288400], "fair_loc": "Nau 101", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Music", "equip": {"Stage / riser": 1}, "ad_notes": ["Stage"], "wo_count": 1, "wos": [4275400], "fair_loc": "Band Rehearsal Bldg", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Navy ROTC", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4293776], "fair_loc": "Rotunda North Plaza", "inclement_loc": "Old Cabell Hall", "severe_loc": "Old Cabell Hall", "day": "Friday", "zone": "CGZ"}, {"name": "Neuroscience", "equip": {"Chairs (standard)": 900, "8' Tables": 5, "Linens": 8}, "ad_notes": [], "wo_count": 1, "wos": [4250483], "fair_loc": "Slaughter Rec", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "West Grounds"}, {"name": "Nursing", "equip": {"Chairs (standard)": 1200, "8' Tables": 2, "Linens": 2, "Tent": 1}, "ad_notes": ["\u00bd of 1200 discounted chairs & 2 tables + \u00bc tent rental"], "wo_count": 1, "wos": [4291137], "fair_loc": "MR5 courtyard", "inclement_loc": "McLEOD", "severe_loc": "SAME", "day": "Friday", "zone": "CGZ"}, {"name": "Pavilion Chair Deliveries", "equip": {"Chairs (standard)": 180}, "ad_notes": ["Chairs delivered to individual Pavilion balconies/gardens for Final Exercises"], "wos": [[4293789], [4293792], [4293796], [4293794], [4293795]], "wo_count": 5, "fair_loc": "Pavilions", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Thursday", "zone": "CGZ"}, {"name": "Philosophy", "equip": {"Chairs (standard)": 150, "8' Tables": 3, "Linens": 3}, "ad_notes": ["150 discounted chairs + 3 discounted tables + 3 linens"], "wo_count": 1, "wos": [4275382], "fair_loc": "Garden IV Lower Garden", "inclement_loc": "WILSON 402", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Politics, Foreign Affairs & Gov't", "equip": {"8' Tables": 2, "Linens": 2}, "ad_notes": ["\u2153 of discounted cost of 2 tables and 2 linens. Split equipment cost 33/33/33 with Commerce and Econ"], "wo_count": 1, "wos": [4289919], "fair_loc": "Lawn Stage", "inclement_loc": "JPJ", "severe_loc": "SAME", "day": "Saturday", "zone": "Hubba"}, {"name": "Psychology", "equip": {"Chairs (standard)": 2200, "8' Tables": 4, "Linens": 4, "Stage / riser": 1}, "ad_notes": ["\u2159 of 4 discounted tables and 4 linens + \u00bd of interpreter platform"], "wo_count": 1, "wos": [4292053], "fair_loc": "AFC", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "McCormick"}, {"name": "Religious Studies", "equip": {"Chairs (standard)": 900, "8' Tables": 5, "Linens": 8}, "ad_notes": [], "wo_count": 1, "wos": [4250487], "fair_loc": "Slaughter Rec", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "West Grounds"}, {"name": "SCPS reception", "equip": {}, "ad_notes": [], "wo_count": 1, "wos": [4296492], "fair_loc": "", "inclement_loc": "", "severe_loc": "", "day": "", "zone": ""}, {"name": "Slavic Languages", "equip": {"Chairs (standard)": 20, "8' Tables": 2, "Linens": 2}, "ad_notes": [], "wo_count": 1, "wos": [4275398], "fair_loc": "Garden VI (lower)", "inclement_loc": "Newcomb Commonwealth Room", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Sociology", "equip": {"8' Tables": 3, "Linens": 3}, "ad_notes": ["\u00bd of 2 discounted tables & linens to share with Chemistry + 1 extra table & linen"], "wo_count": 1, "wos": [4294398], "fair_loc": "Old Cabell Hall", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "Hubba"}, {"name": "Spanish, Italian, Portuguese", "equip": {"Chairs (standard)": 100, "8' Tables": 2, "Linens": 2}, "ad_notes": ["1/4 of 100 chairs, 2 tables, 2 linens"], "wo_count": 1, "wos": [4276526], "fair_loc": "Culbreth Theater", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "CGZ"}, {"name": "Statistics", "equip": {"Chairs (standard)": 1400, "8' Tables": 2, "Linens": 2}, "ad_notes": ["\u00bc of 1400 discounted chairs + 2 discounted tables + 2 linens"], "wo_count": 1, "wos": [4289104], "fair_loc": "NGRC", "inclement_loc": "SAME", "severe_loc": "SAME", "day": "Saturday", "zone": "North Grounds"}];
+    const CATALOG = [["Seating", [["Chairs (standard)", "standard folding chairs"], ["Chairs (white)", "white folding chairs (premium)"]]], ["Tables & Linens", [["8' Tables", "8-foot rectangular tables"], ["6' Tables", "6-foot rectangular tables"], ["Round Tables", "round tables"], ["Linens", "table linens"]]], ["Staging & Access", [["Stage / riser", "staging / risers / platforms"], ["Stage skirts", "stage skirting"], ["Table skirts", "table skirting"]]], ["Site", [["Tent", "tents"]]]];
+    const CATALOG_QTY = new Set(['6\' Tables','8\' Tables','Chairs (standard)','Chairs (white)','Linens','Round Tables','Stage / riser','Stage skirts','Table skirts','Tent']);
+    const VENUE_MAP = {
+      'Amphitheater': 'Amphitheater',
+      'Rotunda North Plaza': 'Rotunda',
+      'Lawn Stage': 'The Lawn'
+    };
+
+    // ── Department dropdown population ──
+    (function initDeptDropdown() {
+      const sel = document.getElementById('dept-select');
+      if (!sel || typeof SCHOOLS === 'undefined') return;
+      SCHOOLS.forEach((s, i) => {
+        const o = document.createElement('option');
+        o.value = String(i);
+        o.textContent = s.name;
+        sel.appendChild(o);
+      });
+    })();
+
+    let currentDept = null;
+
+    function escHtml(t) { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; }
+
+    function onDeptSelect() {
+      const sel = document.getElementById('dept-select');
+      const i = sel.value;
+      if (i === '') { currentDept = null; document.getElementById('dept-reference').style.display = 'none'; return; }
+      currentDept = SCHOOLS[Number(i)];
+      renderDeptReference(currentDept);
+      prefillEquipment(currentDept);
+      const eb = document.getElementById('equip-block'); if (eb) eb.style.display = 'block';
+      // Auto-fill event name if empty
+      const enEl = document.getElementById('event-name');
+      if (enEl && !enEl.value.trim()) enEl.value = currentDept.name + ' — Final Exercises 2027';
+    }
+
+    function renderDeptReference(s) {
+      const ref = document.getElementById('dept-reference');
+      // Build 2026 reference panel
+      const equipKeys = Object.keys(s.equip || {});
+      const equipPills = equipKeys.length
+        ? equipKeys.map(k => '<span class="ref-pill">' + escHtml(k) + '<span class="q">' + escHtml(s.equip[k]) + '</span></span>').join('')
+        : '<span style="font-size:12px;color:#b9c2d6;">No equipment recorded for 2026 — you can still request items below.</span>';
+      const notes = (s.ad_notes || []).filter(Boolean);
+      const adNote = notes.length
+        ? '<div class="ref-adnote"><span class="lbl">Facilities cost note (2026)</span>' + notes.map(escHtml).join('<br>') + '</div>'
+        : '';
+
+      // Weather scenario cards
+      const scenarios = [
+        { key: 'fair_loc',      tag: 'Fair weather',  cls: 'fair' },
+        { key: 'inclement_loc', tag: 'Inclement',     cls: 'inclement' },
+        { key: 'severe_loc',    tag: 'Severe',        cls: 'severe' }
+      ];
+      let resolvedFair = s.fair_loc;
+      const weatherCards = scenarios.map(sc => {
+        let venue = s[sc.key] || '';
+        if (venue.toUpperCase() === 'SAME') venue = resolvedFair;
+        if (!venue) return '<div class="weather-card ' + sc.cls + '"><span class="wc-tag">' + sc.tag + '</span><div class="wc-venue">Not on record</div><div class="wc-offmap">—</div></div>';
+        const mapped = VENUE_MAP[venue];
+        const btn = mapped
+          ? '<button type="button" class="wc-map-btn" onclick="addVenueToMap(\'' + mapped.replace(/'/g, "\\'") + '\')">Add to map</button>'
+          : '<div class="wc-offmap">Off-map venue<br>(indoor / other zone)</div>';
+        return '<div class="weather-card ' + sc.cls + '"><span class="wc-tag">' + sc.tag + '</span><div class="wc-venue">' + escHtml(venue) + '</div>' + btn + '</div>';
+      }).join('');
+
+      ref.innerHTML =
+        '<div class="ref-panel">' +
+          '<span class="ref-tag">2026 request on record</span>' +
+          '<h4>' + escHtml(s.name) + '</h4>' +
+          '<div class="ref-loc-line"><span class="k">Zone</span><span class="v">' + escHtml(s.zone || '—') + '</span></div>' +
+          '<div class="ref-loc-line"><span class="k">Day</span><span class="v">' + escHtml(s.day || 'To be confirmed') + '</span></div>' +
+          '<div class="ref-equip">' + equipPills + '</div>' +
+          adNote +
+        '</div>' +
+        '<p class="sub-label" style="margin-bottom:8px;font-weight:600;">Planned venues by weather scenario</p>' +
+        '<div class="weather-cards">' + weatherCards + '</div>' +
+        '<div class="weather-notice">\u2601 Graduation is planned months ahead, so a live forecast isn\'t available yet. Plan for all three scenarios — pick which venue(s) to lay out on the map using the buttons above.</div>';
+      ref.style.display = 'block';
+    }
+
+    // Add a venue to the map (uses the multi-location system if present, else the single map)
+    function addVenueToMap(venueName) {
+      // If multi-location addLocation exists, use it
+      if (typeof addLocation === 'function') {
+        addLocation(venueName);
+        const mapSection = document.getElementById('locations-container') || document.getElementById('map-container');
+        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        // single-map fallback: set the event-location dropdown
+        const locSel = document.getElementById('event-location');
+        if (locSel) { locSel.value = venueName; if (typeof loadMap === 'function') loadMap(); }
+      }
+    }
+
+    // ── Equipment prefill (renders Ken's catalog into a checklist, prefilled from dept 2026 data) ──
+    function eqFieldId(name) { return 'eqp_' + name.replace(/[^a-z0-9]/gi, '_'); }
+
+    function prefillEquipment(s) {
+      const wrap = document.getElementById('equip-picker');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      CATALOG.forEach(([cat, items]) => {
+        const box = document.createElement('div');
+        box.className = 'equip-cat';
+        box.innerHTML = '<h5>' + escHtml(cat) + '</h5>';
+        items.forEach(([name, sub]) => {
+          const prev = s.equip ? s.equip[name] : undefined;
+          const hasPrev = prev !== undefined;
+          const id = eqFieldId(name);
+          const row = document.createElement('div');
+          row.className = 'equip-row' + (hasPrev ? ' sel' : '');
+          const badge = hasPrev ? '<span class="eprev">2026: ' + escHtml(prev) + '</span>' : '';
+          row.innerHTML =
+            '<input type="checkbox" id="' + id + '_c" ' + (hasPrev ? 'checked' : '') + '>' +
+            '<div class="en">' + escHtml(name) + badge + '<span class="esub">' + escHtml(sub) + '</span></div>' +
+            '<div class="eq-qty"><input type="number" min="0" id="' + id + '_q" value="' + (hasPrev ? prev : '') + '" placeholder="Qty"></div>';
+          box.appendChild(row);
+          const cb = row.querySelector('#' + id + '_c'), q = row.querySelector('#' + id + '_q');
+          cb.addEventListener('change', () => { row.classList.toggle('sel', cb.checked); if (cb.checked && (!q.value || q.value === '0')) q.value = hasPrev ? prev : ''; if (!cb.checked) q.value = ''; });
+          q.addEventListener('input', () => { if (q.value && Number(q.value) > 0) { cb.checked = true; row.classList.add('sel'); } });
+        });
+        wrap.appendChild(box);
+      });
+    }
+
+    function collectEquipment() {
+      const out = [];
+      if (typeof CATALOG === 'undefined') return out;
+      CATALOG.forEach(([cat, items]) => items.forEach(([name]) => {
+        const id = eqFieldId(name), cb = document.getElementById(id + '_c');
+        if (cb && cb.checked) { const q = document.getElementById(id + '_q'); out.push({ item: name, qty: (q && q.value && Number(q.value) > 0) ? Number(q.value) : 'TBD' }); }
+      }));
+      return out;
+    }
+
+
+
     // ── Safe localStorage wrappers (fail gracefully if storage blocked) ──
     function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
     function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
@@ -1756,6 +1954,20 @@
         </div>`;
       }
 
+      
+      if (currentDept) {
+        html += '<div class="summary-section"><div class="summary-section-title">Department</div>' +
+          '<div class="summary-row"><span class="summary-key">Program</span><span class="summary-val">' + escHtml(currentDept.name) + '</span></div>' +
+          '<div class="summary-row"><span class="summary-key">Zone</span><span class="summary-val">' + escHtml(currentDept.zone || '\u2014') + '</span></div>' +
+          '<div class="summary-row"><span class="summary-key">Day</span><span class="summary-val">' + escHtml(currentDept.day || 'TBC') + '</span></div>' +
+          '</div>';
+        const eq = collectEquipment();
+        if (eq.length) {
+          html += '<div class="summary-section"><div class="summary-section-title">Equipment requested</div>' +
+            eq.map(x => '<div class="summary-row"><span class="summary-key">' + escHtml(x.item) + '</span><span class="summary-val">' + escHtml(x.qty) + '</span></div>').join('') +
+            '</div>';
+        }
+      }
       return html;
     }
 
@@ -1863,7 +2075,7 @@
     }
 
     async function submitForm() {
-      const required = ['org-name','org-dept','org-email','worktag','event-name','event-location','event-type'];
+      const required = ['org-name','org-dept','org-email','worktag','event-name','event-location','event-type','dept-select'];
       // Date validation depends on single vs multi-day
       if (eventDurationMode === 'single') {
         required.push('event-date');
@@ -1906,6 +2118,11 @@
     async function doSubmit() {
 
       const payload = {
+        department: currentDept ? currentDept.name : '',
+        departmentZone: currentDept ? currentDept.zone : '',
+        departmentDay: currentDept ? currentDept.day : '',
+        equipment: collectEquipment().map(x => x.item + ' x' + x.qty).join(', '),
+        reference2026: currentDept ? JSON.stringify(currentDept.equip) : '',
         organizerName:    document.getElementById('org-name').value.trim(),
         department:       document.getElementById('org-dept').value.trim(),
         email:            document.getElementById('org-email').value.trim(),
