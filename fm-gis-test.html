@@ -17,89 +17,103 @@
   .status.loading { background:#fff4e0; border:1px solid #f4d9a8; color:#7A3D00; }
   .status.ok { background:#e5f2ea; border:1px solid #bfe0cd; color:#2e5a10; }
   .status.err { background:#fdecea; border:1px solid #f5c6c0; color:#c0392b; }
-  #map { height:600px; width:100%; border-radius:10px; border:1px solid #e4e2dc; }
+  #map { height:600px; width:100%; border-radius:10px; border:1px solid #e4e2dc; background:#eef1f5; }
   .legend { margin-top:12px; font-size:13px; color:#5b6472; }
-  .diag { margin-top:14px; padding:12px 14px; background:#fff; border:1px solid #e4e2dc; border-radius:8px; font-size:12px; font-family:monospace; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
+  .diag { margin-top:14px; padding:12px 14px; background:#fff; border:1px solid #e4e2dc; border-radius:8px; font-size:12px; font-family:monospace; white-space:pre-wrap; max-height:220px; overflow-y:auto; }
 </style>
 </head>
 <body>
 <div class="mast">
   <h1>UVA FM GIS Map — Test Page</h1>
-  <p>Testing whether the FM Atlas building footprints load in a live Leaflet map. If the buildings appear and you can pan/zoom, it works.</p>
+  <p>Testing whether the FM Atlas building footprints load in a live Leaflet map. Open this on GitHub Pages (not the preview pane) for an accurate result.</p>
 </div>
 <div class="wrap">
-  <div class="status loading" id="status">Loading UVA FM building footprints…</div>
+  <div class="status loading" id="status">Loading libraries…</div>
   <div id="map"></div>
   <div class="legend">Central Grounds (Lawn, Range, Pavilions). Building outlines come live from UVA FM Atlas. Click any building to see its facility info.</div>
-  <div class="diag" id="diag">Diagnostics:\n</div>
+  <div class="diag" id="diag">Diagnostics:
+</div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
 <script>
-  const diag = document.getElementById('diag');
-  const status = document.getElementById('status');
-  function log(msg) { diag.textContent += msg + '\n'; }
+  // Robust loader: load Leaflet, then esri-leaflet, then run — waiting for each to be ready.
+  var diag = document.getElementById('diag');
+  var status = document.getElementById('status');
+  function log(m){ diag.textContent += m + '\n'; }
 
-  // Center on Central Grounds / the Lawn
-  const map = L.map('map', { zoomSnap: 0.5 }).setView([38.0356, -78.5034], 17);
-
-  // Base layer: a light neutral basemap so the FM buildings stand out
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png', {
-    maxZoom: 21, attribution: 'CartoDB'
-  }).addTo(map);
-
-  log('Leaflet map initialized.');
-  log('esri-leaflet loaded: ' + (typeof L.esri !== 'undefined'));
-
-  if (typeof L.esri === 'undefined') {
-    status.className = 'status err';
-    status.textContent = 'esri-leaflet failed to load from CDN.';
-    log('ERROR: L.esri is undefined.');
-  } else {
-    const FM_URL = 'https://fm-atlas.eservices.virginia.edu/server/rest/services/Public/PublicFacilitiesSearch/MapServer/0';
-
-    // Add the FM building footprints as a feature layer
-    const fmLayer = L.esri.featureLayer({
-      url: FM_URL,
-      style: function() {
-        return { color: '#232D4B', weight: 1.5, fillColor: '#E57200', fillOpacity: 0.25 };
-      }
+  function loadScript(src) {
+    return new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function(){ resolve(src); };
+      s.onerror = function(){ reject(src); };
+      document.head.appendChild(s);
     });
+  }
 
-    let featureCount = 0;
-    fmLayer.on('load', function() {
-      status.className = 'status ok';
-      status.textContent = '✓ Success! UVA FM building footprints loaded. Pan and zoom to test.';
-      log('FM layer "load" event fired. Buildings rendered: ' + featureCount);
-    });
-
-    fmLayer.on('createfeature', function() { featureCount++; });
-
-    fmLayer.on('requesterror', function(e) {
+  log('Loading Leaflet…');
+  loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
+    .then(function(){
+      log('Leaflet loaded: ' + (typeof L !== 'undefined'));
+      log('Loading esri-leaflet…');
+      return loadScript('https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js');
+    })
+    .then(function(){
+      log('esri-leaflet loaded: ' + (typeof L !== 'undefined' && typeof L.esri !== 'undefined'));
+      initMap();
+    })
+    .catch(function(src){
       status.className = 'status err';
-      status.textContent = '✗ FM layer request error — likely CORS or network. See diagnostics.';
-      log('REQUEST ERROR: ' + JSON.stringify(e && e.message ? e.message : e));
+      status.textContent = '✗ Failed to load a library from CDN: ' + src;
+      log('SCRIPT LOAD FAILED: ' + src);
     });
 
-    // Popup with facility info on click
-    fmLayer.bindPopup(function(layer) {
-      const p = layer.feature.properties;
-      return '<strong>' + (p.FacilityName || 'Unknown') + '</strong><br>' +
-             'Facility #: ' + (p.FacilityNumber || '—') + '<br>' +
-             'Maintenance Zone: ' + (p.MaintenanceZone || '—') + '<br>' +
-             (p.YearBuilt ? 'Built: ' + p.YearBuilt : '');
+  function initMap() {
+    status.textContent = 'Libraries loaded. Initializing map…';
+    var map = L.map('map', { zoomSnap: 0.5 }).setView([38.0356, -78.5034], 17);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png', {
+      maxZoom: 21, attribution: 'CartoDB'
+    }).addTo(map);
+    setTimeout(function(){ map.invalidateSize(); }, 200);
+    log('Map initialized and centered on Central Grounds.');
+
+    var FM_URL = 'https://fm-atlas.eservices.virginia.edu/server/rest/services/Public/PublicFacilitiesSearch/MapServer/0';
+    var featureCount = 0;
+
+    var fmLayer = L.esri.featureLayer({
+      url: FM_URL,
+      style: function(){ return { color:'#232D4B', weight:1.5, fillColor:'#E57200', fillOpacity:0.25 }; }
+    });
+
+    fmLayer.on('load', function(){
+      if (featureCount > 0) {
+        status.className = 'status ok';
+        status.textContent = '✓ Success! ' + featureCount + ' UVA FM buildings loaded. Pan and zoom to test.';
+      }
+      log('FM layer load event. Features so far: ' + featureCount);
+    });
+    fmLayer.on('createfeature', function(){ featureCount++; });
+    fmLayer.on('requesterror', function(e){
+      status.className = 'status err';
+      status.textContent = '✗ FM layer request error — likely CORS. See diagnostics + console.';
+      log('REQUEST ERROR: ' + JSON.stringify(e && e.message ? e.message : (e && e.url ? e.url : e)));
+    });
+
+    fmLayer.bindPopup(function(layer){
+      var p = layer.feature.properties;
+      return '<strong>' + (p.FacilityName||'Unknown') + '</strong><br>Facility #: ' +
+             (p.FacilityNumber||'—') + '<br>Maintenance Zone: ' + (p.MaintenanceZone||'—') +
+             (p.YearBuilt ? '<br>Built: ' + p.YearBuilt : '');
     });
 
     fmLayer.addTo(map);
-    log('FM feature layer added to map. Waiting for data…');
+    log('FM feature layer added. Waiting for data from UVA server…');
 
-    // Timeout check — if nothing loads in 12s, flag it
-    setTimeout(function() {
+    setTimeout(function(){
       if (featureCount === 0 && status.className.indexOf('ok') === -1) {
         status.className = 'status err';
-        status.textContent = '✗ No buildings appeared after 12s. Likely a CORS restriction from UVA\'s server. See diagnostics.';
-        log('TIMEOUT: no features after 12s. If browser console shows a CORS error, the server blocks cross-origin browser requests.');
+        status.textContent = '✗ No buildings after 12s — likely CORS. Check browser console (F12) for a red CORS error.';
+        log('TIMEOUT: 0 features after 12s.');
       }
     }, 12000);
   }
