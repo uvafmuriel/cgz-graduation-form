@@ -1078,6 +1078,17 @@
         <p class="sub-label" style="font-weight:600; margin-bottom:6px;">Rental equipment</p>
         <p class="field-hint" style="font-size:12px; color:#888780; margin-bottom:12px;">Pre-filled from your department's 2026 request. Adjust for 2027.</p>
         <div id="equip-picker" class="equip-picker"></div>
+        <div id="tent-permit-block" style="display:none; margin-top:14px; padding:14px; background:#fff4e0; border:1px solid #f4d9a8; border-radius:8px;">
+          <p class="sub-label" style="margin-bottom:4px; font-weight:600; color:#7A3D00;">Tent permit / Fire Safety</p>
+          <div class="note-box" style="margin-bottom:8px; font-size:12px;">Tents may require a Fire Safety permit. Download the <a href="https://fire.safety.virginia.edu/sites/fire_safety/files/2025-06/UVA%20Tent%20Instructions%202025.pdf" target="_blank" style="color:#232D4B; font-weight:500;">UVA Tent Permit Instructions &amp; Application (PDF)</a>.</div>
+          <p class="sub-label" style="margin-bottom:4px; font-size:13px;">Tent permit obtained?</p>
+          <div class="status-group">
+            <span class="status-pill" onclick="selectStatus(this,'tent-permit','yes')" data-group="tent-permit" data-val="yes">Yes</span>
+            <span class="status-pill" onclick="selectStatus(this,'tent-permit','no')" data-group="tent-permit" data-val="no">No</span>
+            <span class="status-pill" onclick="selectStatus(this,'tent-permit','inprogress')" data-group="tent-permit" data-val="inprogress">In progress</span>
+          </div>
+          <input type="hidden" id="tent-permit" value="">
+        </div>
       </div>
 
       <p class="sub-label" style="font-weight:600; margin-bottom:8px;">FM coordination &amp; other services</p>
@@ -1109,184 +1120,9 @@
         </div>
 
         <!-- Tents -->
-        <div class="svc-wrap">
-          <label class="service-item" id="svc-tent-card">
-            <input type="checkbox" id="svc-tent" value="Tents" onchange="toggleService('tent')">
-            <div>
-              <div class="item-label">Tents</div>
-              <div class="item-sub">Permit &amp; Fire Safety approval required</div>
-            </div>
-          </label>
-          <div class="followup-panel" id="panel-tent">
-            <div class="followup-title">Tent details</div>
-            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
-              <label class="field-label" for="tent-qty">Number of tents</label>
-              <input type="number" min="1" id="tent-qty" placeholder="Qty" style="width:100%;">
-            </div>
-
-            <p class="sub-label" style="margin-bottom:4px;">Tent permit obtained?</p>
-            <div class="note-box" style="margin-bottom:8px; font-size:12px;">Download the <a href="https://fire.safety.virginia.edu/sites/fire_safety/files/2025-06/UVA%20Tent%20Instructions%202025.pdf" target="_blank" style="color:#232D4B; font-weight:500;">UVA Tent Permit Instructions &amp; Application (PDF)</a> for instructions and the application form.</div>
-            <div class="status-group" style="margin-bottom:12px;">
-              <span class="status-pill" onclick="selectStatus(this,'tent-permit','yes')" data-group="tent-permit" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'tent-permit','no')" data-group="tent-permit" data-val="no">No</span>
-              <span class="status-pill" onclick="selectStatus(this,'tent-permit','inprogress')" data-group="tent-permit" data-val="inprogress">In progress</span>
-            </div>
-            <input type="hidden" id="tent-permit" value="">
-
-            <p class="sub-label" style="margin-bottom:6px;">Fire &amp; Safety approval obtained?</p>
-            <div class="status-group" style="margin-bottom:12px;">
-              <span class="status-pill" onclick="selectStatus(this,'tent-safety','yes')" data-group="tent-safety" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'tent-safety','no')" data-group="tent-safety" data-val="no">No</span>
-              <span class="status-pill" onclick="selectStatus(this,'tent-safety','inprogress')" data-group="tent-safety" data-val="inprogress">In progress</span>
-            </div>
-            <input type="hidden" id="tent-safety" value="">
-
-            <div id="tent-safety-warning" class="note-box warning" style="display:none; margin-bottom:12px;">
-              Fire &amp; Safety approval is required before FM can confirm tent support. Please contact UVA Fire Prevention at (434) 924-3311.
-            </div>
-
-            <hr class="divider" style="margin: 10px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
-            <div class="radio-group" style="margin-bottom:0;">
-              <label class="radio-btn" onclick="selectVendorFlow('tent','yes')"><input type="radio" name="tent-vendor-flow">Yes</label>
-              <label class="radio-btn" onclick="selectVendorFlow('tent','no')"><input type="radio" name="tent-vendor-flow">No — request FM assistance in vendor procurement</label>
-            </div>
-            <div class="conditional" id="tent-vendor-yes">
-              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
-                <div class="field-group">
-                  <label class="field-label" for="tent-vendor-name">Vendor name</label>
-                  <input type="text" id="tent-vendor-name" placeholder="Company name">
-                </div>
-                <div class="field-group">
-                  <label class="field-label" for="tent-vendor-supply">What are they supplying?</label>
-                  <input type="text" id="tent-vendor-supply" placeholder="e.g. 40x60 tent, sidewalls">
-                </div>
-              </div>
-            </div>
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
-            <div class="status-group" style="margin-bottom:10px;">
-              <span class="status-pill" onclick="selectStatus(this,'tent-power','yes')" data-group="tent-power" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'tent-power','no')" data-group="tent-power" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="tent-power" value="">
-            <div id="tent-power-notes-section" class="conditional">
-              <div class="field-group">
-                <label class="field-label" for="tent-power-notes">Describe power / water needs</label>
-                <textarea id="tent-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <!-- Food Trucks -->
         <!-- Stages / Platforms -->
-        <div class="svc-wrap">
-          <label class="service-item" id="svc-stage-card">
-            <input type="checkbox" id="svc-stage" value="Stages & platforms" onchange="toggleService('stage')">
-            <div>
-              <div class="item-label">Stages &amp; platforms</div>
-              <div class="item-sub">Vendor sourcing &amp; power coordination</div>
-            </div>
-          </label>
-          <div class="followup-panel" id="panel-stage">
-            <div class="followup-title">Stage details</div>
-            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
-              <label class="field-label" for="stage-qty">Number of stages</label>
-              <input type="number" min="1" id="stage-qty" placeholder="Qty" style="width:100%;">
-            </div>
-
-            <p class="sub-label" style="margin-bottom:6px;">Power needed at the stage?</p>
-            <div class="status-group" style="margin-bottom:12px;">
-              <span class="status-pill" onclick="selectStatus(this,'stage-power','yes')" data-group="stage-power" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'stage-power','no')" data-group="stage-power" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="stage-power" value="">
-            <div id="stage-power-note" class="note-box info" style="display:none; margin-bottom:12px;">
-              Please also select <strong>Power &amp; water connections</strong> above and describe the stage power requirements in the notes field.
-            </div>
-
-            <hr class="divider" style="margin:10px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
-            <div class="radio-group">
-              <label class="radio-btn" onclick="selectVendorFlow('stage','yes')"><input type="radio" name="stage-vendor-flow">Yes</label>
-              <label class="radio-btn" onclick="selectVendorFlow('stage','no')"><input type="radio" name="stage-vendor-flow">No — request FM assistance in vendor procurement</label>
-            </div>
-            <div class="conditional" id="stage-vendor-yes">
-              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
-                <div class="field-group">
-                  <label class="field-label" for="stage-vendor-name">Vendor name</label>
-                  <input type="text" id="stage-vendor-name" placeholder="Company name">
-                </div>
-                <div class="field-group">
-                  <label class="field-label" for="stage-vendor-supply">What are they supplying?</label>
-                  <input type="text" id="stage-vendor-supply" placeholder="e.g. 24x24 stage, stairs, skirting">
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <!-- Chairs & Tables -->
-        <div class="svc-wrap">
-          <label class="service-item" id="svc-chairs-card">
-            <input type="checkbox" id="svc-chairs" value="Chairs & tables" onchange="toggleService('chairs')">
-            <div>
-              <div class="item-label">Chairs &amp; tables</div>
-              <div class="item-sub">Rental sourcing &amp; delivery</div>
-            </div>
-          </label>
-          <div class="followup-panel" id="panel-chairs">
-            <div class="followup-title">Chairs &amp; tables details</div>
-            <div class="field-row" style="margin-bottom:12px;">
-              <div class="field-group">
-                <label class="field-label" for="chairs-qty">Estimated chairs needed</label>
-                <input type="number" id="chairs-qty" placeholder="e.g. 100" min="0">
-              </div>
-              <div class="field-group">
-                <label class="field-label" for="tables-qty">Estimated tables needed</label>
-                <input type="number" id="tables-qty" placeholder="e.g. 20" min="0">
-              </div>
-            </div>
-
-            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
-            <div class="radio-group">
-              <label class="radio-btn" onclick="selectVendorFlow('chairs','yes')"><input type="radio" name="chairs-vendor-flow">Yes</label>
-              <label class="radio-btn" onclick="selectVendorFlow('chairs','no')"><input type="radio" name="chairs-vendor-flow">No — request FM assistance in vendor procurement</label>
-            </div>
-            <div class="conditional" id="chairs-vendor-yes">
-              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
-                <div class="field-group">
-                  <label class="field-label" for="chairs-vendor-name">Vendor name</label>
-                  <input type="text" id="chairs-vendor-name" placeholder="Company name">
-                </div>
-                <div class="field-group">
-                  <label class="field-label" for="chairs-vendor-supply">What are they supplying?</label>
-                  <input type="text" id="chairs-vendor-supply" placeholder="e.g. 100 folding chairs, 20 6ft tables">
-                </div>
-              </div>
-            </div>
-
-            <hr class="divider" style="margin:12px 0;">
-            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
-            <div class="status-group" style="margin-bottom:10px;">
-              <span class="status-pill" onclick="selectStatus(this,'chairs-power','yes')" data-group="chairs-power" data-val="yes">Yes</span>
-              <span class="status-pill" onclick="selectStatus(this,'chairs-power','no')" data-group="chairs-power" data-val="no">No</span>
-            </div>
-            <input type="hidden" id="chairs-power" value="">
-            <div id="chairs-power-notes-section" class="conditional">
-              <div class="field-group">
-                <label class="field-label" for="chairs-power-notes">Describe power / water needs</label>
-                <textarea id="chairs-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <!-- PA System / Amplified Sound -->
         <div class="svc-wrap">
           <label class="service-item" id="svc-pa-card">
@@ -1669,6 +1505,13 @@
         });
         wrap.appendChild(box);
       });
+
+      // Wire Tent checkbox to permit block
+      const tentCb = document.getElementById(eqFieldId('Tent') + '_c');
+      const permitBlock = document.getElementById('tent-permit-block');
+      function syncTentPermit() { if (permitBlock) permitBlock.style.display = (tentCb && tentCb.checked) ? 'block' : 'none'; }
+      if (tentCb) { tentCb.addEventListener('change', syncTentPermit); syncTentPermit(); }
+
     }
 
     function collectEquipment() {
@@ -1710,7 +1553,7 @@
 
       // Conditional warnings
       if (group === 'tent-safety') {
-        document.getElementById('tent-safety-warning').style.display = (val === 'no') ? 'block' : 'none';
+        if(document.getElementById('tent-safety-warning')) document.getElementById('tent-safety-warning').style.display = (val === 'no') ? 'block' : 'none';
       }
       if (group === 'food-license') {
         document.getElementById('food-license-warning').style.display = (val === 'no') ? 'block' : 'none';
@@ -1729,7 +1572,7 @@
         const n = document.getElementById('stage-power-note'); if (n) n.style.display = (val === 'yes') ? 'block' : 'none';
       }
       // Per-service power/water toggle
-      ['tent','chairs'].forEach(svc => {
+      [].forEach(svc => {
         if (group === svc + '-power') {
           const sec = document.getElementById(svc + '-power-notes-section');
           if (sec) sec.classList.toggle('show', val === 'yes');
@@ -1760,8 +1603,8 @@
         document.getElementById('alcohol-section').classList.toggle('show', val === 'yes');
         if (val === 'no') {
           document.getElementById('upd-approval').value = '';
-          document.getElementById('security-staff').value = '';
-          document.getElementById('upd-warning').style.display = 'none';
+          if(document.getElementById('security-staff')) document.getElementById('security-staff').value = '';
+          if(document.getElementById('upd-warning')) document.getElementById('upd-warning').style.display = 'none';
           document.querySelectorAll('[data-group="upd-approval"],[data-group="security-staff"]').forEach(p => p.className = 'status-pill');
         }
       }
@@ -1788,10 +1631,12 @@
     // ── Collect checked services ──
     function getServices() {
       const services = [];
-      ['power','setup','tent','stage','chairs','waste','pa','signs'].forEach(key => {
+      ['power','setup','waste','pa','signs'].forEach(key => {
         const cb = document.getElementById('svc-' + key);
         if (cb && cb.checked) services.push(cb.value);
       });
+      // Include selected equipment as part of services list
+      collectEquipment().forEach(x => services.push(x.item + ' ×' + x.qty));
       return services.join(', ') || 'None';
     }
 
@@ -1858,19 +1703,13 @@
       const checked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c=>c.value).join(', ') || 'None';
 
       const services = [];
-      const qtyMap = { 'svc-tent':'tent-qty', 'svc-stage':'stage-qty', 'svc-chairs':'chairs-qty' };
       [{id:'svc-power',label:'Power & water'},{id:'svc-setup',label:'Setup & takedown'},
-       {id:'svc-tent',label:'Tents'},
-       {id:'svc-stage',label:'Stages & platforms'},{id:'svc-chairs',label:'Chairs & tables'},
        {id:'svc-pa',label:'PA / Sound'},
        {id:'svc-waste',label:'Waste & recycling'},{id:'svc-signs',label:'Signs & fixtures'}
       ].forEach(s => {
         const el = document.getElementById(s.id);
         if (el && el.checked) {
-          let lbl = s.label;
-          const qEl = qtyMap[s.id] ? document.getElementById(qtyMap[s.id]) : null;
-          if (qEl && qEl.value) lbl += ' (×' + qEl.value + ')';
-          services.push(lbl);
+          services.push(s.label);
         }
       });
 
@@ -1918,14 +1757,12 @@
         </div>`;
 
       // Tent
-      const tentCb = document.getElementById('svc-tent');
-      if (tentCb && tentCb.checked) {
-        html += `<div class="summary-section">
-          <div class="summary-section-title">Tent details</div>
-          <div class="summary-row"><span class="summary-key">Tent permit</span><span class="summary-val">${statusBadge(val('tent-permit'),{yes:'Obtained',no:'Not obtained',inprogress:'In progress'})}</span></div>
-          <div class="summary-row"><span class="summary-key">Fire & Safety approval</span><span class="summary-val">${statusBadge(val('tent-safety'),{yes:'Obtained',no:'Not obtained',inprogress:'In progress'})}</span></div>
-          <div class="summary-row"><span class="summary-key">Vendor</span><span class="summary-val">${val('tent-vendor-name') || checked('tent-pref-vendor') || '—'}</span></div>
-        </div>`;
+      const tentEqCb = document.getElementById(eqFieldId('Tent') + '_c');
+      if (tentEqCb && tentEqCb.checked) {
+        const permitVal = document.getElementById('tent-permit') ? document.getElementById('tent-permit').value : '';
+        const permitTxt = permitVal === 'yes' ? 'Obtained' : (permitVal === 'inprogress' ? 'In progress' : (permitVal === 'no' ? 'Not yet' : 'Not answered'));
+        html += '<div class="summary-section"><div class="summary-section-title">Tent permit / Fire Safety</div>' +
+          '<div class="summary-row"><span class="summary-key">Permit status</span><span class="summary-val">' + permitTxt + '</span></div></div>';
       }
 
       // Food trucks
@@ -2141,9 +1978,6 @@
         teardownTime:     document.getElementById('teardown-time').value,
         // Tent
         tentPermit:       document.getElementById('tent-permit').value,
-        tentFireSafety:   document.getElementById('tent-safety').value,
-        tentVendor:       document.getElementById('tent-vendor-name').value.trim(),
-        tentVendorSupply: document.getElementById('tent-vendor-supply').value.trim(),
         tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
         // Stage
@@ -2159,15 +1993,8 @@
         tentPowerNotes:   document.getElementById('tent-power-notes') ? document.getElementById('tent-power-notes').value.trim() : '',
         chairsPowerNeeded:document.getElementById('chairs-power') ? document.getElementById('chairs-power').value : '',
         chairsPowerNotes: document.getElementById('chairs-power-notes') ? document.getElementById('chairs-power-notes').value.trim() : '',
-        stagePower:       document.getElementById('stage-power').value,
-        stageVendor:      document.getElementById('stage-vendor-name').value.trim(),
-        stageVendorSupply:document.getElementById('stage-vendor-supply').value.trim(),
         stagePrefVendors: getCheckedVals('stage-pref-vendor'),
         // Chairs
-        chairsQty:        document.getElementById('chairs-qty').value,
-        tablesQty:        document.getElementById('tables-qty').value,
-        chairsVendor:     document.getElementById('chairs-vendor-name').value.trim(),
-        chairsVendorSupply:document.getElementById('chairs-vendor-supply').value.trim(),
         chairsPrefVendors:getCheckedVals('chairs-pref-vendor'),
         // Waste & custodial
         wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
@@ -2175,9 +2002,6 @@
         majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
         signsServices:    Array.from(document.querySelectorAll('input[name="signs-services"]:checked')).map(c=>c.value).join(', '),
         signsNotes:       document.getElementById('signs-notes') ? document.getElementById('signs-notes').value.trim() : '',
-        tentQty:          document.getElementById('tent-qty') ? document.getElementById('tent-qty').value : '',
-        stageQty:         document.getElementById('stage-qty') ? document.getElementById('stage-qty').value : '',
-        chairsQty:        document.getElementById('chairs-qty') ? document.getElementById('chairs-qty').value : '',
         crossesQty:       document.getElementById('crosses-qty') ? document.getElementById('crosses-qty').value : '',
         hubbaQty:         document.getElementById('hubba-qty') ? document.getElementById('hubba-qty').value : '',
         lecternQty:       document.getElementById('lectern-qty') ? document.getElementById('lectern-qty').value : '',
@@ -2314,7 +2138,7 @@
     }
 
     function getComplexity() {
-      const services = ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'];
+      const services = ['svc-setup','svc-pa','svc-waste','svc-signs'];
       const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
 
       // Escalating flags — any of these bump the level up
@@ -2339,7 +2163,6 @@
 
     // ── Timeline builder ──
     const TIMELINE_RULES = [
-      { service:'svc-tent',  when:'4+ weeks out', what:'Submit tent permit & Fire Safety applications (tent, open flame if applicable)', color:'#8B1A1A' },
       { general: true,       when:'2+ weeks out', what:'Submit this form, finalize event layout, and confirm all vendors', color:'#5a8a2e' },
       { general: true,       when:'1 week out',   what:'Follow up with FM to confirm services, approvals, and setup schedule', color:'#232D4B' },
     ];
@@ -2368,7 +2191,7 @@
     }
 
     // Hook timeline update to all service checkboxes
-    ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
+    ['svc-setup','svc-pa','svc-waste','svc-signs'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', updateTimeline);
     });
@@ -2385,12 +2208,12 @@
         'tent-permit','tent-safety','tent-vendor-name','tent-vendor-supply',
         'alcohol','upd-approval','security-staff',
         'stage-power','stage-vendor-name','stage-vendor-supply',
-        'chairs-qty','tables-qty','chairs-vendor-name','chairs-vendor-supply',
+        'chairs-vendor-name','chairs-vendor-supply',
         'waste-notes','signs-notes','power-notes','parking-use','parking-type','parking-approval','parking-notes'];
       const data = {};
       fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
       // Checkboxes
-      ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
+      ['svc-setup','svc-pa','svc-waste','svc-signs'].forEach(id => {
         const el = document.getElementById(id); if (el) data[id] = el.checked;
       });
       return data;
