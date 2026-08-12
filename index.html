@@ -1283,7 +1283,7 @@
         <ol style="margin:0 0 10px; padding-left:20px;">
           <li><strong>Pick what you want to place</strong> — click a resource button (Tent, Stage, Chairs, etc.) above the map. It will highlight to show it's selected.</li>
           <li><strong>Click on the map</strong> where that item should go. A marker drops at that spot.</li>
-          <li><strong>For areas like tents or seating</strong>, click each corner to trace the shape, then click <em>"Finish shape."</em></li>
+          <li><strong>For areas like tents or seating</strong>, click each corner to trace the shape. To close it, either <em>click the orange starting dot</em> or <em>double-click</em> — the shape completes automatically. (The <em>"Finish shape"</em> button still works too.)</li>
           <li><strong>Add a quantity or note</strong> — click any marker you placed to set how many (e.g. 200 chairs) or add a note.</li>
           <li><strong>Made a mistake?</strong> Use <em>Undo</em> to remove the last thing, or click a marker and choose <em>Remove.</em> <em>Clear all</em> starts over.</li>
         </ol>
@@ -2480,16 +2480,13 @@
     function loadMap() {
       const loc=document.getElementById('event-location').value;
       const ph=document.getElementById('map-placeholder'), mc=document.getElementById('map-container'), mt=document.getElementById('map-tools');
-      console.log('[loadMap] location =', loc, '| valid =', !!(loc && VENUE_COORDS[loc]), '| L =', typeof L, '| L.esri =', typeof (window.L && L.esri));
       if(!loc||!VENUE_COORDS[loc]){ ph.style.display='flex'; ph.textContent = loc ? ('No map coordinates for: ' + loc) : 'Select a location above to load the site map.'; mc.style.display='none'; mt.style.display='none'; return; }
       ph.style.display='none'; mc.style.display='block'; mt.style.display='block';
       const v=VENUE_COORDS[loc];
       if(map){ map.remove(); map=null; } pins=[]; markers=[]; clearPolyTemp();
       setTimeout(function(){
         try {
-        console.log('[loadMap] container size before init:', mc.offsetWidth, 'x', mc.offsetHeight);
-        map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false });
-        console.log('[loadMap] L.map created OK');
+        map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false, doubleClickZoom:false });
         // Light base layer under the FM buildings
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',{
           maxZoom:21
@@ -2506,19 +2503,33 @@
         }
         map.setView([v.lat, v.lng], v.zoom);
         map.invalidateSize();
-        map.on('click',function(e){ handleMapClick(e); });
+        map.on('click',function(e){
+          const pt=getActiveType();
+          // For polygon mode, delay single-click so a double-click can cancel it
+          if(pt&&pt.shape==='rect'){
+            if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; }
+            clickTimer=setTimeout(function(){ clickTimer=null; handleMapClick(e); }, 220);
+          } else {
+            handleMapClick(e);
+          }
+        });
+        map.on('dblclick',function(e){
+          if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; }
+          const pt=getActiveType();
+          if(pt&&pt.shape==='rect'&&polyPoints.length>=3){ finishPolygon(); }
+        });
         buildToolbar(); renderPinList();
         // Safety: re-invalidate after paint in case container was just revealed
-        setTimeout(function(){ try { map.invalidateSize(); console.log('[loadMap] final invalidateSize, size:', mc.offsetWidth,'x',mc.offsetHeight); } catch(e){} }, 300);
+        setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 300);
         } catch(err) {
-          console.error('[loadMap] ERROR:', err);
-          ph.style.display='flex'; ph.textContent = 'Map error: ' + (err && err.message ? err.message : err);
+          ph.style.display='flex'; ph.textContent = 'Map could not load. Please refresh, or skip the map and FM will follow up.';
           mc.style.display='none';
         }
       }, 150);
     }
 
         let polyPoints = [];
+    let clickTimer = null;
     let polyTempMarkers = [];
     let polyTempLine = null;
 
@@ -2527,10 +2538,20 @@
       const pt=getActiveType();
       if(!pt) return;
       if(pt.shape==='rect') {
-        // Polygon mode: click corners, double-click to finish
+        // Polygon mode: click corners; click the first dot or double-click to close
+        // If we have 3+ points and the click is near the starting point, close the shape
+        if(polyPoints.length>=3){
+          const firstPt=polyPoints[0];
+          const p1=map.latLngToContainerPoint(firstPt);
+          const p2=map.latLngToContainerPoint(e.latlng);
+          const distPx=Math.sqrt(Math.pow(p1.x-p2.x,2)+Math.pow(p1.y-p2.y,2));
+          if(distPx<=14){ finishPolygon(); return; }
+        }
         polyPoints.push(e.latlng);
-        // Temp corner marker
-        const dot=L.circleMarker(e.latlng,{radius:4,color:'#fff',fillColor:pt.color,fillOpacity:1,weight:2}).addTo(map);
+        // Temp corner marker — make the FIRST dot bigger/highlighted so users know they can click it to close
+        const isFirst=polyPoints.length===1;
+        const dot=L.circleMarker(e.latlng,{radius:isFirst?7:4,color:'#fff',fillColor:isFirst?'#E57200':pt.color,fillOpacity:1,weight:isFirst?3:2}).addTo(map);
+        if(isFirst){ dot.bindTooltip('Click here to close the shape',{direction:'top',offset:[0,-8]}); }
         polyTempMarkers.push(dot);
         // Draw preview line
         if(polyTempLine){map.removeLayer(polyTempLine);}
