@@ -1,0 +1,2590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graduation Event Support – UVA Facilities Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      background: #f3f1ec;
+      color: #1a1a18;
+      line-height: 1.6;
+      padding: 0 0 4rem;
+    }
+
+    .site-header {
+      background: #232D4B;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      height: 64px;
+    }
+
+    .accent-bar { height: 5px; background: #E57200; }
+
+    .page-content { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 0; }
+    .page-header { margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #d4d2cb; }
+    .page-header h1 { font-size: 23px; font-weight: 600; color: #232D4B; margin-bottom: 5px; letter-spacing: -0.01em; }
+    .page-header p { font-size: 14px; color: #5a5957; }
+
+    .form-section {
+      background: #ffffff;
+      border: 1px solid #e4e2dc;
+      border-radius: 12px;
+      padding: 1.35rem 1.6rem;
+      margin-bottom: 1.1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #232D4B;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 0.55rem;
+      border-bottom: 2px solid #E57200;
+      width: fit-content;
+    }
+    .section-title svg { width: 14px; height: 14px; stroke: #232D4B; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .field-row.full { grid-template-columns: 1fr; }
+    .field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .field-row:last-of-type { margin-bottom: 0; }
+    .field-group { display: flex; flex-direction: column; gap: 5px; }
+
+    label.field-label { font-size: 13px; color: #3d3c3a; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .req-tag { font-size: 10px; font-weight: 500; background: #fde8d8; color: #8B3A00; padding: 2px 7px; border-radius: 99px; }
+
+    input[type=text], input[type=email], input[type=tel], input[type=number],
+    input[type=date], input[type=time], select, textarea {
+      width: 100%; font-family: inherit; font-size: 14px; color: #1a1a18;
+      background: #ffffff; border: 1px solid #d0cec7; border-radius: 8px;
+      padding: 8px 11px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none; -webkit-appearance: none;
+    }
+    input:hover, select:hover, textarea:hover { border-color: #232D4B; }
+    input:focus, select:focus, textarea:focus { border-color: #232D4B; box-shadow: 0 0 0 3px rgba(35,45,75,0.12); }
+    input.error, select.error, textarea.error { border-color: #c0392b; box-shadow: 0 0 0 3px rgba(192,57,43,0.12); }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23888780' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+      padding-right: 32px; cursor: pointer;
+    }
+    textarea { min-height: 72px; resize: vertical; line-height: 1.5; }
+
+    .note-box { background: #f5f4f0; border-left: 3px solid #c8c6bf; border-radius: 0 8px 8px 0; padding: 9px 13px; font-size: 13px; color: #5a5957; line-height: 1.5; margin-top: 6px; }
+    .note-box.info { background: #EEF3FA; border-left-color: #232D4B; color: #232D4B; }
+    .note-box.warning { background: #FFF6E8; border-left-color: #E57200; color: #7A3D00; }
+    .note-box.success { background: #eaf3e0; border-left-color: #5a8a2e; color: #2e5a10; }
+
+    .divider { border: none; border-top: 1px solid #eceae4; margin: 1rem 0; }
+    .sub-label { font-size: 13px; color: #5a5957; margin-bottom: 8px; }
+
+    /* ── Service checkbox cards ── */
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+    .service-grid > .svc-wrap {
+      min-width: 0;
+    }
+    .service-grid > .svc-wrap.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .service-item {
+      border: 1px solid #e4e2dc; border-radius: 10px; padding: 11px 14px;
+      cursor: pointer; display: flex; align-items: flex-start; gap: 10px;
+      transition: background 0.12s, border-color 0.12s; user-select: none;
+    }
+    .service-item:hover { background: #f5f4f0; }
+    .service-item.checked { background: #EEF3FA; border-color: #232D4B; }
+    .service-item input[type=checkbox] { margin-top: 2px; width: 15px; height: 15px; flex-shrink: 0; accent-color: #232D4B; cursor: pointer; border: none; box-shadow: none; padding: 0; }
+    .item-label { font-size: 14px; font-weight: 500; color: #1a1a18; line-height: 1.3; }
+    .item-sub { font-size: 12px; color: #888780; margin-top: 2px; line-height: 1.4; }
+
+    /* ── Expanding follow-up panels ── */
+    .followup-panel {
+      display: none;
+      margin-top: 10px;
+      background: #faf9f6;
+      border: 1px solid #e4e2dc;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      animation: slideDown 0.18s ease;
+    }
+    .followup-panel.open { display: block; }
+    /* When panel is open inside a svc-wrap, the parent expands to full width via JS */
+
+
+    .followup-title { font-size: 12px; font-weight: 600; color: #232D4B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+    /* ── Radio / toggle groups ── */
+    .radio-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .radio-btn { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border: 1px solid #d0cec7; border-radius: 99px; cursor: pointer; font-size: 13px; font-weight: 500; color: #3d3c3a; transition: all 0.15s; user-select: none; background: #fff; }
+    .radio-btn:hover { border-color: #232D4B; }
+    .radio-btn input { display: none; }
+    .radio-btn.selected { background: #232D4B; border-color: #232D4B; color: #fff; }
+    .radio-btn.selected-orange { background: #E57200; border-color: #E57200; color: #fff; }
+
+    /* Status pill group */
+    .status-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-pill { padding: 6px 16px; border: 1px solid #d0cec7; border-radius: 99px; font-size: 13px; cursor: pointer; transition: all 0.15s; background: #fff; color: #3d3c3a; user-select: none; }
+    .status-pill:hover { border-color: #232D4B; }
+    .status-pill.yes { background: #eaf3e0; border-color: #5a8a2e; color: #2e5a10; }
+    .status-pill.no { background: #fdecea; border-color: #c0392b; color: #7b1a13; }
+    .status-pill.inprogress { background: #FFF6E8; border-color: #E57200; color: #7A3D00; }
+
+    /* Vendor preferred list */
+    .vendor-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+    .vendor-card { border: 1px solid #dddbd4; border-radius: 6px; padding: 8px 10px; cursor: pointer; transition: all 0.12s; background: #fff; }
+    .vendor-card:hover { border-color: #E57200; background: #FFF6E8; }
+    .vendor-card.selected { border-color: #E57200; background: #FFF6E8; }
+    .vendor-card input { display: none; }
+    .vendor-name { font-size: 13px; font-weight: 500; color: #1a1a18; }
+    .vendor-type { font-size: 11px; color: #888780; }
+
+    /* Nested conditional */
+    .conditional { display: none; margin-top: 10px; }
+    .conditional.show { display: block; }
+
+    /* ── Buttons ── */
+    .submit-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; }
+    .btn-reset { background: transparent; color: #5a5957; border: 1px solid #d0cec7; border-radius: 8px; padding: 10px 20px; font-size: 15px; font-family: inherit; cursor: pointer; transition: background 0.12s; }
+    .btn-reset:hover { background: #f5f4f0; }
+    .btn-submit { background: #E57200; color: #ffffff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 15px; font-family: inherit; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.12s; }
+    .btn-submit:hover { background: #c96400; }
+    .btn-submit svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .success-msg { display: none; background: #eaf3e0; border: 1px solid #5a8a2e; border-radius: 12px; padding: 1.5rem; text-align: center; color: #2e5a10; font-size: 16px; font-weight: 500; margin-top: 1rem; }
+    .success-msg svg { width: 28px; height: 28px; stroke: #2e5a10; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto 8px; }
+    .error-banner { display: none; background: #fdecea; border: 1px solid #c0392b; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #7b1a13; margin-top: 1rem; }
+
+    #rotunda-note { display: none; }
+
+    /* ── Draft banner ── */
+    .draft-banner {
+      display: none;
+      background: #FFF6E8;
+      border: 1px solid #E57200;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 13px;
+      color: #7A3D00;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .draft-banner button {
+      background: none; border: none; color: #E57200;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: inherit; padding: 0; white-space: nowrap;
+    }
+
+    /* ── Timeline checklist ── */
+    .timeline-section {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #dddbd4;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 0.5px solid #eceae4;
+      font-size: 13px;
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 4px;
+    }
+    .timeline-when { font-weight: 600; color: #232D4B; min-width: 110px; flex-shrink: 0; }
+    .timeline-what { color: #3d3c3a; }
+
+    /* ── Complexity badge ── */
+    .complexity-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 12px; font-weight: 600;
+    }
+    .complexity-moderate { background:#fff4e0; color:#7A3D00; }
+    .complexity-high { background: #fdecea; color: #7b1a13; border: 1px solid #e08080; }
+    .complexity-standard { background: #eaf3e0; color: #2e5a10; border: 1px solid #7ab54a; }
+
+    /* ── Event map ── */
+    .map-section {
+      margin-top: 1rem;
+      border: 1px solid #e4e2dc;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .map-header {
+      padding: 10px 14px;
+      background: #f5f4f0;
+      border-bottom: 1px solid #dddbd4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .map-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #232D4B;
+    }
+    .map-header-hint {
+      font-size: 12px;
+      color: #888780;
+    }
+    .map-pin-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #eceae4;
+      background: #fafaf8;
+    }
+    .pin-type-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border: 1px solid #c8c6bf;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #fff;
+      color: #3d3c3a;
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .pin-type-btn:hover { border-color: #232D4B; background: #EEF3FA; }
+    .pin-type-btn.active { border-color: #232D4B; background: #232D4B; color: #fff; }
+    .pin-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .map-canvas-wrap {
+      position: relative;
+      cursor: crosshair;
+      line-height: 0;
+      overflow: visible;
+    }
+    .map-canvas-wrap img.map-bg {
+      width: 100%;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Point pins */
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: grab;
+      z-index: 10;
+    }
+    .map-pin-icon {
+      width: 20px; height: 20px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      border: 1.5px solid rgba(255,255,255,0.9);
+    }
+    .map-pin-icon span {
+      transform: rotate(45deg);
+      font-size: 9px;
+      line-height: 1;
+    }
+    .map-pin-label {
+      margin-top: 2px;
+      background: rgba(35,45,75,0.82);
+      color: #fff;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* Rectangle resources */
+    .map-rect {
+      position: absolute;
+      cursor: grab;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+    .map-rect-inner {
+      width: 100%; height: 100%;
+      border-radius: 4px;
+      border: 2px solid rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      box-sizing: border-box;
+      position: relative;
+    }
+    .map-rect-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+    .map-rect-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      padding: 0 4px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
+    }
+    /* Resize handle */
+    .map-rect-resize {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 14px; height: 14px;
+      cursor: se-resize;
+      background: rgba(255,255,255,0.75);
+      border-radius: 2px 0 3px 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: #333;
+      z-index: 12;
+    }
+    /* Rotate handle */
+    .map-rect-rotate {
+      position: absolute;
+      top: 0; right: 0;
+      width: 14px; height: 14px;
+      cursor: grab;
+      background: rgba(255,255,255,0.75);
+      border-radius: 0 3px 0 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #333;
+      z-index: 12;
+    }
+    /* Grab/move handle */
+    .map-rect-move {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 14px; height: 14px;
+      cursor: grab;
+      background: rgba(255,255,255,0.75);
+      border-radius: 3px 0 0 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #333;
+      z-index: 12;
+      user-select: none;
+    }
+    .map-rect-move:active { cursor: grabbing; }
+    /* Draw ghost while dragging */
+    .map-rect-ghost {
+      position: absolute;
+      border: 2px dashed #232D4B;
+      background: rgba(35,45,75,0.08);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 20;
+    }
+    /* Fixed popup — rendered in <body>, never clipped */
+    #map-float-popup {
+      display: none;
+      position: fixed;
+      background: #fff;
+      border: 1px solid #c8c6bf;
+      border-radius: 8px;
+      padding: 12px 14px;
+      width: 220px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.16);
+      z-index: 9999;
+      font-size: 13px;
+    }
+    #map-float-popup.open { display: block; }
+    #map-float-popup input {
+      width: 100%;
+      font-size: 13px;
+      margin-top: 6px;
+      padding: 6px 9px;
+      border: 1px solid #c8c6bf;
+      border-radius: 6px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    #map-float-popup .popup-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .map-pin-popup input {
+      width: 100%;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .map-pin-popup .popup-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .popup-btn {
+      flex: 1;
+      padding: 5px 0;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    .popup-btn.save { background: #232D4B; color: #fff; }
+    .popup-btn.delete { background: #fdecea; color: #c0392b; }
+    .map-pin-list {
+      padding: 10px 14px;
+      border-top: 1px solid #eceae4;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .map-pin-list-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888780;
+      margin-bottom: 6px;
+    }
+    .pin-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 13px;
+      border-bottom: 0.5px solid #eceae4;
+    }
+    .pin-list-item:last-child { border-bottom: none; }
+    .pin-list-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pin-list-name { font-weight: 500; color: #1a1a18; }
+    .pin-list-note { color: #888780; font-size: 12px; margin-left: 2px; }
+    .pin-list-remove { margin-left: auto; cursor: pointer; color: #c0392b; font-size: 16px; line-height: 1; padding: 0 2px; }
+    .map-clear-btn {
+      font-size: 12px;
+      color: #c0392b;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .map-no-location {
+      padding: 2rem;
+      text-align: center;
+      color: #888780;
+      font-size: 14px;
+    }
+    .custom-pin-row {
+      display: flex;
+      gap: 6px;
+      padding: 6px 14px 10px;
+      border-bottom: 1px solid #eceae4;
+      background: #fafaf8;
+    }
+    .custom-pin-row input {
+      flex: 1;
+      font-size: 13px;
+      padding: 5px 9px;
+      border: 1px solid #c8c6bf;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+    .custom-pin-row button {
+      padding: 5px 12px;
+      background: #232D4B;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+
+    @media (max-width: 540px) {
+      .field-row, .field-row.three, .vendor-list { grid-template-columns: 1fr; }
+      .service-grid { grid-template-columns: 1fr; }
+      .form-section { padding: 1rem; }
+    }
+
+    /* ── Summary modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .modal-header {
+      background: #232D4B;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 16px; font-weight: 600; margin: 0; }
+    .modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
+    .modal-body { padding: 1.25rem 1.5rem; }
+    .summary-section { margin-bottom: 1rem; }
+    .summary-section-title {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #232D4B;
+      border-bottom: 2px solid #E57200;
+      padding-bottom: 4px; margin-bottom: 8px;
+      width: fit-content;
+    }
+    .summary-row {
+      display: flex; gap: 8px;
+      font-size: 13px; padding: 4px 0;
+      border-bottom: 0.5px solid #eceae4;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: #5a5957; min-width: 160px; flex-shrink: 0; }
+    .summary-val { color: #1a1a18; font-weight: 500; }
+    .summary-badge {
+      display: inline-block; background: #EEF3FA; color: #232D4B;
+      border-radius: 99px; padding: 2px 10px; font-size: 12px;
+      font-weight: 500; margin: 2px 3px 2px 0;
+    }
+    .summary-badge.warn { background: #FFF6E8; color: #7A3D00; }
+    .summary-badge.ok   { background: #eaf3e0; color: #2e5a10; }
+    .summary-badge.no   { background: #fdecea; color: #7b1a13; }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #eceae4;
+      display: flex; gap: 10px; justify-content: flex-end;
+    }
+    .btn-back {
+      background: transparent; color: #5a5957;
+      border: 1px solid #d0cec7; border-radius: 8px;
+      padding: 10px 20px; font-size: 15px;
+      font-family: inherit; cursor: pointer;
+    }
+    .btn-confirm {
+      background: #E57200; color: #fff; border: none;
+      border-radius: 6px; padding: 10px 24px;
+      font-size: 15px; font-family: inherit;
+      font-weight: 600; cursor: pointer;
+    }
+    .btn-confirm:hover { background: #c96400; }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1rem 1rem 0;
+    }
+    .progress-bar-bg {
+      height: 6px;
+      background: #e4e2dc;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #E57200, #232D4B);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-size: 11px;
+      color: #888780;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* ── Collapsible sections ── */
+    .form-section.collapsible .section-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      width: 100%;
+    }
+    .form-section.collapsible .section-toggle .collapse-arrow {
+      font-size: 14px;
+      color: #888780;
+      transition: transform 0.2s;
+    }
+    .form-section.collapsed .section-body { display: none; }
+    .form-section.collapsed .collapse-arrow { transform: rotate(-90deg); }
+    .form-section.collapsed .section-summary {
+      display: block;
+      font-size: 13px;
+      color: #5a5957;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .section-summary { display: none; }
+
+    /* ── Smooth slide-in for panels and conditionals ── */
+    .followup-panel {
+      display: none;
+      margin-top: 10px;
+      background: #faf9f6;
+      border: 1px solid #e4e2dc;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      animation: slideIn 0.2s ease;
+    }
+    .followup-panel.open { display: block; }
+    .conditional {
+      display: none;
+      animation: slideIn 0.2s ease;
+    }
+    .conditional.show { display: block; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Micro-interactions ── */
+    .service-item input[type=checkbox]:checked + div {
+      animation: checkBounce 0.25s ease;
+    }
+    @keyframes checkBounce {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .status-pill.yes, .status-pill.no, .status-pill.inprogress {
+      animation: pillPop 0.2s ease;
+    }
+    @keyframes pillPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .service-item.checked {
+      animation: cardCheck 0.2s ease;
+    }
+    @keyframes cardCheck {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.015); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Extra contact cards ── */
+    .extra-contact-card {
+      background: #faf9f6;
+      border: 1px solid #e4e2dc;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 8px;
+      position: relative;
+      animation: slideIn 0.2s ease;
+    }
+    .extra-contact-remove {
+      position: absolute;
+      top: 8px; right: 10px;
+      background: none; border: none;
+      color: #c0392b; font-size: 16px;
+      cursor: pointer; line-height: 1;
+    }
+
+    /* ── Day detail cards ── */
+    .day-detail-card {
+      background: #faf9f6;
+      border: 1px solid #e4e2dc;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 8px;
+      animation: slideIn 0.2s ease;
+      position: relative;
+    }
+    .day-detail-card .day-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #232D4B;
+      margin-bottom: 8px;
+    }
+    .day-detail-remove {
+      position: absolute;
+      top: 8px; right: 10px;
+      background: none; border: none;
+      color: #c0392b; font-size: 16px;
+      cursor: pointer; line-height: 1;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      max-width: 720px;
+      margin: 2rem auto 0;
+      padding: 1.5rem 1rem;
+      border-top: 1px solid #e4e2dc;
+    }
+    .footer-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #232D4B;
+      margin-bottom: 10px;
+    }
+    .footer-contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+    .footer-contact {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #3d3c3a;
+    }
+    .footer-contact strong { color: #232D4B; }
+    .footer-contact a { color: #E57200; text-decoration: none; }
+    .footer-contact a:hover { text-decoration: underline; }
+    .footer-role { font-size: 11px; color: #888780; }
+    .footer-divider {
+      width: 1px;
+      background: #e4e2dc;
+      align-self: stretch;
+    }
+
+    /* Pin toolbar */
+    .pin-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; margin-bottom: 8px; }
+    .pin-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border: 1px solid #d0cec7; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; color: #3d3c3a; transition: all 0.15s; user-select: none; }
+    .pin-btn:hover { border-color: #232D4B; background: #EEF3FA; }
+    .pin-btn.active { border-color: #232D4B; background: #232D4B; color: #fff; }
+    .pin-count { background: rgba(35,45,75,0.15); border-radius: 99px; font-size: 10px; padding: 1px 6px; margin-left: 2px; }
+    .pin-btn.active .pin-count { background: rgba(255,255,255,0.3); }
+    .pin-list-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #888780; margin-bottom: 6px; }
+    .pin-list-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-bottom: 0.5px solid #eceae4; }
+    .pin-list-item:last-child { border-bottom: none; }
+    .pin-list-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pin-list-name { font-weight: 500; }
+    .pin-list-note { color: #888780; font-size: 12px; }
+    .pin-list-remove { margin-left: auto; cursor: pointer; color: #c0392b; font-size: 16px; padding: 0 4px; }
+
+    /* Summary modal */
+    .summary-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .summary-modal.open { display:flex; }
+    .summary-modal-inner { background:#fff; border-radius:12px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto; padding:24px; }
+    .summary-modal h2 { color:#232D4B; font-size:18px; margin-bottom:4px; }
+    .summary-modal .sub { color:#5a5957; font-size:13px; margin-bottom:16px; }
+    .summary-row { padding:6px 0; border-bottom:0.5px solid #eceae4; font-size:13px; display:flex; gap:10px; }
+    .summary-row .k { color:#888780; width:160px; flex-shrink:0; }
+    .summary-row .v { color:#1a1a18; font-weight:500; }
+    .summary-section-title { color:#232D4B; font-size:13px; font-weight:600; margin:16px 0 6px; border-bottom:2px solid #E57200; padding-bottom:3px; display:inline-block; }
+    .summary-modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .summary-badge { display:inline-block; font-size:11px; padding:1px 8px; border-radius:99px; font-weight:500; }
+    .summary-badge.ok { background:#eaf3e0; color:#2e5a10; }
+    .summary-badge.no { background:#fdecea; color:#c0392b; }
+    .summary-badge.warn { background:#fde8d8; color:#8B3A00; }
+    /* FM Review banner */
+    .fm-banner { display:none; background:#232D4B; color:#fff; padding:10px 16px; border-radius:8px; margin-bottom:12px; font-size:14px; }
+    .fm-banner.show { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .fm-banner button { background:#E57200; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <img src="data:image/png;base64,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" alt="University of Virginia" style="height:44px; width:auto;">
+  </header>
+  <div class="accent-bar"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0% complete</div>
+  </div>
+
+  <div class="page-content">
+    <div id="draft-banner" class="draft-banner" style="display:none;">
+      <span>📋 You have a saved draft from a previous session.</span>
+      <div style="display:flex;gap:10px;">
+        <button onclick="loadDraft()">Restore draft</button>
+        <button onclick="clearDraft()" style="color:#888780; font-weight:400;">Discard</button>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h1>Graduation Event Support Request</h1>
+      <p>Submit at least 10 business days before your graduation event. FM zone staff will follow up to confirm services and your AIM work order.</p>
+    </div>
+
+    <!-- ── ORGANIZER INFO ── -->
+    <div class="fm-banner" id="fm-banner">
+      <div><strong>FM Review Mode</strong> — The organizer's layout is loaded. Add suggestions, then send back.</div>
+      <button type="button" onclick="sendBackToOrganizer()">Send back with edits</button>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Organizer information
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="org-name">Organizer name <span class="req-tag">required</span></label>
+          <input type="text" id="org-name" placeholder="Full name">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="org-dept">Department / organization <span class="req-tag">required</span></label>
+          <input type="text" id="org-dept" placeholder="e.g. Student Council, Darden">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="org-email">Email <span class="req-tag">required</span></label>
+          <input type="email" id="org-email" placeholder="computing-id@virginia.edu">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="org-phone">Phone number</label>
+          <input type="tel" id="org-phone" placeholder="(434) 555-0100">
+        </div>
+      </div>
+
+      <div id="extra-contacts-container"></div>
+      <button type="button" onclick="addExtraContact()" style="margin-bottom:12px; background:none; border:1px solid #d0cec7; border-radius:8px; padding:6px 14px; font-size:13px; font-family:inherit; color:#5a5957; cursor:pointer;">+ Add another contact</button>
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label" for="worktag">Work order or worktag <span class="req-tag">required</span></label>
+          <input type="text" id="worktag" placeholder="e.g. PG-00XXXXX">
+          <div class="note-box">All events require a customer-funded work order in AIM. You may contact the FM service desk to create a work order, or provide your departmental worktag and a work order will be created on your behalf.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EVENT DETAILS ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Event details
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="event-name">Event name <span class="req-tag">required</span></label>
+          <input type="text" id="event-name" placeholder="e.g. Spring Vendor Fair">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="event-location">Location <span class="req-tag">required</span></label>
+          <select id="event-location" onchange="loadMap(); checkRotunda();">
+          <option value="">Select a location...</option>
+          <option>Amphitheater</option>
+          <option>Homer Flat</option>
+          <option>The Lawn</option>
+          <option>Pavilion I</option>
+          <option>Pavilion II</option>
+          <option>Pavilion III</option>
+          <option>Pavilion IV</option>
+          <option>Pavilion V</option>
+          <option>Pavilion VI</option>
+          <option>Pavilion VII</option>
+          <option>Pavilion VIII</option>
+          <option>Pavilion IX</option>
+          <option>Pavilion X</option>
+          <option>Rotunda</option>
+        </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Event duration</label>
+          <div class="radio-group" style="margin-top:2px;">
+            <label class="radio-btn selected" onclick="setEventDuration('single')"><input type="radio" name="event-duration" checked> Single day</label>
+            <label class="radio-btn" onclick="setEventDuration('multi')"><input type="radio" name="event-duration"> Multi-day</label>
+          </div>
+        </div>
+      </div>
+      <div id="single-day-fields">
+        <div class="field-row three">
+          <div class="field-group">
+            <label class="field-label" for="event-date">Event date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-start">Start time</label>
+            <input type="time" id="event-start">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-end">End time</label>
+            <input type="time" id="event-end">
+          </div>
+        </div>
+      </div>
+      <div id="multi-day-fields" style="display:none;">
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="event-date-start">Start date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date-start">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="event-date-end">End date <span class="req-tag">required</span></label>
+            <input type="date" id="event-date-end">
+          </div>
+        </div>
+        <div id="day-details-container"></div>
+        <button type="button" onclick="addDayDetail()" style="margin-top:8px; background:#232D4B; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-family:inherit; font-weight:500; cursor:pointer;">+ Add day details</button>
+        <div style="font-size:12px; color:#888780; margin-top:4px;">Specify different services, times, or notes for individual days.</div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="event-attendance">Expected attendance</label>
+          <input type="number" id="event-attendance" placeholder="# of people" min="0">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="event-type">Event type</label>
+          <input type="text" id="event-type" value="Graduation" readonly style="background:#f5f4f0; color:#232D4B; font-weight:600; cursor:default;">
+        </div>
+      </div>
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label" for="event-desc">Brief event description</label>
+          <textarea id="event-desc" placeholder="Describe the event, any special activities, or notes about access and setup…"></textarea>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field-row full">
+        <div class="field-group">
+          <label class="field-label">Rain plan</label>
+          <select id="rain-plan" onchange="toggleRainBackup()">
+            <option value="">Select…</option>
+            <option value="rain-or-shine">Proceeds rain or shine</option>
+            <option value="indoor-backup">Has indoor backup location</option>
+            <option value="cancel">Will cancel if rain</option>
+          </select>
+          <div id="rain-backup-section" class="conditional" style="margin-top:8px;">
+            <input type="text" id="rain-backup-location" placeholder="Indoor backup location name">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="note-box info" id="rotunda-note">
+        Rotunda events require notifying Sher Winston. FM will coordinate on your behalf once this request is received.
+      </div>
+    </div>
+
+    <!-- ── FM SERVICES ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        FM services needed
+      </div>
+      <p class="sub-label">Select all that apply. Additional questions will appear based on your selections.</p>
+
+      <div class="service-grid">
+
+        <!-- Event Setup & Takedown -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-setup-card">
+            <input type="checkbox" id="svc-setup" value="Event setup & takedown" onchange="toggleService('setup')">
+            <div>
+              <div class="item-label">Event setup &amp; takedown</div>
+              <div class="item-sub">Staffing &amp; HVAC coordination</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-setup">
+            <div class="followup-title">Setup details</div>
+            <div class="field-row" style="margin-bottom:0;">
+              <div class="field-group">
+                <label class="field-label" for="setup-time">Setup start time</label>
+                <input type="time" id="setup-time">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="teardown-time">Teardown end time</label>
+                <input type="time" id="teardown-time">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tents -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-tent-card">
+            <input type="checkbox" id="svc-tent" value="Tents" onchange="toggleService('tent')">
+            <div>
+              <div class="item-label">Tents</div>
+              <div class="item-sub">Permit &amp; Fire Safety approval required</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-tent">
+            <div class="followup-title">Tent details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="tent-qty">Number of tents</label>
+              <input type="number" min="1" id="tent-qty" placeholder="Qty" style="width:100%;">
+            </div>
+
+            <p class="sub-label" style="margin-bottom:4px;">Tent permit obtained?</p>
+            <div class="note-box" style="margin-bottom:8px; font-size:12px;">Download the <a href="https://fire.safety.virginia.edu/sites/fire_safety/files/2025-06/UVA%20Tent%20Instructions%202025.pdf" target="_blank" style="color:#232D4B; font-weight:500;">UVA Tent Permit Instructions &amp; Application (PDF)</a> for instructions and the application form.</div>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','yes')" data-group="tent-permit" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','no')" data-group="tent-permit" data-val="no">No</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-permit','inprogress')" data-group="tent-permit" data-val="inprogress">In progress</span>
+            </div>
+            <input type="hidden" id="tent-permit" value="">
+
+            <p class="sub-label" style="margin-bottom:6px;">Fire &amp; Safety approval obtained?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','yes')" data-group="tent-safety" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','no')" data-group="tent-safety" data-val="no">No</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-safety','inprogress')" data-group="tent-safety" data-val="inprogress">In progress</span>
+            </div>
+            <input type="hidden" id="tent-safety" value="">
+
+            <div id="tent-safety-warning" class="note-box warning" style="display:none; margin-bottom:12px;">
+              Fire &amp; Safety approval is required before FM can confirm tent support. Please contact UVA Fire Prevention at (434) 924-3311.
+            </div>
+
+            <hr class="divider" style="margin: 10px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group" style="margin-bottom:0;">
+              <label class="radio-btn" onclick="selectVendorFlow('tent','yes')"><input type="radio" name="tent-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('tent','no')"><input type="radio" name="tent-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="tent-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="tent-vendor-name">Vendor name</label>
+                  <input type="text" id="tent-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="tent-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="tent-vendor-supply" placeholder="e.g. 40x60 tent, sidewalls">
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'tent-power','yes')" data-group="tent-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'tent-power','no')" data-group="tent-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="tent-power" value="">
+            <div id="tent-power-notes-section" class="conditional">
+              <div class="field-group">
+                <label class="field-label" for="tent-power-notes">Describe power / water needs</label>
+                <textarea id="tent-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Food Trucks -->
+        <!-- Stages / Platforms -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-stage-card">
+            <input type="checkbox" id="svc-stage" value="Stages & platforms" onchange="toggleService('stage')">
+            <div>
+              <div class="item-label">Stages &amp; platforms</div>
+              <div class="item-sub">Vendor sourcing &amp; power coordination</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-stage">
+            <div class="followup-title">Stage details</div>
+            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
+              <label class="field-label" for="stage-qty">Number of stages</label>
+              <input type="number" min="1" id="stage-qty" placeholder="Qty" style="width:100%;">
+            </div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Power needed at the stage?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'stage-power','yes')" data-group="stage-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'stage-power','no')" data-group="stage-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="stage-power" value="">
+            <div id="stage-power-note" class="note-box info" style="display:none; margin-bottom:12px;">
+              Please also select <strong>Power &amp; water connections</strong> above and describe the stage power requirements in the notes field.
+            </div>
+
+            <hr class="divider" style="margin:10px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group">
+              <label class="radio-btn" onclick="selectVendorFlow('stage','yes')"><input type="radio" name="stage-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('stage','no')"><input type="radio" name="stage-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="stage-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="stage-vendor-name">Vendor name</label>
+                  <input type="text" id="stage-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="stage-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="stage-vendor-supply" placeholder="e.g. 24x24 stage, stairs, skirting">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Chairs & Tables -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-chairs-card">
+            <input type="checkbox" id="svc-chairs" value="Chairs & tables" onchange="toggleService('chairs')">
+            <div>
+              <div class="item-label">Chairs &amp; tables</div>
+              <div class="item-sub">Rental sourcing &amp; delivery</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-chairs">
+            <div class="followup-title">Chairs &amp; tables details</div>
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="chairs-qty">Estimated chairs needed</label>
+                <input type="number" id="chairs-qty" placeholder="e.g. 100" min="0">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="tables-qty">Estimated tables needed</label>
+                <input type="number" id="tables-qty" placeholder="e.g. 20" min="0">
+              </div>
+            </div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Vendor already contacted?</p>
+            <div class="radio-group">
+              <label class="radio-btn" onclick="selectVendorFlow('chairs','yes')"><input type="radio" name="chairs-vendor-flow">Yes</label>
+              <label class="radio-btn" onclick="selectVendorFlow('chairs','no')"><input type="radio" name="chairs-vendor-flow">No — request FM assistance in vendor procurement</label>
+            </div>
+            <div class="conditional" id="chairs-vendor-yes">
+              <div class="field-row" style="margin-top:10px; margin-bottom:0;">
+                <div class="field-group">
+                  <label class="field-label" for="chairs-vendor-name">Vendor name</label>
+                  <input type="text" id="chairs-vendor-name" placeholder="Company name">
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="chairs-vendor-supply">What are they supplying?</label>
+                  <input type="text" id="chairs-vendor-supply" placeholder="e.g. 100 folding chairs, 20 6ft tables">
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider" style="margin:12px 0;">
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power or water connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'chairs-power','yes')" data-group="chairs-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'chairs-power','no')" data-group="chairs-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="chairs-power" value="">
+            <div id="chairs-power-notes-section" class="conditional">
+              <div class="field-group">
+                <label class="field-label" for="chairs-power-notes">Describe power / water needs</label>
+                <textarea id="chairs-power-notes" placeholder="e.g. Power for lighting, water hookup…" style="min-height:50px;"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PA System / Amplified Sound -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-pa-card">
+            <input type="checkbox" id="svc-pa" value="PA system / amplified sound" onchange="toggleService('pa')">
+            <div>
+              <div class="item-label">PA system / amplified sound</div>
+              <div class="item-sub">Speakers, live music, DJ</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-pa">
+            <div class="followup-title">PA system &amp; sound details</div>
+            <div class="field-row" style="margin-bottom:12px;">
+              <div class="field-group">
+                <label class="field-label" for="pa-type">Type of sound</label>
+                <select id="pa-type">
+                  <option value="">Select…</option>
+                  <option value="speakers">PA / speakers only</option>
+                  <option value="live-music">Live music</option>
+                  <option value="dj">DJ</option>
+                  <option value="speakers-and-live">PA / speakers + live music</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="pa-vendor">Sound vendor / provider</label>
+                <input type="text" id="pa-vendor" placeholder="e.g. Spectrum Integrators, The South Live">
+              </div>
+            </div>
+            <p class="sub-label" style="margin-bottom:6px;">Will this require power connections?</p>
+            <div class="status-group" style="margin-bottom:10px;">
+              <span class="status-pill" onclick="selectStatus(this,'pa-power','yes')" data-group="pa-power" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'pa-power','no')" data-group="pa-power" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="pa-power" value="">
+            <div class="field-group">
+              <label class="field-label" for="pa-notes">Sound &amp; power details</label>
+              <textarea id="pa-notes" placeholder="e.g. Need 2 power drops for DJ booth and monitor speakers, sound check at 2pm…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waste & Recycling -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-waste-card">
+            <input type="checkbox" id="svc-waste" value="Waste & recycling" onchange="toggleService('waste')">
+            <div>
+              <div class="item-label">Waste &amp; recycling</div>
+              <div class="item-sub">Bins &amp; servicing</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-waste">
+            <div class="followup-title">Waste &amp; recycling details</div>
+
+            <p class="sub-label" style="margin-bottom:6px;">Would you like to request zero waste status for this event?</p>
+            <div class="status-group" style="margin-bottom:12px;">
+              <span class="status-pill" onclick="selectStatus(this,'zero-waste','yes')" data-group="zero-waste" data-val="yes">Yes</span>
+              <span class="status-pill" onclick="selectStatus(this,'zero-waste','no')" data-group="zero-waste" data-val="no">No</span>
+            </div>
+            <input type="hidden" id="zero-waste" value="">
+
+            <div id="zero-waste-section" class="conditional">
+              <div class="note-box warning" style="margin-bottom:10px; line-height:1.6;">
+                Zero waste events must be requested <strong>at least 10 business days</strong> before the event date. Submit your application through the <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=x4A0ewc3c0iLd-IWczplrDIGqOCnXy9HnyGTU7Oc9slURUkxN0E4QVlTWlNVNkFPNDA2Qkg4UkFPUS4u" target="_blank" style="color:#7A3D00; font-weight:600;">UVA Sustainability Zero Waste Event Form</a>.
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="waste-notes">Notes on placement or quantity</label>
+              <textarea id="waste-notes" placeholder="e.g. Recycling bins at each tent, extra trash cans near food area…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portable Bathrooms & Custodial — major events only -->
+        <!-- Steel Barriers & Signs — major events only -->
+        <div class="svc-wrap">
+          <label class="service-item" id="svc-signs-card">
+            <input type="checkbox" id="svc-signs" value="Signs & fixtures" onchange="toggleService('signs')">
+            <div>
+              <div class="item-label">Signs &amp; fixtures</div>
+              <div class="item-sub">Wooden crosses, Hubba shop signs, lectern &amp; podium</div>
+            </div>
+          </label>
+          <div class="followup-panel" id="panel-signs">
+            <div class="followup-title">Signs &amp; fixtures needed</div>
+            <p class="sub-label" style="margin-bottom:6px;">Select all that apply:</p>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Wooden crosses" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Wooden crosses</div><div class="item-sub">Ceremonial wooden cross signage</div></div>
+              </label>
+              <input type="number" min="1" id="crosses-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Hubba shop signs" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Hubba shop signs</div><div class="item-sub">Signs produced by the Hubba shop</div></div>
+              </label>
+              <input type="number" min="1" id="hubba-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Lectern" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Lectern</div><div class="item-sub">Speaking lectern</div></div>
+              </label>
+              <input type="number" min="1" id="lectern-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
+              <label class="service-item" style="border-radius:6px;">
+                <input type="checkbox" name="signs-services" value="Podium" onchange="this.closest('.service-item').classList.toggle('checked',this.checked)">
+                <div><div class="item-label">Podium</div><div class="item-sub">Raised platform / podium</div></div>
+              </label>
+              <input type="number" min="1" id="podium-qty" placeholder="Qty" onclick="event.preventDefault();" style="width:70px; margin-left:8px; font-size:13px; padding:4px 8px; border:1px solid #d0cec7; border-radius:6px;">
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="signs-notes">Describe signs &amp; fixtures needs</label>
+              <textarea id="signs-notes" placeholder="e.g. 2 wooden crosses flanking the stage, lectern with mic at center, wayfinding signs from parking…" style="min-height:55px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end service-grid -->
+
+      <hr class="divider">
+
+      <!-- Timeline section injected by JS -->
+      <div class="timeline-section" id="timeline-section">
+        <div class="section-title" style="border-bottom:2px solid #E57200; padding-bottom:6px; margin-bottom:12px;">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#232D4B;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Pre-event checklist
+        </div>
+        <p class="sub-label" style="margin-bottom:8px;">Based on your selected services, complete these steps before your event:</p>
+        <div id="timeline-items"></div>
+      </div>
+
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Event layout map
+      </div>
+
+      <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;height:500px;color:#888780;font-size:14px;border:1px solid #e4e2dc;border-radius:10px;">Select a location above to load the site map.</div>
+      <div id="map-container" style="display:none;height:500px;width:100%;border-radius:10px;border:1px solid #e4e2dc;"></div>
+
+      <div id="map-tools" style="display:none;">
+        <div class="pin-toolbar" id="pin-toolbar"></div>
+        <div id="pin-hint" style="font-size:12px;color:#E57200;font-weight:500;min-height:18px;margin-bottom:4px;"></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <input type="text" id="custom-pin-input" placeholder="Custom resource label (e.g. DJ Booth)" style="flex:1;font-size:13px;padding:5px 9px;border:1px solid #d0cec7;border-radius:8px;">
+          <button onclick="addCustomPin()" style="padding:5px 12px;background:#232D4B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">+ Add</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+          <button onclick="undoPin()" style="font-size:12px;font-family:inherit;cursor:pointer;border-radius:8px;padding:5px 14px;background:none;border:1px solid #d0cec7;color:#5a5957;">↩ Undo</button>
+          <button id="btn-finish" onclick="finishPolygon()" style="display:none;background:#E57200;color:#fff;border:none;border-radius:8px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Finish shape</button>
+          <button onclick="clearPins()" style="font-size:12px;font-family:inherit;cursor:pointer;background:none;border:none;color:#c0392b;text-decoration:underline;padding:5px 8px;">Clear all</button>
+          <span style="flex:1;"></span>
+          <span id="pin-counter" style="font-size:12px;color:#888780;"></span>
+        </div>
+        <div id="pin-list" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Additional notes for FM
+      </div>
+      <p class="sub-label">Additional notes for FM staff</p>
+      <textarea id="fm-notes" placeholder="Any other details, special timing, or access requirements…" style="min-height:60px;"></textarea>
+    </div>
+
+    <!-- ── PARKING ── -->
+    <div class="form-section">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
+        Parking lot use
+      </div>
+      <p class="sub-label" style="margin-bottom:8px;">Will a parking lot be used for this event?</p>
+      <div class="status-group" style="margin-bottom:0;">
+        <span class="status-pill" onclick="selectStatus(this,'parking-use','yes')" data-group="parking-use" data-val="yes">Yes</span>
+        <span class="status-pill" onclick="selectStatus(this,'parking-use','no')" data-group="parking-use" data-val="no">No</span>
+      </div>
+      <input type="hidden" id="parking-use" value="">
+
+      <div id="parking-section" class="conditional" style="margin-top:12px;">
+        <p class="sub-label" style="margin-bottom:6px;">How will the lot be used?</p>
+        <div class="status-group" style="margin-bottom:12px;">
+          <span class="status-pill" onclick="selectStatus(this,'parking-type','parking')" data-group="parking-type" data-val="parking">Guest parking</span>
+          <span class="status-pill" onclick="selectStatus(this,'parking-type','event')" data-group="parking-type" data-val="event">Event held in lot</span>
+          <span class="status-pill" onclick="selectStatus(this,'parking-type','both')" data-group="parking-type" data-val="both">Both</span>
+        </div>
+        <input type="hidden" id="parking-type" value="">
+
+        <p class="sub-label" style="margin-bottom:6px;">Has Parking &amp; Transportation (P&amp;T) Events given approval?</p>
+        <div class="status-group" style="margin-bottom:0;">
+          <span class="status-pill" onclick="selectStatus(this,'parking-approval','yes')" data-group="parking-approval" data-val="yes">Yes</span>
+          <span class="status-pill" onclick="selectStatus(this,'parking-approval','no')" data-group="parking-approval" data-val="no">No — I need to request approval</span>
+          <span class="status-pill" onclick="selectStatus(this,'parking-approval','inprogress')" data-group="parking-approval" data-val="inprogress">In progress</span>
+        </div>
+        <input type="hidden" id="parking-approval" value="">
+
+        <div id="parking-links" class="conditional" style="margin-top:10px;">
+          <div class="note-box warning">
+            P&amp;T Events approval is required before using a parking lot. Submit a request through the appropriate link below:
+            <ul style="margin-top:8px; padding-left:18px; line-height:2;">
+              <li><a href="https://uva.t2hosted.com/Account/Portal" target="_blank" style="color:#7A3D00; font-weight:500;">UVA Faculty &amp; Staff — T2 Parking Portal</a></li>
+              <li><a href="https://parking.virginia.edu/event-non-affiliated" target="_blank" style="color:#7A3D00; font-weight:500;">UVA Students &amp; Non-Affiliates — Parking Events Page</a></li>
+            </ul>
+            Questions? Email <a href="mailto:ptevents@virginia.edu" style="color:#7A3D00; font-weight:500;">ptevents@virginia.edu</a>
+          </div>
+        </div>
+
+        <div id="parking-lot-name-section" class="conditional" style="margin-top:12px;">
+          <div class="field-group">
+            <label class="field-label" for="parking-notes">Parking lot name &amp; any notes</label>
+            <input type="text" id="parking-notes" placeholder="e.g. C1 Parking Lot, in front of Bryan Hall">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-reset" type="button" onclick="resetForm()">Clear form</button>
+      <button class="btn-submit" type="button" id="submit-btn" onclick="submitForm()">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        <span id="submit-label">Submit request</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+    </div>
+
+    <div class="error-banner" id="error-banner">Submission failed. Please try again or contact FM directly.</div>
+    <div class="success-msg" id="success-msg">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+      <div style="margin-bottom:6px;">Request submitted!</div>
+      <div style="font-size:14px; font-weight:400; margin-bottom:4px;">Your request ID: <strong id="success-request-id" style="font-size:16px; letter-spacing:0.05em;"></strong></div>
+      <div style="font-size:13px; font-weight:400; color:#3d6b20; margin-bottom:4px;" id="success-complexity"></div>
+      <div style="font-size:13px; font-weight:400;">FM will follow up to confirm services and your AIM work order.</div>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button onclick="requestAnotherSame()" style="background:#2e5a10; color:#fff; border:none; border-radius:6px; padding:9px 18px; font-size:14px; font-family:inherit; font-weight:500; cursor:pointer;">
+          Same organizer info
+        </button>
+        <button onclick="requestRepeatEvent()" style="background:#232D4B; color:#fff; border:none; border-radius:6px; padding:9px 18px; font-size:14px; font-family:inherit; font-weight:500; cursor:pointer;">
+          Same event, new date
+        </button>
+        <button onclick="requestAnother()" style="background:transparent; color:#2e5a10; border:1px solid #5a8a2e; border-radius:6px; padding:9px 18px; font-size:14px; font-family:inherit; font-weight:500; cursor:pointer;">
+          New request
+        </button>
+      </div>
+      <div style="margin-top:10px;">
+        <button onclick="printSummary()" style="background:transparent; color:#5a5957; border:1px solid #d0cec7; border-radius:8px; padding:7px 16px; font-size:13px; font-family:inherit; cursor:pointer;">
+          🖨 Print summary
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end page-content -->
+
+  <script>
+    const POWER_AUTOMATE_URL = "https://default7b3480c7370748738b77e216733a65.ac.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e2f38e9d483f4625a6739d146588a32a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=VU0Th2HD46yJzCwiikF4TL-qxNJ1kWYo7y6ThgnMGcc";
+
+    // ── Safe localStorage wrappers (fail gracefully if storage blocked) ──
+    function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+    function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+    function lsRemove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+    // ── Service toggle (checkbox + panel) ──
+    function toggleService(key) {
+      const cb = document.getElementById('svc-' + key);
+      const card = document.getElementById('svc-' + key + '-card');
+      const panel = document.getElementById('panel-' + key);
+      if (card) card.classList.toggle('checked', cb.checked);
+      if (panel) {
+        panel.classList.toggle('open', cb.checked);
+        // Make the parent grid cell span full width when panel is open
+        const parentDiv = panel.closest('.svc-wrap');
+        if (parentDiv) parentDiv.classList.toggle('full-width', cb.checked);
+      }
+    }
+
+    // ── Status pills ──
+    function selectStatus(el, group, val) {
+      document.querySelectorAll(`[data-group="${group}"]`).forEach(p => p.className = 'status-pill');
+      el.classList.add(val === 'yes' ? 'yes' : val === 'no' ? 'no' : 'inprogress');
+      document.getElementById(group).value = val;
+
+      // Conditional warnings
+      if (group === 'tent-safety') {
+        document.getElementById('tent-safety-warning').style.display = (val === 'no') ? 'block' : 'none';
+      }
+      if (group === 'food-license') {
+        document.getElementById('food-license-warning').style.display = (val === 'no') ? 'block' : 'none';
+      }
+      if (group === 'food-kitchen') {
+        // Only show Fire & Safety license question if trucks have a kitchen
+        const licenseSection = document.getElementById('food-license-section');
+        if (licenseSection) licenseSection.classList.toggle('show', val === 'yes' || val === 'some');
+        if (val === 'no') {
+          const fl = document.getElementById('food-license'); if (fl) fl.value = '';
+          const fw = document.getElementById('food-license-warning'); if (fw) fw.style.display = 'none';
+          document.querySelectorAll('[data-group="food-license"]').forEach(p => p.className = 'status-pill');
+        }
+      }
+      if (group === 'stage-power') {
+        const n = document.getElementById('stage-power-note'); if (n) n.style.display = (val === 'yes') ? 'block' : 'none';
+      }
+      // Per-service power/water toggle
+      ['tent','chairs'].forEach(svc => {
+        if (group === svc + '-power') {
+          const sec = document.getElementById(svc + '-power-notes-section');
+          if (sec) sec.classList.toggle('show', val === 'yes');
+        }
+      });
+      if (group === 'zero-waste') {
+        const sec = document.getElementById('zero-waste-section');
+        if (sec) sec.classList.toggle('show', val === 'yes');
+      }
+      if (group === 'parking-use') {
+        document.getElementById('parking-section').classList.toggle('show', val === 'yes');
+        if (val === 'no') {
+          document.getElementById('parking-approval').value = '';
+          document.getElementById('parking-type').value = '';
+          document.getElementById('parking-links').classList.remove('show');
+          document.querySelectorAll('[data-group="parking-approval"],[data-group="parking-type"]').forEach(p => p.className = 'status-pill');
+        }
+      }
+      if (group === 'parking-type') {
+        const showLotName = (val === 'event' || val === 'both');
+        document.getElementById('parking-lot-name-section').classList.toggle('show', showLotName);
+        if (!showLotName) document.getElementById('parking-notes').value = '';
+      }
+      if (group === 'parking-approval') {
+        document.getElementById('parking-links').classList.toggle('show', val === 'no');
+      }
+      if (group === 'alcohol') {
+        document.getElementById('alcohol-section').classList.toggle('show', val === 'yes');
+        if (val === 'no') {
+          document.getElementById('upd-approval').value = '';
+          document.getElementById('security-staff').value = '';
+          document.getElementById('upd-warning').style.display = 'none';
+          document.querySelectorAll('[data-group="upd-approval"],[data-group="security-staff"]').forEach(p => p.className = 'status-pill');
+        }
+      }
+      if (group === 'upd-approval') {
+        document.getElementById('upd-warning').style.display = (val === 'no') ? 'block' : 'none';
+      }
+    }
+
+    // ── Vendor flow (yes/no radio) ──
+    function selectVendorFlow(service, choice) {
+      const yesDiv = document.getElementById(service + '-vendor-yes');
+      document.querySelectorAll(`[name="${service}-vendor-flow"]`).forEach((r, i) => {
+        r.closest('.radio-btn').classList.toggle('selected', (i === 0 && choice === 'yes') || (i === 1 && choice === 'no'));
+      });
+      if (yesDiv) yesDiv.classList.toggle('show', choice === 'yes');
+    }
+
+    // ── Rotunda notice ──
+    function checkRotunda() {
+      const loc = document.getElementById('event-location').value;
+      document.getElementById('rotunda-note').style.display = loc.includes('Rotunda') ? 'block' : 'none';
+    }
+
+    // ── Collect checked services ──
+    function getServices() {
+      const services = [];
+      ['power','setup','tent','stage','chairs','waste','pa','signs'].forEach(key => {
+        const cb = document.getElementById('svc-' + key);
+        if (cb && cb.checked) services.push(cb.value);
+      });
+      return services.join(', ') || 'None';
+    }
+
+    function getCheckedVals(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value).join(', ');
+    }
+
+    // ── Undo last pin ──
+    let pinHistory = [];
+    function pushPinHistory() {
+      pinHistory.push(JSON.stringify(pins));
+      var _ub=document.getElementById('undo-btn'); if(_ub) _ub.disabled = false;
+    }
+    function undoLastPin() {
+      if (!pinHistory.length) return;
+      // Remove last placed element
+      if (pins.length) {
+        const last = pins[pins.length - 1];
+        const el = document.getElementById('pin-' + last.id);
+        if (el) el.remove();
+        pins.pop();
+      }
+      renderPinList();
+      buildToolbar();
+      if (!pins.length) { var _ub2=document.getElementById('undo-btn'); if(_ub2) _ub2.disabled = true; }
+    }
+
+    // ── Pin count badges on toolbar ──
+    // (buildToolbar already called after pin place; we hook renderPinList to also rebuild toolbar)
+    const _origRenderPinList = renderPinList;
+
+    // Auto-power removed — power is now asked per-service
+
+
+    // ── Date warning ──
+    document.getElementById('event-date').addEventListener('change', function() {
+      let warn = document.getElementById('date-warn');
+      const val = this.value;
+      if (!val) { if (warn) warn.remove(); return; }
+      const eventDate = new Date(val + 'T00:00:00');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const diffDays = Math.round((eventDate - today) / 86400000);
+      if (!warn) {
+        warn = document.createElement('div');
+        warn.id = 'date-warn';
+        warn.className = 'note-box warning';
+        warn.style.marginTop = '6px';
+        this.parentElement.appendChild(warn);
+      }
+      if (diffDays < 0) {
+        warn.textContent = 'This date is in the past.';
+        warn.style.display = 'block';
+      } else if (diffDays < 14) {
+        warn.textContent = `This event is ${diffDays} day${diffDays !== 1 ? 's' : ''} away. FM requests at least 10 business days notice — please contact FM directly to confirm availability.`;
+        warn.style.display = 'block';
+      } else {
+        warn.style.display = 'none';
+      }
+    });
+
+    // ── Build summary HTML ──
+    function buildSummary() {
+      const val = (id) => (document.getElementById(id) || {}).value || '—';
+      const checked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c=>c.value).join(', ') || 'None';
+
+      const services = [];
+      const qtyMap = { 'svc-tent':'tent-qty', 'svc-stage':'stage-qty', 'svc-chairs':'chairs-qty' };
+      [{id:'svc-power',label:'Power & water'},{id:'svc-setup',label:'Setup & takedown'},
+       {id:'svc-tent',label:'Tents'},
+       {id:'svc-stage',label:'Stages & platforms'},{id:'svc-chairs',label:'Chairs & tables'},
+       {id:'svc-pa',label:'PA / Sound'},
+       {id:'svc-waste',label:'Waste & recycling'},{id:'svc-signs',label:'Signs & fixtures'}
+      ].forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el && el.checked) {
+          let lbl = s.label;
+          const qEl = qtyMap[s.id] ? document.getElementById(qtyMap[s.id]) : null;
+          if (qEl && qEl.value) lbl += ' (×' + qEl.value + ')';
+          services.push(lbl);
+        }
+      });
+
+      const statusBadge = (val, labels) => {
+        if (!val || val === '—') return '<span class="summary-badge warn">Not answered</span>';
+        const map = {yes:'ok', no:'no', inprogress:'warn'};
+        const cls = map[val] || '';
+        const txt = labels ? labels[val] || val : val;
+        return `<span class="summary-badge ${cls}">${txt}</span>`;
+      };
+
+      const dateVal = val('event-date');
+      let dateDisplay = dateVal;
+      if (dateVal && dateVal !== '—') {
+        const d = new Date(dateVal + 'T00:00:00');
+        const diffDays = Math.round((d - new Date().setHours(0,0,0,0)) / 86400000);
+        if (diffDays < 14 && diffDays >= 0) dateDisplay += ` <span class="summary-badge warn">⚠ ${diffDays}d away</span>`;
+        if (diffDays < 0) dateDisplay += ` <span class="summary-badge no">Past date</span>`;
+      }
+
+      const startT = val('event-start'), endT = val('event-end');
+      const timeStr = startT !== '—' ? `${startT}${endT !== '—' ? ' – ' + endT : ''}` : '—';
+
+      let html = `
+        <div class="summary-section">
+          <div class="summary-section-title">Organizer</div>
+          <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${val('org-name')}</span></div>
+          <div class="summary-row"><span class="summary-key">Department</span><span class="summary-val">${val('org-dept')}</span></div>
+          <div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${val('org-email')}</span></div>
+          <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${val('org-phone') || '—'}</span></div>
+          <div class="summary-row"><span class="summary-key">Work order / worktag</span><span class="summary-val">${val('worktag')}</span></div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-section-title">Event</div>
+          <div class="summary-row"><span class="summary-key">Event name</span><span class="summary-val">${val('event-name')}</span></div>
+          <div class="summary-row"><span class="summary-key">Location</span><span class="summary-val">${val('event-location')}</span></div>
+          <div class="summary-row"><span class="summary-key">Date</span><span class="summary-val">${dateDisplay}</span></div>
+          <div class="summary-row"><span class="summary-key">Time</span><span class="summary-val">${timeStr}</span></div>
+          <div class="summary-row"><span class="summary-key">Expected attendance</span><span class="summary-val">${val('event-attendance') || '—'}</span></div>
+          <div class="summary-row"><span class="summary-key">Event type</span><span class="summary-val">${val('event-type') || '—'}</span></div>
+          <div class="summary-row"><span class="summary-key">Complexity</span><span class="summary-val">${(()=>{const c=getComplexity();const cls=c==='High'?'complexity-high':(c==='Moderate'?'complexity-moderate':'complexity-standard');const icon=c==='High'?'⚠':(c==='Moderate'?'●':'✓');return '<span class="complexity-badge '+cls+'">'+icon+' '+c+' Complexity</span>';})()}</span></div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-section-title">FM Services</div>
+          <div class="summary-row"><span class="summary-key">Selected services</span><span class="summary-val">${services.length ? services.map(s=>`<span class="summary-badge">${s}</span>`).join('') : '<span class="summary-badge warn">None selected</span>'}</span></div>
+        </div>`;
+
+      // Tent
+      const tentCb = document.getElementById('svc-tent');
+      if (tentCb && tentCb.checked) {
+        html += `<div class="summary-section">
+          <div class="summary-section-title">Tent details</div>
+          <div class="summary-row"><span class="summary-key">Tent permit</span><span class="summary-val">${statusBadge(val('tent-permit'),{yes:'Obtained',no:'Not obtained',inprogress:'In progress'})}</span></div>
+          <div class="summary-row"><span class="summary-key">Fire & Safety approval</span><span class="summary-val">${statusBadge(val('tent-safety'),{yes:'Obtained',no:'Not obtained',inprogress:'In progress'})}</span></div>
+          <div class="summary-row"><span class="summary-key">Vendor</span><span class="summary-val">${val('tent-vendor-name') || checked('tent-pref-vendor') || '—'}</span></div>
+        </div>`;
+      }
+
+      // Food trucks
+      // Map layout
+      if (pins.length > 0) {
+        const pinList = pins.map(p => p.label + (p.note ? ' — ' + p.note : '')).join(', ');
+        html += `<div class="summary-section">
+          <div class="summary-section-title">Event layout (${pins.length} resource${pins.length!==1?'s':''})</div>
+          <div class="summary-row"><span class="summary-key">Placed</span><span class="summary-val" style="font-size:12px;">${pinList}</span></div>
+          ${window._mapScreenshot ? `<div style="margin-top:8px;"><img src="${window._mapScreenshot}" style="width:100%; border:1px solid #e4e2dc; border-radius:8px;" alt="Event layout map"></div>` : '<div style="margin-top:6px; font-size:12px; color:#888780;">Map screenshot will be captured on submit.</div>'}
+        </div>`;
+      }
+
+      // Parking
+      if (val('parking-use') === 'yes') {
+        html += `<div class="summary-section">
+          <div class="summary-section-title">Parking</div>
+          <div class="summary-row"><span class="summary-key">Lot use</span><span class="summary-val">${val('parking-type') || '—'}</span></div>
+          <div class="summary-row"><span class="summary-key">P&T approval</span><span class="summary-val">${statusBadge(val('parking-approval'),{yes:'Approved',no:'Not approved',inprogress:'In progress'})}</span></div>
+          ${val('parking-notes') ? `<div class="summary-row"><span class="summary-key">Lot details</span><span class="summary-val">${val('parking-notes')}</span></div>` : ''}
+        </div>`;
+      }
+
+      return html;
+    }
+
+    function openSummary() {
+      document.getElementById('summary-body').innerHTML = buildSummary();
+      document.getElementById('summary-modal').classList.add('open');
+    }
+
+    function closeSummary() {
+      document.getElementById('summary-modal').classList.remove('open');
+    }
+
+    async function confirmSubmit() {
+      window._currentRequestId  = generateRequestId();
+      window._currentComplexity = getComplexity();
+      closeSummary();
+      await doSubmit();
+    }
+
+    // ── Submit ──
+    // ── Event duration toggle ──
+    var eventDurationMode = 'single';
+    function setEventDuration(mode) {
+      eventDurationMode = mode;
+      document.getElementById('single-day-fields').style.display = mode === 'single' ? '' : 'none';
+      document.getElementById('multi-day-fields').style.display = mode === 'multi' ? '' : 'none';
+      // Update radio button visual state (toggle .selected on the pill labels)
+      document.querySelectorAll('input[name="event-duration"]').forEach((r, i) => {
+        const isThis = (i === 0 && mode === 'single') || (i === 1 && mode === 'multi');
+        r.checked = isThis;
+        r.closest('.radio-btn').classList.toggle('selected', isThis);
+      });
+    }
+
+    // ── Extra contacts ──
+    function addExtraContact() {
+      const container = document.getElementById('extra-contacts-container');
+      const row = document.createElement('div');
+      row.className = 'extra-contact-row';
+      row.style.cssText = 'display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:center;';
+      row.innerHTML = '<input type="text" placeholder="Name" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="text" placeholder="Role (e.g. day-of coordinator)" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="email" placeholder="Email" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<input type="tel" placeholder="Phone" style="font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;">' +
+        '<button type="button" onclick="this.parentElement.remove()" style="background:#fdecea;color:#c0392b;border:none;border-radius:8px;padding:7px 12px;font-size:16px;cursor:pointer;line-height:1;">×</button>';
+      container.appendChild(row);
+    }
+
+    // ── Multi-day details ──
+    function addDayDetail() {
+      const container = document.getElementById('day-details-container');
+      const count = container.querySelectorAll('.day-detail-row').length + 1;
+      const row = document.createElement('div');
+      row.className = 'day-detail-row';
+      row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:flex-start;';
+      row.innerHTML = '<div style="flex:1;"><input type="text" placeholder="Day ' + count + ' — date or label" style="width:100%;font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;margin-bottom:6px;">' +
+        '<textarea placeholder="Services, times, or notes for this day" style="width:100%;font-size:13px;padding:7px 9px;border:1px solid #d0cec7;border-radius:8px;min-height:48px;font-family:inherit;"></textarea></div>' +
+        '<button type="button" onclick="this.parentElement.remove()" style="background:#fdecea;color:#c0392b;border:none;border-radius:8px;padding:7px 12px;font-size:16px;cursor:pointer;line-height:1;">×</button>';
+      container.appendChild(row);
+    }
+
+    // ── Print summary ──
+    function printSummary() {
+      const body = document.getElementById('summary-body');
+      if (!body) return;
+      const w = window.open('', '', 'width=800,height=900');
+      w.document.write('<html><head><title>CGZ Graduation Event Request</title>');
+      w.document.write('<style>body{font-family:-apple-system,Segoe UI,Arial,sans-serif;font-size:13px;color:#1a1a18;padding:30px;max-width:700px;} h1{color:#232D4B;font-size:18px;} .summary-row{padding:5px 0;border-bottom:0.5px solid #ddd;display:flex;gap:10px;} .k{color:#888;width:160px;flex-shrink:0;} .v{font-weight:500;} .summary-section-title{color:#232D4B;font-weight:600;margin:14px 0 6px;border-bottom:2px solid #E57200;display:inline-block;} .summary-badge{font-size:11px;padding:1px 7px;border-radius:99px;background:#eee;}</style>');
+      w.document.write('</he' + 'ad><body>');
+      w.document.write('<h1>CGZ Graduation Event Support Request</h1>');
+      w.document.write(body.innerHTML);
+      w.document.write('</bo' + 'dy></html>');
+      w.document.close();
+      w.print();
+    }
+
+
+
+    function getMapPinData() {
+      if (typeof pins === 'undefined' || !pins.length) return 'None';
+      return pins.map(p => p.label + (p.note ? ' (' + p.note + ')' : '')).join(', ');
+    }
+
+    function getExtraContactsData() {
+      const rows = document.querySelectorAll('#extra-contacts-container .extra-contact-row');
+      if (!rows.length) return [];
+      return Array.from(rows).map(r => {
+        const inputs = r.querySelectorAll('input');
+        return {
+          name:  inputs[0] ? inputs[0].value.trim() : '',
+          role:  inputs[1] ? inputs[1].value.trim() : '',
+          email: inputs[2] ? inputs[2].value.trim() : '',
+          phone: inputs[3] ? inputs[3].value.trim() : ''
+        };
+      }).filter(c => c.name || c.email || c.phone);
+    }
+
+    function getDayDetailsData() {
+      const rows = document.querySelectorAll('#day-details-container .day-detail-row');
+      if (!rows.length) return [];
+      return Array.from(rows).map(r => {
+        const inputs = r.querySelectorAll('input, textarea');
+        return Array.from(inputs).map(i => i.value.trim()).filter(Boolean).join(' | ');
+      }).filter(Boolean);
+    }
+
+    async function submitForm() {
+      const required = ['org-name','org-dept','org-email','worktag','event-name','event-location','event-type'];
+      // Date validation depends on single vs multi-day
+      if (eventDurationMode === 'single') {
+        required.push('event-date');
+      } else {
+        required.push('event-date-start', 'event-date-end');
+      }
+      let firstError = null;
+      required.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) { el.classList.add('error'); if (!firstError) firstError = el; }
+        else el.classList.remove('error');
+      });
+      if (firstError) { firstError.focus(); firstError.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+
+      // Email format validation
+      const emailEl = document.getElementById('org-email');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
+        emailEl.classList.add('error');
+        emailEl.focus();
+        emailEl.scrollIntoView({ behavior:'smooth', block:'center' });
+        return;
+      }
+
+      // Capture map screenshot, then show summary
+      const mapWrap = document.getElementById('map-container');
+      if (mapWrap && typeof html2canvas !== 'undefined' && pins.length > 0) {
+        try {
+          const canvas = await html2canvas(mapWrap, { useCORS: true, scale: 2, backgroundColor: null });
+          window._mapScreenshot = canvas.toDataURL('image/png');
+        } catch(e) {
+          console.warn('Map capture failed:', e);
+          window._mapScreenshot = null;
+        }
+      } else {
+        window._mapScreenshot = null;
+      }
+      openSummary();
+    }
+
+    async function doSubmit() {
+
+      const payload = {
+        organizerName:    document.getElementById('org-name').value.trim(),
+        department:       document.getElementById('org-dept').value.trim(),
+        email:            document.getElementById('org-email').value.trim(),
+        phone:            document.getElementById('org-phone').value.trim(),
+        extraContacts:    getExtraContactsData(),
+        workOrderWorktag: document.getElementById('worktag').value.trim(),
+        eventName:        document.getElementById('event-name').value.trim(),
+        location:         document.getElementById('event-location').value,
+        eventDate:        document.getElementById('event-date').value,
+        startTime:        document.getElementById('event-start').value,
+        endTime:          document.getElementById('event-end').value,
+        attendance:       document.getElementById('event-attendance').value,
+        eventType:        document.getElementById('event-type').value,
+        description:      document.getElementById('event-desc').value.trim(),
+        fmServices:       getServices(),
+        fmNotes:          document.getElementById('fm-notes').value.trim(),
+        // Power
+        powerNotes:       document.getElementById('power-notes') ? document.getElementById('power-notes').value.trim() : '',
+        // Setup
+        setupTime:        document.getElementById('setup-time').value,
+        teardownTime:     document.getElementById('teardown-time').value,
+        // Tent
+        tentPermit:       document.getElementById('tent-permit').value,
+        tentFireSafety:   document.getElementById('tent-safety').value,
+        tentVendor:       document.getElementById('tent-vendor-name').value.trim(),
+        tentVendorSupply: document.getElementById('tent-vendor-supply').value.trim(),
+        tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
+        // Food trucks &amp; catering
+        // Stage
+        // PA system
+        paType:           document.getElementById('pa-type') ? document.getElementById('pa-type').value : '',
+        paVendor:         document.getElementById('pa-vendor') ? document.getElementById('pa-vendor').value.trim() : '',
+        paPower:          document.getElementById('pa-power') ? document.getElementById('pa-power').value : '',
+        paNotes:          document.getElementById('pa-notes') ? document.getElementById('pa-notes').value.trim() : '',
+        paPowerNotes:     document.getElementById('pa-power-notes') ? document.getElementById('pa-power-notes').value.trim() : '',
+        // Food vendor
+        // Per-service power
+        tentPowerNeeded:  document.getElementById('tent-power') ? document.getElementById('tent-power').value : '',
+        tentPowerNotes:   document.getElementById('tent-power-notes') ? document.getElementById('tent-power-notes').value.trim() : '',
+        chairsPowerNeeded:document.getElementById('chairs-power') ? document.getElementById('chairs-power').value : '',
+        chairsPowerNotes: document.getElementById('chairs-power-notes') ? document.getElementById('chairs-power-notes').value.trim() : '',
+        stagePower:       document.getElementById('stage-power').value,
+        stageVendor:      document.getElementById('stage-vendor-name').value.trim(),
+        stageVendorSupply:document.getElementById('stage-vendor-supply').value.trim(),
+        stagePrefVendors: getCheckedVals('stage-pref-vendor'),
+        // Chairs
+        chairsQty:        document.getElementById('chairs-qty').value,
+        tablesQty:        document.getElementById('tables-qty').value,
+        chairsVendor:     document.getElementById('chairs-vendor-name').value.trim(),
+        chairsVendorSupply:document.getElementById('chairs-vendor-supply').value.trim(),
+        chairsPrefVendors:getCheckedVals('chairs-pref-vendor'),
+        // Waste & custodial
+        wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
+        custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
+        majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
+        signsServices:    Array.from(document.querySelectorAll('input[name="signs-services"]:checked')).map(c=>c.value).join(', '),
+        signsNotes:       document.getElementById('signs-notes') ? document.getElementById('signs-notes').value.trim() : '',
+        tentQty:          document.getElementById('tent-qty') ? document.getElementById('tent-qty').value : '',
+        stageQty:         document.getElementById('stage-qty') ? document.getElementById('stage-qty').value : '',
+        chairsQty:        document.getElementById('chairs-qty') ? document.getElementById('chairs-qty').value : '',
+        crossesQty:       document.getElementById('crosses-qty') ? document.getElementById('crosses-qty').value : '',
+        hubbaQty:         document.getElementById('hubba-qty') ? document.getElementById('hubba-qty').value : '',
+        lecternQty:       document.getElementById('lectern-qty') ? document.getElementById('lectern-qty').value : '',
+        podiumQty:        document.getElementById('podium-qty') ? document.getElementById('podium-qty').value : '',
+        wasteNotes:       document.getElementById('waste-notes').value.trim(),
+        // Alcohol & security
+        alcoholServed:    document.getElementById('alcohol') ? document.getElementById('alcohol').value : '',
+        updApproval:      document.getElementById('upd-approval') ? document.getElementById('upd-approval').value : '',
+        securityStaff:    document.getElementById('security-staff') ? document.getElementById('security-staff').value : '',
+        // Parking
+        parkingUse:       document.getElementById('parking-use').value,
+        parkingType:      document.getElementById('parking-type').value,
+        parkingApproval:  document.getElementById('parking-approval').value,
+        parkingNotes:     document.getElementById('parking-notes').value.trim(),
+        mapPins:          getMapPinData(),
+        mapScreenshot:    window._mapScreenshot || '',
+        requestId:        window._currentRequestId || '',
+        complexity:       window._currentComplexity || '',
+        eventDuration:    eventDurationMode,
+        eventDateStart:   document.getElementById('event-date-start') ? document.getElementById('event-date-start').value : '',
+        eventDateEnd:     document.getElementById('event-date-end') ? document.getElementById('event-date-end').value : '',
+        dayDetails:       getDayDetailsData(),
+        rainPlan:         document.getElementById('rain-plan') ? document.getElementById('rain-plan').value : '',
+        rainBackup:       document.getElementById('rain-backup-location') ? document.getElementById('rain-backup-location').value.trim() : '',
+        submittedAt:      new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+      };
+
+      const btn = document.getElementById('submit-btn');
+      const label = document.getElementById('submit-label');
+      const spinner = document.getElementById('spinner');
+      const errorBanner = document.getElementById('error-banner');
+
+      btn.disabled = true; label.textContent = 'Sending…'; spinner.style.display = 'block';
+      errorBanner.style.display = 'none';
+
+      try {
+        const res = await fetch(POWER_AUTOMATE_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (!res.ok) throw new Error();
+        document.getElementById('success-msg').style.display = 'block';
+        document.getElementById('success-request-id').textContent = window._currentRequestId || '';
+        const cx = window._currentComplexity || 'Low';
+        const cxEl = document.getElementById('success-complexity');
+        if (cxEl) {
+          if (cx === 'High') {
+            cxEl.innerHTML = '⚠ <strong>High Complexity</strong> — FM will prioritize coordination for this event.';
+          } else if (cx === 'Moderate') {
+            cxEl.innerHTML = '● <strong>Moderate Complexity</strong> — FM will coordinate the requested services.';
+          } else {
+            cxEl.innerHTML = '✓ <strong>Low Complexity</strong> — straightforward setup.';
+          }
+        }
+        clearDraft();
+        document.getElementById('success-msg').scrollIntoView({ behavior:'smooth' });
+      } catch {
+        errorBanner.style.display = 'block';
+        errorBanner.scrollIntoView({ behavior:'smooth' });
+      } finally {
+        btn.disabled = false; label.textContent = 'Submit request'; spinner.style.display = 'none';
+      }
+    }
+
+    function toggleSignage(checked) {
+      const el = document.getElementById('signage-section');
+      if (el) el.classList.toggle('show', checked);
+    }
+
+    // ── Request another with same organizer info ──
+    function requestAnotherSame() {
+      // Save organizer fields
+      const saved = {
+        name:   document.getElementById('org-name').value,
+        dept:   document.getElementById('org-dept').value,
+        email:  document.getElementById('org-email').value,
+        phone:  document.getElementById('org-phone').value,
+        worktag: document.getElementById('worktag').value,
+      };
+      resetForm();
+      // Restore organizer fields
+      document.getElementById('org-name').value   = saved.name;
+      document.getElementById('org-dept').value   = saved.dept;
+      document.getElementById('org-email').value  = saved.email;
+      document.getElementById('org-phone').value  = saved.phone;
+      document.getElementById('worktag').value    = saved.worktag;
+      // Scroll to event details
+      document.getElementById('event-name').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('event-name').focus();
+    }
+
+    function requestAnother() {
+      resetForm();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Request another with same organizer info ──
+    // ── Request another with same organizer info ──
+    // ── Reset ──
+    function resetForm() {
+      document.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea').forEach(el => { el.value = ''; el.classList.remove('error'); });
+      document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+      document.querySelectorAll('.service-item').forEach(el => el.classList.remove('checked'));
+      document.querySelectorAll('.followup-panel').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.status-pill').forEach(el => el.className = 'status-pill');
+      document.querySelectorAll('.radio-btn').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.conditional').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.vendor-card').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('[id$="-warning"], [id$="-note"]').forEach(el => { if(el.classList.contains('note-box')) el.style.display = 'none'; });
+      document.getElementById('rotunda-note').style.display = 'none';
+      document.getElementById('success-msg').style.display = 'none';
+      document.getElementById('error-banner').style.display = 'none';
+    }
+
+    function toggleMapHelp() {
+      const panel = document.getElementById('map-help-panel');
+      const arrow = document.getElementById('map-help-arrow');
+      const open = panel.style.display === 'none';
+      panel.style.display = open ? 'block' : 'none';
+      arrow.textContent   = open ? '▾' : '▸';
+    }
+
+    // ── Request ID generator ──
+    function generateRequestId() {
+      const year = new Date().getFullYear();
+      const stored = lsGet('cgz_counter_' + year);
+      const counter = stored ? parseInt(stored) + 1 : 1;
+      lsSet('cgz_counter_' + year, counter);
+      return 'CGZ-' + year + '-' + String(counter).padStart(4, '0');
+    }
+
+    // ── Complexity check ──
+    function toggleRainBackup() {
+      const val = document.getElementById('rain-plan').value;
+      const section = document.getElementById('rain-backup-section');
+      if (section) section.style.display = (val === 'backup' || val === 'indoor') ? 'block' : 'none';
+    }
+
+    function getComplexity() {
+      const services = ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'];
+      const count = services.filter(id => { const el = document.getElementById(id); return el && el.checked; }).length;
+
+      // Escalating flags — any of these bump the level up
+      const hasAlcohol   = document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
+      
+      const attEl        = document.getElementById('event-attendance');
+      const bigCrowd     = attEl && parseInt(attEl.value, 10) >= 500;
+      const flags        = [hasAlcohol, bigCrowd].filter(Boolean).length;
+
+      // Base tier from service count
+      let level;
+      if (count <= 2)      level = 1;   // Low
+      else if (count <= 5) level = 2;   // Moderate
+      else                 level = 3;   // High
+
+      // Each flag bumps up a tier, capped at High
+      level = Math.min(3, level + (flags > 0 ? 1 : 0));
+      if (flags >= 2) level = 3;
+
+      return ['Low', 'Moderate', 'High'][level - 1];
+    }
+
+    // ── Timeline builder ──
+    const TIMELINE_RULES = [
+      { service:'svc-tent',  when:'4+ weeks out', what:'Submit tent permit & Fire Safety applications (tent, open flame if applicable)', color:'#8B1A1A' },
+      { general: true,       when:'2+ weeks out', what:'Submit this form, finalize event layout, and confirm all vendors', color:'#5a8a2e' },
+      { general: true,       when:'1 week out',   what:'Follow up with FM to confirm services, approvals, and setup schedule', color:'#232D4B' },
+    ];
+
+    function updateTimeline() {
+      const container = document.getElementById('timeline-items');
+      const section   = document.getElementById('timeline-section');
+      if (!container || !section) return;
+
+      const items = TIMELINE_RULES.filter(rule => {
+        if (rule.general) return true;
+        if (rule.service === 'alcohol') return document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
+        if (rule.service === 'parking') return document.getElementById('parking-use') && document.getElementById('parking-use').value === 'yes';
+        const el = document.getElementById(rule.service);
+        return el && el.checked;
+      });
+
+      if (items.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+      container.innerHTML = items.map(item => `
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:${item.color}"></div>
+          <span class="timeline-when">${item.when}</span>
+          <span class="timeline-what">${item.what}</span>
+        </div>`).join('');
+    }
+
+    // Hook timeline update to all service checkboxes
+    ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', updateTimeline);
+    });
+    // Also hook alcohol and parking
+    document.addEventListener('change', function(e) {
+      if (e.target.id === 'alcohol' || e.target.id === 'parking-use') updateTimeline();
+    });
+
+    // ── Draft save/load ──
+    function getDraftData() {
+      const fields = ['org-name','org-dept','org-email','org-phone','worktag',
+        'event-name','event-location','event-date','event-start','event-end',
+        'event-attendance','event-type','event-desc','fm-notes',
+        'tent-permit','tent-safety','tent-vendor-name','tent-vendor-supply',
+        'alcohol','upd-approval','security-staff',
+        'stage-power','stage-vendor-name','stage-vendor-supply',
+        'chairs-qty','tables-qty','chairs-vendor-name','chairs-vendor-supply',
+        'waste-notes','signs-notes','power-notes','parking-use','parking-type','parking-approval','parking-notes'];
+      const data = {};
+      fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+      // Checkboxes
+      ['svc-setup','svc-tent','svc-stage','svc-chairs','svc-pa','svc-waste','svc-signs'].forEach(id => {
+        const el = document.getElementById(id); if (el) data[id] = el.checked;
+      });
+      return data;
+    }
+
+    function saveDraft() {
+      const data = getDraftData();
+      // Only save if something meaningful is filled
+      if (!data['org-name'] && !data['event-name']) return;
+      lsSet('cgz_draft', JSON.stringify(data));
+    }
+
+    function loadDraft() {
+      const raw = lsGet('cgz_draft');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      // First pass: restore all field values
+      Object.entries(data).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (typeof val === 'boolean') {
+          el.checked = val;
+        } else {
+          el.value = val;
+        }
+      });
+      // Second pass: call toggleService for each checked service so panels + full-width open correctly
+      ['power','setup','tent','stage','chairs','waste','pa','signs'].forEach(key => {
+        const cb = document.getElementById('svc-' + key);
+        if (cb && cb.checked) toggleService(key);
+      });
+      // Trigger dependent UI
+      checkRotunda();
+      loadMap(document.getElementById('event-location').value);
+      updateTimeline();
+      document.getElementById('draft-banner').style.display = 'none';
+    }
+
+    function clearDraft() {
+      lsRemove('cgz_draft');
+      document.getElementById('draft-banner').style.display = 'none';
+    }
+
+    // Auto-save draft every 30 seconds and on field change
+    setInterval(saveDraft, 30000);
+    document.addEventListener('change', saveDraft);
+    document.addEventListener('input', saveDraft);
+
+    // Check for draft on load
+    window.addEventListener('load', function() {
+      if (lsGet('cgz_draft')) {
+        document.getElementById('draft-banner').style.display = 'flex';
+      }
+    });
+
+    // ── Repeat event (same event, new date) ──
+    function requestRepeatEvent() {
+      const saved = getDraftData();
+      resetForm();
+      // Restore everything except date, start/end time
+      Object.entries(saved).forEach(([id, val]) => {
+        if (['event-date','event-start','event-end'].includes(id)) return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (typeof val === 'boolean') { el.checked = val; toggleService(id.replace('svc-','')); }
+        else el.value = val;
+      });
+      checkRotunda();
+      loadMap(document.getElementById('event-location').value);
+      updateTimeline();
+      document.getElementById('event-date').scrollIntoView({ behavior:'smooth', block:'center' });
+      document.getElementById('event-date').focus();
+    }
+
+    document.querySelectorAll('input, select, textarea').forEach(el => el.addEventListener('input', () => el.classList.remove('error')));
+
+    // ── Suppress accidental placement after handle drags ──
+    let _suppressPlace = false;
+    function suppressNextPlace() {
+      _suppressPlace = true;
+      // Clear after a short delay to cover the click that follows mouseup
+      setTimeout(() => { _suppressPlace = false; }, 300);
+    }
+
+    // ── MAP DATA ──
+    const VENUE_COORDS = {
+      'Amphitheater':    { lat: 38.033710, lng: -78.505767, zoom: 19 },
+      'Homer Flat':      { lat: 38.033349, lng: -78.504687, zoom: 19 },
+      'The Lawn':        { lat: 38.034751, lng: -78.503914, zoom: 18 },
+      'Pavilion I':      { lat: 38.035706, lng: -78.504315, zoom: 20 },
+      'Pavilion II':     { lat: 38.035141, lng: -78.502660, zoom: 20 },
+      'Pavilion III':    { lat: 38.035453, lng: -78.504547, zoom: 20 },
+      'Pavilion IV':     { lat: 38.034833, lng: -78.502870, zoom: 20 },
+      'Pavilion V':      { lat: 38.035147, lng: -78.504691, zoom: 20 },
+      'Pavilion VI':     { lat: 38.034586, lng: -78.503017, zoom: 20 },
+      'Pavilion VII':    { lat: 38.034828, lng: -78.504890, zoom: 20 },
+      'Pavilion VIII':   { lat: 38.034209, lng: -78.503166, zoom: 20 },
+      'Pavilion IX':     { lat: 38.034384, lng: -78.505127, zoom: 20 },
+      'Pavilion X':      { lat: 38.033826, lng: -78.503349, zoom: 20 },
+      'Rotunda':         { lat: 38.035925, lng: -78.503251, zoom: 20 },
+    }
+    
+    const PIN_TYPES = [
+      { id: 'tent',          label: 'Tent',                emoji: '⛺',     color: '#232D4B',  shape: 'rect' },
+      { id: 'stage',         label: 'Stage',               emoji: '🎤', color: '#8B1A1A',  shape: 'rect' },
+      { id: 'chairs',        label: 'Chairs',              emoji: '🪑', color: '#8B6A1A',  shape: 'rect' },
+      { id: 'food-truck',    label: 'Food Truck',          emoji: '🚚', color: '#E57200',  shape: 'marker' },
+      { id: 'table',         label: 'Table',               emoji: '📋', color: '#6B5B3A',  shape: 'marker' },
+      { id: 'pa',            label: 'PA / Sound',          emoji: '🔊', color: '#5A3A8B',  shape: 'marker' },
+      { id: 'lighting',      label: 'Lighting',            emoji: '💡', color: '#E6B800',  shape: 'marker' },
+      { id: 'water-monster', label: 'Water Monster',       emoji: '💧', color: '#1A6B8B',  shape: 'marker' },
+      { id: 'generator',     label: 'Generator',           emoji: '⚡',     color: '#5A3A8B',  shape: 'marker' },
+      { id: 'porta-john',    label: 'Porta-John',          emoji: '🚽', color: '#3A7A3A',  shape: 'marker' },
+      { id: 'drop-cord',     label: 'Drop/Extension Cord', emoji: '🔌', color: '#B5451B',  shape: 'marker' },
+    ];
+
+    let customPins=[], activePinType=null, map=null, pins=[], markers=[];
+
+    function getActiveType() {
+      return [...PIN_TYPES,...customPins].find(p=>p.id===activePinType);
+    }
+
+    function buildToolbar() {
+      const tb=document.getElementById('pin-toolbar'); tb.innerHTML='';
+      [...PIN_TYPES,...customPins].forEach(pt=>{
+        const btn=document.createElement('button'); btn.className='pin-btn'+(activePinType===pt.id?' active':'');
+        const count=pins.filter(p=>p.typeId===pt.id).length;
+        const shapeHint = pt.shape==='rect' ? ' ▭' : '';
+        btn.innerHTML='<span class="pin-dot" style="background:'+pt.color+'"></span>'+pt.label+shapeHint+(count?'<span class="pin-count">'+count+'</span>':'');
+        btn.onclick=()=>{ activePinType=activePinType===pt.id?null:pt.id; clearPolyTemp(); buildToolbar(); if(map)map.getContainer().style.cursor=activePinType?'crosshair':''; };
+        tb.appendChild(btn);
+      });
+      const fb=document.getElementById('btn-finish'); if(fb){const apt=getActiveType(); fb.style.display=(apt&&apt.shape==='rect'&&polyPoints.length>=3)?'inline-block':'none';}
+      const c=document.getElementById('pin-counter'); if(c)c.textContent=pins.length?pins.length+' resource'+(pins.length!==1?'s':'')+' placed':'';
+      if(document.getElementById('pin-hint')) {
+        const pt=getActiveType();
+        const hint=document.getElementById('pin-hint');
+        if(pt&&pt.shape==='rect'&&polyPoints.length===0) hint.textContent='Click corners to trace the '+pt.label+' area. Click "Finish shape" when done.';
+        else if(pt&&pt.shape==='rect'&&polyPoints.length>0) hint.textContent=polyPoints.length+' corner'+(polyPoints.length!==1?'s':'')+' placed. '+(polyPoints.length<3?'Keep clicking corners.':'Click "Finish shape" or add more corners.');
+        else if(pt) hint.textContent='Click the map to place '+pt.label;
+        else hint.textContent='';
+      }
+    }
+
+    function addCustomPin() {
+      const input=document.getElementById('custom-pin-input'), label=input.value.trim(); if(!label)return;
+      const colors=['#C0392B','#1ABC9C','#8E44AD','#2980B9','#D35400'];
+      customPins.push({ id:'custom-'+Date.now(), label, emoji:'📍', color:colors[customPins.length%colors.length], shape:'marker' });
+      input.value=''; activePinType=customPins[customPins.length-1].id; buildToolbar();
+    }
+
+    function loadMap() {
+      const loc=document.getElementById('event-location').value;
+      const ph=document.getElementById('map-placeholder'), mc=document.getElementById('map-container'), mt=document.getElementById('map-tools');
+      if(!loc||!VENUE_COORDS[loc]){ ph.style.display='flex'; mc.style.display='none'; mt.style.display='none'; return; }
+      ph.style.display='none'; mc.style.display='block'; mt.style.display='block';
+      const v=VENUE_COORDS[loc];
+      if(map){ map.remove(); map=null; } pins=[]; markers=[]; clearPolyTemp();
+      setTimeout(function(){
+        map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',{
+          maxZoom:21
+        }).addTo(map);
+        map.setView([v.lat, v.lng], v.zoom);
+        map.invalidateSize();
+        map.on('click',function(e){ handleMapClick(e); });
+        buildToolbar(); renderPinList();
+      }, 100);
+    }
+
+        let polyPoints = [];
+    let polyTempMarkers = [];
+    let polyTempLine = null;
+
+    function handleMapClick(e) {
+      if(!activePinType) return;
+      const pt=getActiveType();
+      if(!pt) return;
+      if(pt.shape==='rect') {
+        // Polygon mode: click corners, double-click to finish
+        polyPoints.push(e.latlng);
+        // Temp corner marker
+        const dot=L.circleMarker(e.latlng,{radius:4,color:'#fff',fillColor:pt.color,fillOpacity:1,weight:2}).addTo(map);
+        polyTempMarkers.push(dot);
+        // Draw preview line
+        if(polyTempLine){map.removeLayer(polyTempLine);}
+        if(polyPoints.length>1){
+          polyTempLine=L.polyline(polyPoints,{color:pt.color,weight:2,dashArray:'6,3'}).addTo(map);
+        }
+        buildToolbar();
+      } else {
+        placePin(pt, e.latlng);
+      }
+    }
+
+    function finishPolygon() {
+      const pt=getActiveType();
+      if(!pt||polyPoints.length<3) return;
+      placeArea(pt, [...polyPoints]);
+      clearPolyTemp();
+      buildToolbar();
+    }
+
+    function clearPolyTemp() {
+      polyPoints=[];
+      polyTempMarkers.forEach(m=>map.removeLayer(m));
+      polyTempMarkers=[];
+      if(polyTempLine){map.removeLayer(polyTempLine);polyTempLine=null;}
+    }
+
+    function placeArea(pt, points) {
+      const pin={id:Date.now(),typeId:pt.id,label:pt.label,emoji:pt.emoji,color:pt.color,points:points,note:'',isRect:true};
+      pins.push(pin);
+      const poly=L.polygon(points,{
+        color:pt.color,weight:2,fillColor:pt.color,fillOpacity:0.25,dashArray:'6,3',
+      }).addTo(map);
+      const center=poly.getBounds().getCenter();
+      const labelMarker=L.marker(center,{
+        icon:L.divIcon({className:'',html:'<div style="background:'+pt.color+';color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.3);">'+pt.emoji+' '+pt.label+'</div>',iconAnchor:[0,0]}),
+        interactive:false,
+      }).addTo(map);
+      poly.on('click',function(){
+        L.popup().setLatLng(center).setContent(makePopup(pin,pt)).openOn(map);
+      });
+      poly._pinId=pin.id;
+      poly._labelMarker=labelMarker;
+      markers.push(poly);
+      buildToolbar(); renderPinList();
+    }
+
+    function placePin(pt, latlng) {
+      const pin={id:Date.now(),typeId:pt.id,label:pt.label,emoji:pt.emoji,color:pt.color,latlng:latlng,note:'',isRect:false};
+      pins.push(pin);
+      const icon=L.divIcon({className:'',html:'<div style="background:'+pt.color+';width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);font-size:14px;cursor:grab;">'+pt.emoji+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+      const marker=L.marker(latlng,{icon,draggable:true}).addTo(map);
+      marker.bindPopup(function(){ return makePopup(pin, pt); });
+      marker.openPopup();
+      marker._pinId=pin.id; markers.push(marker);
+      marker.on('dragend',function(){pin.latlng=marker.getLatLng();});
+      buildToolbar(); renderPinList();
+    }
+
+    function makePopup(pin, pt) {
+      const div=document.createElement('div'); div.style.minWidth='180px';
+      div.innerHTML='<div style="font-weight:600;font-size:13px;margin-bottom:6px;">'+pt.emoji+' '+pt.label+'</div><input type="text" id="note-'+pin.id+'" value="'+(pin.note||'')+'" placeholder="Add a note (e.g. 40x60 tent)" style="width:100%;font-size:13px;padding:4px 8px;border:1px solid #ccc;border-radius:6px;margin-bottom:6px;"><div style="display:flex;gap:6px;"><button onclick="saveNote('+pin.id+')" style="flex:1;background:#232D4B;color:#fff;border:none;border-radius:6px;padding:5px;font-size:12px;cursor:pointer;">Save</button><button onclick="removePin('+pin.id+')" style="flex:1;background:#fdecea;color:#c0392b;border:none;border-radius:6px;padding:5px;font-size:12px;cursor:pointer;">Remove</button></div>';
+      return div;
+    }
+
+    function saveNote(id){ const i=document.getElementById('note-'+id),p=pins.find(x=>x.id===id); if(p&&i)p.note=i.value.trim(); map.closePopup(); renderPinList(); }
+    function removePin(id){
+      pins=pins.filter(p=>p.id!==id);
+      const m=markers.find(x=>x._pinId===id);
+      if(m){
+        map.removeLayer(m);
+        if(m._labelMarker) map.removeLayer(m._labelMarker);
+        markers=markers.filter(x=>x!==m);
+      }
+      map.closePopup(); buildToolbar(); renderPinList();
+    }
+    function undoPin(){ if(polyPoints.length>0){polyPoints.pop();const m=polyTempMarkers.pop();if(m)map.removeLayer(m);if(polyTempLine){map.removeLayer(polyTempLine);polyTempLine=null;}if(polyPoints.length>1)polyTempLine=L.polyline(polyPoints,{color:getActiveType().color,weight:2,dashArray:'6,3'}).addTo(map);buildToolbar();} else if(pins.length)removePin(pins[pins.length-1].id); }
+    function clearPins(){ markers.forEach(m=>{map.removeLayer(m);if(m._labelMarker)map.removeLayer(m._labelMarker);}); pins=[];markers=[]; clearPolyTemp(); buildToolbar(); renderPinList(); }
+
+    function renderPinList() {
+      const c=document.getElementById('pin-list'); if(!c)return;
+      if(!pins.length){ c.innerHTML='<div class="pin-list-title">Placed resources</div><div style="font-size:13px;color:#888780;">No resources placed yet. Select a type and click the map.</div>'; return; }
+      c.innerHTML='<div class="pin-list-title">Placed resources ('+pins.length+')</div>'+
+        pins.map(p=>'<div class="pin-list-item"><div class="pin-list-dot" style="background:'+p.color+'"></div><span class="pin-list-name">'+p.label+(p.isRect?' (area)':'')+'</span>'+(p.note?'<span class="pin-list-note"> — '+p.note+'</span>':'')+'<span class="pin-list-remove" onclick="removePin('+p.id+')">×</span></div>').join('');
+    }
+
+    document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',()=>el.classList.remove('error')));
+
+    // ── FM Review Mode ──
+    const FM_PIN = { id:'fm-suggestion', label:'FM Suggestion', emoji:'🚩', color:'#C0392B', shape:'marker' };
+
+    function getReviewLink() {
+      // Encode current pins + location into a URL hash
+      const data = {
+        loc: document.getElementById('event-location').value,
+        org: document.getElementById('org-name').value,
+        email: document.getElementById('org-email').value,
+        pins: pins.map(p => ({
+          typeId:p.typeId, label:p.label, emoji:p.emoji, color:p.color,
+          isRect:p.isRect,
+          latlng: p.isRect ? null : (p.latlng ? {lat:p.latlng.lat,lng:p.latlng.lng} : null),
+          points: p.isRect && p.points ? p.points.map(ll=>({lat:ll.lat,lng:ll.lng})) : null,
+          note:p.note
+        }))
+      };
+      return window.location.origin + window.location.pathname + '#review=' + encodeURIComponent(JSON.stringify(data));
+    }
+
+    function loadFromURL() {
+      const hash = window.location.hash;
+      if (!hash.startsWith('#review=')) return;
+      try {
+        const data = JSON.parse(decodeURIComponent(hash.slice(8)));
+        // Show FM banner
+        var _fmb = document.getElementById('fm-banner'); if(_fmb) _fmb.classList.add('show');
+        // Set organizer info
+        if(data.org) document.getElementById('org-name').value = data.org;
+        if(data.email) document.getElementById('org-email').value = data.email;
+        // Set location and load map
+        if(data.loc) {
+          document.getElementById('event-location').value = data.loc;
+          loadMap();
+          // Wait for map to init, then place pins
+          setTimeout(function(){
+            if(data.pins) {
+              data.pins.forEach(p => {
+                const pt = {id:p.typeId, label:p.label, emoji:p.emoji, color:p.color, shape:p.isRect?'rect':'marker'};
+                if(p.isRect && p.points) {
+                  const latlngs = p.points.map(ll=>L.latLng(ll.lat,ll.lng));
+                  placeArea(pt, latlngs);
+                  if(p.note) { pins[pins.length-1].note = p.note; }
+                } else if(p.latlng) {
+                  placePin(pt, L.latLng(p.latlng.lat, p.latlng.lng));
+                  if(p.note) { pins[pins.length-1].note = p.note; saveNote(pins[pins.length-1].id); }
+                }
+              });
+              renderPinList();
+              // Add FM suggestion pin type to toolbar
+              if(!PIN_TYPES.find(x=>x.id==='fm-suggestion')) PIN_TYPES.push(FM_PIN);
+              buildToolbar();
+            }
+          }, 500);
+        }
+      } catch(e) { console.warn('Failed to load review data:', e); }
+    }
+
+    async function sendBackToOrganizer() {
+      const email = document.getElementById('org-email').value;
+      const loc = document.getElementById('event-location').value;
+      if(!email) { alert('No organizer email found.'); return; }
+      // Capture screenshot
+      let mapShot = '';
+      if(map && pins.length) {
+        try {
+          const canvas = await html2canvas(document.getElementById('map-container'),{useCORS:true,scale:2});
+          mapShot = canvas.toDataURL('image/png');
+          // Open image in new tab so FM can save/copy it
+          const w = window.open('');
+          w.document.write('<html><head><title>Layout with FM edits</title></head><body style="margin:0;background:#f3f1ec;padding:20px;font-family:sans-serif;">');
+          w.document.write('<h2 style="color:#232D4B;">Event Layout with FM Edits</h2>');
+          w.document.write('<p style="color:#5a5957;">Location: '+loc+'</p>');
+          w.document.write('<p style="color:#5a5957;">Right-click the image below to save, then attach to your email reply.</p>');
+          w.document.write('<img src="'+mapShot+'" style="max-width:100%;border:1px solid #ddd;border-radius:8px;">');
+          w.document.write('<p style="margin-top:12px;font-size:13px;color:#888;">FM suggestions shown in red.</p>');
+          w.document.write('</body></html>');
+          w.document.close();
+        } catch(e) { console.warn('Screenshot failed:', e); }
+      }
+      // Also open mailto
+      const subject = encodeURIComponent('[CGZ Layout Update] ' + loc);
+      const body = encodeURIComponent('Hi,\n\nFM has reviewed your event layout for ' + loc + ' and made some suggestions. Please see the attached updated layout image.\n\nPlease review and let us know if you have questions.\n\nThanks,\nUriel An\nCentral Grounds Zone Event & Maintenance Coordinator\n(434) 906-0976');
+      window.open('mailto:' + email + '?subject=' + subject + '&body=' + body);
+    }
+
+    // Load review data on page load
+    loadFromURL();
+</script>
+  <!-- ── FOOTER ── -->
+  <div class="site-footer">
+    <div class="footer-title">Need help? Contact us</div>
+    <div class="footer-contacts">
+      <div class="footer-contact">
+        <strong>Uriel An</strong><br>
+        <span class="footer-role">Central Grounds Zone Event &amp; Maintenance Coordinator</span><br>
+        <a href="mailto:gre4se@virginia.edu">gre4se@virginia.edu</a><br>
+        <a href="tel:4349060976">(434) 906-0976</a><br>
+        <span class="footer-role">Hours: Mon–Fri, 7:00 AM – 3:30 PM</span>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-contact">
+        <strong>Jacob Campbell</strong><br>
+        <span class="footer-role">Central Grounds Zone Senior Maintenance Coordinator</span><br>
+        <span class="footer-role">Secondary contact if Uriel is not reachable</span><br>
+        <a href="mailto:jrc3zz@virginia.edu">jrc3zz@virginia.edu</a><br>
+        <a href="tel:4349646507">(434) 964-6507</a>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-contact">
+        <strong>FM Service Desk</strong><br>
+        <span class="footer-role">After-hours event emergencies only</span><br>
+        <a href="tel:4349241777">(434) 924-1777</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FLOAT POPUP ── -->
+  
+
+  <!-- ── SUMMARY MODAL ── -->
+  <div class="modal-overlay" id="summary-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Review your request</h2>
+        <button class="modal-close" onclick="closeSummary()">×</button>
+      </div>
+      <div class="modal-body" id="summary-body"></div>
+      <div class="modal-footer">
+        <button class="btn-back" onclick="closeSummary()">← Go back &amp; edit</button>
+        <button class="btn-confirm" onclick="confirmSubmit()">Confirm &amp; submit</button>
+      </div>
+    </div>
+  </div>
+
+
+  </body>
+</html>
