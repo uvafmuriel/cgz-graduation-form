@@ -109,6 +109,7 @@
 </style>
 </head>
 <body>
+  <div id="errbar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#c0392b;color:#fff;padding:10px 16px;font-size:13px;font-family:monospace"></div>
   <div class="masthead">
     <div class="masthead-inner">
       <div class="brand">
@@ -133,6 +134,12 @@
   </div>
 
 <script>
+window.onerror=function(msg,src,line,col,err){
+  var b=document.getElementById('errbar');
+  if(b){b.style.display='block';b.textContent='JS Error: '+msg+' (line '+line+')';}
+  return false;
+};
+
 /* ============================================================
    DATA SOURCE — the ONE place to change when moving to Azure.
    Today: returns embedded sample data.
@@ -385,6 +392,7 @@ function windows(s){
 }
 
 function openGameplan(){
+  try{
   document.getElementById('gpOverlay').style.display='flex';
   const locs=[...new Set(ALL.map(s=>s.location).filter(Boolean))].sort();
   const zones=[...new Set(ALL.map(s=>s.departmentZone||'Unassigned'))].sort();
@@ -397,6 +405,7 @@ function openGameplan(){
     fg('Date from', '<div class="gp-date"><input type="date" id="gpFrom"><input type="date" id="gpTo"></div>')+
     fg('&nbsp;', '<div style="font-size:12px;color:var(--muted);line-height:1.5">Filters combine. Empty = include all. Resource filter keeps only events needing at least one selected resource.</div>');
   document.getElementById('gpResult').innerHTML='';
+  }catch(e){var b=document.getElementById('errbar');b.style.display='block';b.textContent='openGameplan error: '+e.message;}
 }
 function fg(label,inner){ return '<div class="gp-fg"><label>'+label+'</label>'+inner+'</div>'; }
 function multi(id,opts){ return '<div class="gp-multi" id="'+id+'">'+opts.map(o=>'<label><input type="checkbox" value="'+esc(o)+'"> '+esc(o)+'</label>').join('')+'</div>'; }
