@@ -919,15 +919,11 @@
           <input type="text" id="org-name" placeholder="Full name">
         </div>
         <div class="field-group">
-          <label class="field-label" for="org-dept">Department / organization <span class="req-tag">required</span></label>
-          <input type="text" id="org-dept" placeholder="e.g. Student Council, Darden">
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-group">
           <label class="field-label" for="org-email">Email <span class="req-tag">required</span></label>
           <input type="email" id="org-email" placeholder="computing-id@virginia.edu">
         </div>
+      </div>
+      <div class="field-row">
         <div class="field-group">
           <label class="field-label" for="org-phone">Phone number</label>
           <input type="tel" id="org-phone" placeholder="(434) 555-0100">
@@ -1902,7 +1898,6 @@
         <div class="summary-section">
           <div class="summary-section-title">Organizer</div>
           <div class="summary-row"><span class="summary-key">Name</span><span class="summary-val">${val('org-name')}</span></div>
-          <div class="summary-row"><span class="summary-key">Department</span><span class="summary-val">${val('org-dept')}</span></div>
           <div class="summary-row"><span class="summary-key">Email</span><span class="summary-val">${val('org-email')}</span></div>
           <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${val('org-phone') || '—'}</span></div>
           <div class="summary-row"><span class="summary-key">Work order / worktag</span><span class="summary-val">${val('worktag')}</span></div>
@@ -2075,7 +2070,7 @@
     }
 
     async function submitForm() {
-      const required = ['org-name','org-dept','org-email','worktag','event-name','event-location','event-type','dept-select'];
+      const required = ['org-name','org-email','worktag','event-name','event-location','event-type','dept-select'];
       // Date validation depends on single vs multi-day
       if (eventDurationMode === 'single') {
         required.push('event-date');
@@ -2124,7 +2119,7 @@
         equipment: collectEquipment().map(x => x.item + ' x' + x.qty).join(', '),
         reference2026: currentDept ? JSON.stringify(currentDept.equip) : '',
         organizerName:    document.getElementById('org-name').value.trim(),
-        department:       document.getElementById('org-dept').value.trim(),
+        
         email:            document.getElementById('org-email').value.trim(),
         phone:            document.getElementById('org-phone').value.trim(),
         extraContacts:    getExtraContactsData(),
@@ -2254,7 +2249,7 @@
       // Save organizer fields
       const saved = {
         name:   document.getElementById('org-name').value,
-        dept:   document.getElementById('org-dept').value,
+        dept:   document.getElementById('dept-select').value,
         email:  document.getElementById('org-email').value,
         phone:  document.getElementById('org-phone').value,
         worktag: document.getElementById('worktag').value,
@@ -2262,7 +2257,7 @@
       resetForm();
       // Restore organizer fields
       document.getElementById('org-name').value   = saved.name;
-      document.getElementById('org-dept').value   = saved.dept;
+      if(document.getElementById('dept-select')){document.getElementById('dept-select').value = saved.dept; onDeptSelect();}
       document.getElementById('org-email').value  = saved.email;
       document.getElementById('org-phone').value  = saved.phone;
       document.getElementById('worktag').value    = saved.worktag;
@@ -2384,7 +2379,7 @@
 
     // ── Draft save/load ──
     function getDraftData() {
-      const fields = ['org-name','org-dept','org-email','org-phone','worktag',
+      const fields = ['org-name','org-email','org-phone','worktag',
         'event-name','event-location','event-date','event-start','event-end',
         'event-attendance','event-type','event-desc','fm-notes',
         'tent-permit','tent-safety','tent-vendor-name','tent-vendor-supply',
