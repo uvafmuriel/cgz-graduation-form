@@ -2480,12 +2480,16 @@
     function loadMap() {
       const loc=document.getElementById('event-location').value;
       const ph=document.getElementById('map-placeholder'), mc=document.getElementById('map-container'), mt=document.getElementById('map-tools');
-      if(!loc||!VENUE_COORDS[loc]){ ph.style.display='flex'; mc.style.display='none'; mt.style.display='none'; return; }
+      console.log('[loadMap] location =', loc, '| valid =', !!(loc && VENUE_COORDS[loc]), '| L =', typeof L, '| L.esri =', typeof (window.L && L.esri));
+      if(!loc||!VENUE_COORDS[loc]){ ph.style.display='flex'; ph.textContent = loc ? ('No map coordinates for: ' + loc) : 'Select a location above to load the site map.'; mc.style.display='none'; mt.style.display='none'; return; }
       ph.style.display='none'; mc.style.display='block'; mt.style.display='block';
       const v=VENUE_COORDS[loc];
       if(map){ map.remove(); map=null; } pins=[]; markers=[]; clearPolyTemp();
       setTimeout(function(){
+        try {
+        console.log('[loadMap] container size before init:', mc.offsetWidth, 'x', mc.offsetHeight);
         map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false });
+        console.log('[loadMap] L.map created OK');
         // Light base layer under the FM buildings
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',{
           maxZoom:21
@@ -2505,7 +2509,12 @@
         map.on('click',function(e){ handleMapClick(e); });
         buildToolbar(); renderPinList();
         // Safety: re-invalidate after paint in case container was just revealed
-        setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 300);
+        setTimeout(function(){ try { map.invalidateSize(); console.log('[loadMap] final invalidateSize, size:', mc.offsetWidth,'x',mc.offsetHeight); } catch(e){} }, 300);
+        } catch(err) {
+          console.error('[loadMap] ERROR:', err);
+          ph.style.display='flex'; ph.textContent = 'Map error: ' + (err && err.message ? err.message : err);
+          mc.style.display='none';
+        }
       }, 150);
     }
 
