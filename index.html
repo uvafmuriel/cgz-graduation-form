@@ -872,6 +872,16 @@
     .equip-row .en .esub { display: block; color: #888780; font-size: 11px; }
     .equip-row .eprev { display: inline-block; margin-left: 6px; font-size: 11px; color: #888780; background: #f0eeea; border: 1px solid #e4e2dc; border-radius: 100px; padding: 1px 8px; }
     .equip-row .eq-qty input { width: 100%; text-align: center; padding: 6px; font-size: 13px; border: 1px solid #d0cec7; border-radius: 6px; }
+
+    .dept-combo { position: relative; }
+    .dept-combo input[type=text] { width: 100%; padding-right: 32px; }
+    .dept-combo-caret { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #888780; pointer-events: none; font-size: 12px; }
+    .dept-list { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #d0cec7; border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 50; box-shadow: 0 6px 20px rgba(35,45,75,0.12); }
+    .dept-list.open { display: block; }
+    .dept-option { padding: 9px 12px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f0eeea; }
+    .dept-option:hover, .dept-option.active { background: #f0f3f9; }
+    .dept-option.zone-tag { color: #888780; font-size: 11px; float: right; font-weight: normal; }
+    .dept-list-empty { padding: 12px; font-size: 13px; color: #888780; text-align: center; }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -949,10 +959,13 @@
       </div>
 
       <div class="field-group" style="margin-bottom:16px;">
-        <label class="field-label" for="dept-select">Graduating department / program <span class="req-tag">required</span></label>
-        <select id="dept-select" onchange="onDeptSelect()">
-          <option value="">Select your department...</option>
-        </select>
+        <label class="field-label" for="dept-search">Graduating department / program <span class="req-tag">required</span></label>
+        <div class="dept-combo" id="dept-combo">
+          <input type="text" id="dept-search" autocomplete="off" placeholder="Type to search your department..." onfocus="openDeptList()" oninput="filterDeptList()" onkeydown="deptKeydown(event)">
+          <span class="dept-combo-caret">&#9662;</span>
+          <div class="dept-list" id="dept-list"></div>
+        </div>
+        <input type="hidden" id="dept-select" value="">
         <p class="field-hint" style="font-size:12px;color:#888780;margin-top:4px;">Selecting your department pre-fills last year's equipment and shows your planned venues. You can edit everything below.</p>
       </div>
 
@@ -1373,17 +1386,79 @@
       'Lawn Stage': 'The Lawn'
     };
 
-    // ── Department dropdown population ──
-    (function initDeptDropdown() {
+    // ── Searchable department combobox ──
+    let deptActiveIdx = -1;
+    let deptFiltered = [];
+
+    function buildDeptList(filter) {
+      const list = document.getElementById('dept-list');
+      if (!list || typeof SCHOOLS === 'undefined') return;
+      const f = (filter || '').trim().toLowerCase();
+      deptFiltered = SCHOOLS.map((s, i) => ({ s, i })).filter(({ s }) => !f || s.name.toLowerCase().includes(f));
+      if (!deptFiltered.length) {
+        list.innerHTML = '<div class="dept-list-empty">No department matches \u201c' + escHtml(filter) + '\u201d</div>';
+        return;
+      }
+      list.innerHTML = deptFiltered.map(({ s, i }, pos) =>
+        '<div class="dept-option' + (pos === deptActiveIdx ? ' active' : '') + '" data-idx="' + i + '" data-pos="' + pos + '" onmousedown="pickDept(' + i + ')">' +
+          escHtml(s.name) +
+          (s.zone ? '<span class="zone-tag">' + escHtml(s.zone) + '</span>' : '') +
+        '</div>'
+      ).join('');
+    }
+
+    function openDeptList() {
+      buildDeptList(document.getElementById('dept-search').value);
+      document.getElementById('dept-list').classList.add('open');
+    }
+
+    function closeDeptList() {
+      const l = document.getElementById('dept-list');
+      if (l) l.classList.remove('open');
+      deptActiveIdx = -1;
+    }
+
+    function filterDeptList() {
+      deptActiveIdx = -1;
+      const q = document.getElementById('dept-search').value;
+      // If the box no longer matches the selected dept, clear the selection
       const sel = document.getElementById('dept-select');
-      if (!sel || typeof SCHOOLS === 'undefined') return;
-      SCHOOLS.forEach((s, i) => {
-        const o = document.createElement('option');
-        o.value = String(i);
-        o.textContent = s.name;
-        sel.appendChild(o);
-      });
-    })();
+      if (sel.value !== '') {
+        const selName = SCHOOLS[Number(sel.value)] ? SCHOOLS[Number(sel.value)].name : '';
+        if (q !== selName) { sel.value = ''; onDeptSelect(); }
+      }
+      buildDeptList(q);
+      document.getElementById('dept-list').classList.add('open');
+    }
+
+    function pickDept(i) {
+      const s = SCHOOLS[i];
+      document.getElementById('dept-select').value = String(i);
+      document.getElementById('dept-search').value = s.name;
+      closeDeptList();
+      onDeptSelect();
+    }
+
+    function deptKeydown(ev) {
+      const list = document.getElementById('dept-list');
+      if (!list.classList.contains('open')) { if (ev.key === 'ArrowDown') openDeptList(); return; }
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); deptActiveIdx = Math.min(deptActiveIdx + 1, deptFiltered.length - 1); buildDeptList(document.getElementById('dept-search').value); scrollActive(); }
+      else if (ev.key === 'ArrowUp') { ev.preventDefault(); deptActiveIdx = Math.max(deptActiveIdx - 1, 0); buildDeptList(document.getElementById('dept-search').value); scrollActive(); }
+      else if (ev.key === 'Enter') { ev.preventDefault(); if (deptActiveIdx >= 0 && deptFiltered[deptActiveIdx]) pickDept(deptFiltered[deptActiveIdx].i); }
+      else if (ev.key === 'Escape') { closeDeptList(); }
+    }
+
+    function scrollActive() {
+      const list = document.getElementById('dept-list');
+      const el = list.querySelector('.dept-option.active');
+      if (el) el.scrollIntoView({ block: 'nearest' });
+    }
+
+    // Close the list when clicking outside
+    document.addEventListener('click', function(ev) {
+      const combo = document.getElementById('dept-combo');
+      if (combo && !combo.contains(ev.target)) closeDeptList();
+    });
 
     let currentDept = null;
 
@@ -2072,7 +2147,7 @@
       resetForm();
       // Restore organizer fields
       document.getElementById('org-name').value   = saved.name;
-      if(document.getElementById('dept-select')){document.getElementById('dept-select').value = saved.dept; onDeptSelect();}
+      if(document.getElementById('dept-select') && saved.dept){document.getElementById('dept-select').value = saved.dept; const _ds=SCHOOLS[Number(saved.dept)]; if(_ds && document.getElementById('dept-search')) document.getElementById('dept-search').value = _ds.name; onDeptSelect();}
       document.getElementById('org-email').value  = saved.email;
       document.getElementById('org-phone').value  = saved.phone;
       document.getElementById('worktag').value    = saved.worktag;
@@ -2090,6 +2165,10 @@
     // ── Request another with same organizer info ──
     // ── Reset ──
     function resetForm() {
+      if(document.getElementById('dept-search')) document.getElementById('dept-search').value='';
+      if(document.getElementById('dept-select')) document.getElementById('dept-select').value='';
+      if(typeof revealGated==='function') revealGated(false);
+      const _h=document.getElementById('pre-dept-hint'); if(_h) _h.style.display='block';
       document.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea').forEach(el => { el.value = ''; el.classList.remove('error'); });
       document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
       document.querySelectorAll('.service-item').forEach(el => el.classList.remove('checked'));
