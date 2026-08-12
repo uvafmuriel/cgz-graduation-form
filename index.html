@@ -550,6 +550,19 @@
       .field-row, .field-row.three, .vendor-list { grid-template-columns: 1fr; }
       .service-grid { grid-template-columns: 1fr; }
       .form-section { padding: 1rem; }
+      /* Equipment rows: tighten qty column on phones */
+      .equip-row { grid-template-columns: 18px 1fr 72px; gap: 8px; }
+      .equip-row .eq-qty input { padding: 8px 4px; font-size: 14px; }
+      /* Map a bit shorter so the toolbar is reachable */
+      #map-container, #map-placeholder { height: 380px !important; }
+      /* Bigger tap targets for pin buttons and pills on touch */
+      .pin-btn { padding: 8px 12px; font-size: 13px; }
+      .status-pill { padding: 9px 18px; font-size: 14px; }
+      /* Department search: full-width, larger touch target */
+      #dept-search { font-size: 16px; padding: 11px 32px 11px 12px; }
+      .dept-option { padding: 12px; font-size: 15px; }
+      /* Prevent iOS zoom-on-focus by keeping inputs at 16px */
+      input, select, textarea { font-size: 16px; }
     }
 
     /* ── Summary modal ── */
@@ -1324,48 +1337,22 @@
     <div class="form-section dept-gated" style="display:none;">
       <div class="section-title">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>
-        Parking lot use
+        Parking
       </div>
-      <p class="sub-label" style="margin-bottom:8px;">Will a parking lot be used for this event?</p>
+      <p class="sub-label" style="margin-bottom:8px;">Have you already requested parking passes from Parking &amp; Transportation?</p>
       <div class="status-group" style="margin-bottom:0;">
-        <span class="status-pill" onclick="selectStatus(this,'parking-use','yes')" data-group="parking-use" data-val="yes">Yes</span>
-        <span class="status-pill" onclick="selectStatus(this,'parking-use','no')" data-group="parking-use" data-val="no">No</span>
+        <span class="status-pill" onclick="selectStatus(this,'parking-requested','yes')" data-group="parking-requested" data-val="yes">Yes</span>
+        <span class="status-pill" onclick="selectStatus(this,'parking-requested','no')" data-group="parking-requested" data-val="no">No</span>
       </div>
-      <input type="hidden" id="parking-use" value="">
+      <input type="hidden" id="parking-requested" value="">
 
-      <div id="parking-section" class="conditional" style="margin-top:12px;">
-        <p class="sub-label" style="margin-bottom:6px;">How will the lot be used?</p>
-        <div class="status-group" style="margin-bottom:12px;">
-          <span class="status-pill" onclick="selectStatus(this,'parking-type','parking')" data-group="parking-type" data-val="parking">Guest parking</span>
-          <span class="status-pill" onclick="selectStatus(this,'parking-type','event')" data-group="parking-type" data-val="event">Event held in lot</span>
-          <span class="status-pill" onclick="selectStatus(this,'parking-type','both')" data-group="parking-type" data-val="both">Both</span>
-        </div>
-        <input type="hidden" id="parking-type" value="">
-
-        <p class="sub-label" style="margin-bottom:6px;">Has Parking &amp; Transportation (P&amp;T) Events given approval?</p>
-        <div class="status-group" style="margin-bottom:0;">
-          <span class="status-pill" onclick="selectStatus(this,'parking-approval','yes')" data-group="parking-approval" data-val="yes">Yes</span>
-          <span class="status-pill" onclick="selectStatus(this,'parking-approval','no')" data-group="parking-approval" data-val="no">No — I need to request approval</span>
-          <span class="status-pill" onclick="selectStatus(this,'parking-approval','inprogress')" data-group="parking-approval" data-val="inprogress">In progress</span>
-        </div>
-        <input type="hidden" id="parking-approval" value="">
-
-        <div id="parking-links" class="conditional" style="margin-top:10px;">
-          <div class="note-box warning">
-            P&amp;T Events approval is required before using a parking lot. Submit a request through the appropriate link below:
-            <ul style="margin-top:8px; padding-left:18px; line-height:2;">
-              <li><a href="https://uva.t2hosted.com/Account/Portal" target="_blank" style="color:#7A3D00; font-weight:500;">UVA Faculty &amp; Staff — T2 Parking Portal</a></li>
-              <li><a href="https://parking.virginia.edu/event-non-affiliated" target="_blank" style="color:#7A3D00; font-weight:500;">UVA Students &amp; Non-Affiliates — Parking Events Page</a></li>
-            </ul>
-            Questions? Email <a href="mailto:ptevents@virginia.edu" style="color:#7A3D00; font-weight:500;">ptevents@virginia.edu</a>
+      <div id="parking-request-link" class="conditional" style="margin-top:12px;">
+        <div class="note-box">
+          No problem — you can request event parking from Parking &amp; Transportation here:
+          <div style="margin-top:8px;">
+            <a href="#" target="_blank" id="parking-request-url" style="color:#232D4B; font-weight:600;">Request event parking &rarr;</a>
           </div>
-        </div>
-
-        <div id="parking-lot-name-section" class="conditional" style="margin-top:12px;">
-          <div class="field-group">
-            <label class="field-label" for="parking-notes">Parking lot name &amp; any notes</label>
-            <input type="text" id="parking-notes" placeholder="e.g. C1 Parking Lot, in front of Bryan Hall">
-          </div>
+          <p style="margin:8px 0 0; font-size:12px; color:#888780;">(Link coming soon — for now, contact P&amp;T Events at <a href="mailto:ptevents@virginia.edu" style="color:#232D4B;">ptevents@virginia.edu</a>.)</p>
         </div>
       </div>
     </div>
@@ -1663,22 +1650,10 @@
         const sec = document.getElementById('zero-waste-section');
         if (sec) sec.classList.toggle('show', val === 'yes');
       }
-      if (group === 'parking-use') {
-        document.getElementById('parking-section').classList.toggle('show', val === 'yes');
-        if (val === 'no') {
-          document.getElementById('parking-approval').value = '';
-          document.getElementById('parking-type').value = '';
-          document.getElementById('parking-links').classList.remove('show');
-          document.querySelectorAll('[data-group="parking-approval"],[data-group="parking-type"]').forEach(p => p.className = 'status-pill');
-        }
-      }
-      if (group === 'parking-type') {
-        const showLotName = (val === 'event' || val === 'both');
-        document.getElementById('parking-lot-name-section').classList.toggle('show', showLotName);
-        if (!showLotName) document.getElementById('parking-notes').value = '';
-      }
-      if (group === 'parking-approval') {
-        document.getElementById('parking-links').classList.toggle('show', val === 'no');
+      if (group === 'parking-requested') {
+        // Show the request link only if they haven't requested passes yet
+        const link = document.getElementById('parking-request-link');
+        if (link) link.classList.toggle('show', val === 'no');
       }
       if (group === 'alcohol') {
         document.getElementById('alcohol-section').classList.toggle('show', val === 'yes');
@@ -1858,12 +1833,11 @@
       }
 
       // Parking
-      if (val('parking-use') === 'yes') {
+      if (val('parking-requested') && val('parking-requested') !== '—') {
+        const pr = val('parking-requested');
         html += `<div class="summary-section">
           <div class="summary-section-title">Parking</div>
-          <div class="summary-row"><span class="summary-key">Lot use</span><span class="summary-val">${val('parking-type') || '—'}</span></div>
-          <div class="summary-row"><span class="summary-key">P&T approval</span><span class="summary-val">${statusBadge(val('parking-approval'),{yes:'Approved',no:'Not approved',inprogress:'In progress'})}</span></div>
-          ${val('parking-notes') ? `<div class="summary-row"><span class="summary-key">Lot details</span><span class="summary-val">${val('parking-notes')}</span></div>` : ''}
+          <div class="summary-row"><span class="summary-key">Passes requested from P&T</span><span class="summary-val">${pr === 'yes' ? 'Yes' : 'Not yet — will request event parking'}</span></div>
         </div>`;
       }
 
@@ -2072,6 +2046,7 @@
         rainLocation:     document.getElementById('rain-location') ? document.getElementById('rain-location').value.trim() : '',
         rainTime:         document.getElementById('rain-time') ? document.getElementById('rain-time').value.trim() : '',
         rainChanges:      document.getElementById('rain-changes') ? document.getElementById('rain-changes').value.trim() : '',
+        parkingRequested: document.getElementById('parking-requested') ? document.getElementById('parking-requested').value : '',
         tentPermit:       document.getElementById('tent-permit').value,
         tentPrefVendors:  getCheckedVals('tent-pref-vendor'),
         // Food trucks &amp; catering
@@ -2107,10 +2082,6 @@
         updApproval:      document.getElementById('upd-approval') ? document.getElementById('upd-approval').value : '',
         securityStaff:    document.getElementById('security-staff') ? document.getElementById('security-staff').value : '',
         // Parking
-        parkingUse:       document.getElementById('parking-use').value,
-        parkingType:      document.getElementById('parking-type').value,
-        parkingApproval:  document.getElementById('parking-approval').value,
-        parkingNotes:     document.getElementById('parking-notes').value.trim(),
         mapPins:          getMapPinData(),
         mapScreenshot:    window._mapScreenshot || '',
         requestId:        window._currentRequestId || '',
@@ -2258,7 +2229,7 @@
       const items = TIMELINE_RULES.filter(rule => {
         if (rule.general) return true;
         if (rule.service === 'alcohol') return document.getElementById('alcohol') && document.getElementById('alcohol').value === 'yes';
-        if (rule.service === 'parking') return document.getElementById('parking-use') && document.getElementById('parking-use').value === 'yes';
+        if (rule.service === 'parking') return document.getElementById('parking-requested') && document.getElementById('parking-requested').value === 'no';
         const el = document.getElementById(rule.service);
         return el && el.checked;
       });
@@ -2280,7 +2251,7 @@
     });
     // Also hook alcohol and parking
     document.addEventListener('change', function(e) {
-      if (e.target.id === 'alcohol' || e.target.id === 'parking-use') updateTimeline();
+      if (e.target.id === 'alcohol' || e.target.id === 'parking-requested') updateTimeline();
     });
 
     // ── Draft save/load ──
@@ -2292,7 +2263,7 @@
         'alcohol','upd-approval','security-staff',
         'stage-power','stage-vendor-name','stage-vendor-supply',
         'chairs-vendor-name','chairs-vendor-supply',
-        'waste-notes','signs-notes','power-notes','parking-use','parking-type','parking-approval','parking-notes'];
+        'waste-notes','signs-notes','power-notes','parking-requested'];
       const data = {};
       fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
       // Checkboxes
@@ -2545,7 +2516,7 @@
           const p1=map.latLngToContainerPoint(firstPt);
           const p2=map.latLngToContainerPoint(e.latlng);
           const distPx=Math.sqrt(Math.pow(p1.x-p2.x,2)+Math.pow(p1.y-p2.y,2));
-          if(distPx<=14){ finishPolygon(); return; }
+          const closeTol=('ontouchstart' in window)?24:14; if(distPx<=closeTol){ finishPolygon(); return; }
         }
         polyPoints.push(e.latlng);
         // Temp corner marker — make the FIRST dot bigger/highlighted so users know they can click it to close
