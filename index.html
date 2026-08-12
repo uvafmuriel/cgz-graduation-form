@@ -918,6 +918,11 @@
       <button type="button" onclick="sendBackToOrganizer()">Send back with edits</button>
     </div>
 
+    <div class="form-intro" style="background:#fff; border:1px solid #e4e2dc; border-radius:10px; padding:18px 20px; margin-bottom:20px;">
+      <p style="margin:0 0 8px; font-size:15px; font-weight:600; color:#232D4B;">Requesting Facilities support for your graduation ceremony</p>
+      <p style="margin:0; font-size:14px; color:#5b6472; line-height:1.55;">This form takes about 5 minutes. Start by choosing your department — we'll show what your department requested last year so you can reuse or adjust it. Everything is editable, and most items are already filled in for you. If you get stuck on anything, just leave it blank and add a note; FM will follow up.</p>
+    </div>
+
     <div class="form-section">
       <div class="section-title">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -945,7 +950,7 @@
       <div class="field-row full">
         <div class="field-group">
           <label class="field-label" for="worktag">Work order or worktag <span class="req-tag">required</span></label>
-          <input type="text" id="worktag" placeholder="e.g. PG-00XXXXX">
+          <input type="text" id="worktag" placeholder="Enter your worktag or work order # (ask FM if unsure)">
           <div class="note-box">All events require a customer-funded work order in AIM. You may contact the FM service desk to create a work order, or provide your departmental worktag and a work order will be created on your behalf.</div>
         </div>
       </div>
@@ -1044,7 +1049,7 @@
       <div class="field-row full">
         <div class="field-group">
           <label class="field-label" for="event-attendance">Expected attendance</label>
-          <input type="number" id="event-attendance" placeholder="# of people" min="0">
+          <input type="number" id="event-attendance" placeholder="Rough number of guests is fine" min="0">
         </div>
       </div>
       <input type="hidden" id="event-type" value="Graduation">
@@ -1257,6 +1262,30 @@
         Event layout map
       </div>
 
+      <p class="sub-label" style="margin-bottom:10px;">Show us where things go by placing markers on the map. This is optional — if you're not sure yet, you can skip it and FM will follow up.</p>
+
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:12px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+          <input type="checkbox" id="map-skip" onchange="toggleMapSkip()" style="width:17px;height:17px;accent-color:#E57200;">
+          Skip the map for now
+        </label>
+        <button type="button" id="map-help-btn" onclick="toggleMapHelp()" style="display:inline-flex; align-items:center; gap:6px; background:#232D4B; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;">
+          <span style="font-size:16px;">&#9432;</span> How to use the map
+        </button>
+      </div>
+
+      <div id="map-help-box" style="display:none; background:#eef1f7; border:1px solid #cdd6e8; border-left:4px solid #232D4B; border-radius:8px; padding:16px 18px; margin-bottom:14px; font-size:13px; line-height:1.6;">
+        <p style="font-weight:600; color:#232D4B; margin:0 0 8px;">Placing items on the map</p>
+        <ol style="margin:0 0 10px; padding-left:20px;">
+          <li><strong>Pick what you want to place</strong> — click a resource button (Tent, Stage, Chairs, etc.) above the map. It will highlight to show it's selected.</li>
+          <li><strong>Click on the map</strong> where that item should go. A marker drops at that spot.</li>
+          <li><strong>For areas like tents or seating</strong>, click each corner to trace the shape, then click <em>"Finish shape."</em></li>
+          <li><strong>Add a quantity or note</strong> — click any marker you placed to set how many (e.g. 200 chairs) or add a note.</li>
+          <li><strong>Made a mistake?</strong> Use <em>Undo</em> to remove the last thing, or click a marker and choose <em>Remove.</em> <em>Clear all</em> starts over.</li>
+        </ol>
+        <p style="margin:0; color:#5b6472;">You don't need to be precise — a rough placement helps FM understand your setup. When in doubt, drop a marker near the right spot and add a note.</p>
+      </div>
+
       <div id="map-placeholder" style="display:flex;align-items:center;justify-content:center;height:500px;color:#888780;font-size:14px;border:1px solid #e4e2dc;border-radius:10px;">Select a location above to load the site map.</div>
       <div id="map-container" style="display:none;height:500px;width:100%;border-radius:10px;border:1px solid #e4e2dc;"></div>
 
@@ -1349,10 +1378,15 @@
     <div class="error-banner" id="error-banner">Submission failed. Please try again or contact FM directly.</div>
     <div class="success-msg" id="success-msg">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
-      <div style="margin-bottom:6px;">Request submitted!</div>
-      <div style="font-size:14px; font-weight:400; margin-bottom:4px;">Your request ID: <strong id="success-request-id" style="font-size:16px; letter-spacing:0.05em;"></strong></div>
-      <div style="font-size:13px; font-weight:400; color:#3d6b20; margin-bottom:4px;" id="success-complexity"></div>
-      <div style="font-size:13px; font-weight:400;">FM will follow up to confirm services and your AIM work order.</div>
+      <div style="margin-bottom:6px; font-size:18px;">Your request has been sent!</div>
+      <div style="font-size:14px; font-weight:400; margin-bottom:8px;">Confirmation number: <strong id="success-request-id" style="font-size:16px; letter-spacing:0.05em;"></strong><br><span style="font-size:12px; color:#3d6b20;">Save this number — mention it if you contact FM about this request.</span></div>
+      <div style="font-size:13px; font-weight:400; color:#3d6b20; margin-bottom:8px;" id="success-complexity"></div>
+      <div style="font-size:13px; font-weight:400; text-align:left; max-width:440px; margin:0 auto; background:rgba(255,255,255,0.6); border-radius:8px; padding:12px 14px;">
+        <strong style="display:block; margin-bottom:5px;">What happens next:</strong>
+        1. FM reviews your request within a few business days.<br>
+        2. We'll email you to confirm the details and equipment.<br>
+        3. If anything's unclear, we'll reach out — no action needed from you right now.
+      </div>
       <div style="margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
         <button onclick="requestAnotherSame()" style="background:#2e5a10; color:#fff; border:none; border-radius:6px; padding:9px 18px; font-size:14px; font-family:inherit; font-weight:500; cursor:pointer;">
           Same organizer info
@@ -1466,6 +1500,10 @@
 
     function revealGated(show) {
       document.querySelectorAll('.dept-gated').forEach(el => { el.style.display = show ? '' : 'none'; });
+      // Leaflet maps render blank if they were initialized while hidden — force a resize once visible
+      if (show && typeof map !== 'undefined' && map) {
+        setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 150);
+      }
     }
 
     function onDeptSelect() {
@@ -2183,14 +2221,6 @@
       document.getElementById('error-banner').style.display = 'none';
     }
 
-    function toggleMapHelp() {
-      const panel = document.getElementById('map-help-panel');
-      const arrow = document.getElementById('map-help-arrow');
-      const open = panel.style.display === 'none';
-      panel.style.display = open ? 'block' : 'none';
-      arrow.textContent   = open ? '▾' : '▸';
-    }
-
     // ── Request ID generator ──
     function generateRequestId() {
       const year = new Date().getFullYear();
@@ -2429,6 +2459,35 @@
       input.value=''; activePinType=customPins[customPins.length-1].id; buildToolbar();
     }
 
+    
+    function toggleMapHelp() {
+      const box = document.getElementById('map-help-box');
+      const btn = document.getElementById('map-help-btn');
+      if (!box) return;
+      const open = box.style.display === 'none' || !box.style.display;
+      box.style.display = open ? 'block' : 'none';
+      if (btn) btn.innerHTML = open
+        ? '<span style="font-size:16px;">&#9432;</span> Hide map instructions'
+        : '<span style="font-size:16px;">&#9432;</span> How to use the map';
+    }
+
+    function toggleMapSkip() {
+      const skip = document.getElementById('map-skip').checked;
+      ['map-placeholder','map-container','map-tools'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = skip ? 'none' : el.style.display;
+      });
+      const helpBtn = document.getElementById('map-help-btn');
+      if (helpBtn) helpBtn.style.display = skip ? 'none' : 'inline-flex';
+      if (skip) {
+        const hb = document.getElementById('map-help-box'); if (hb) hb.style.display = 'none';
+        // re-show placeholder logic when unskipped
+      } else {
+        // Re-trigger location display
+        if (typeof loadMap === 'function') loadMap();
+      }
+    }
+
     function loadMap() {
       const loc=document.getElementById('event-location').value;
       const ph=document.getElementById('map-placeholder'), mc=document.getElementById('map-container'), mt=document.getElementById('map-tools');
@@ -2445,7 +2504,9 @@
         map.invalidateSize();
         map.on('click',function(e){ handleMapClick(e); });
         buildToolbar(); renderPinList();
-      }, 100);
+        // Safety: re-invalidate after paint in case container was just revealed
+        setTimeout(function(){ try { map.invalidateSize(); } catch(e){} }, 300);
+      }, 150);
     }
 
         let polyPoints = [];
