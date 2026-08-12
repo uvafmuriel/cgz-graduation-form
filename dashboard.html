@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CGZ Graduation Requests — FM Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" onerror="window.__noChart=true"></script>
 <style>
   :root{
     --navy:#232D4B; --navy-700:#1a2138; --orange:#E57200; --orange-soft:#f4a259;
@@ -554,6 +554,10 @@ function crewView(subs,fRes){
 
 let charts={};
 function drawCharts(subs,comp){
+  if(typeof Chart==='undefined'){ // Chart.js not loaded — skip charts, keep everything else working
+    ['chDate','chComp'].forEach(id=>{const el=document.getElementById(id);if(el&&el.parentElement)el.parentElement.innerHTML='<div style="color:#999;font-size:12px;padding:30px;text-align:center">Charts unavailable (chart library did not load)</div>';});
+    return;
+  }
   Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});
   // by date
   const byDate={};subs.forEach(s=>{const d=s.eventDate||s.departmentDay||'—';byDate[d]=(byDate[d]||0)+1;});
