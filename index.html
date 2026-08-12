@@ -1188,10 +1188,6 @@
           </label>
           <div class="followup-panel" id="panel-chairs">
             <div class="followup-title">Chairs &amp; tables details</div>
-            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
-              <label class="field-label" for="chairs-qty">Number of chairs</label>
-              <input type="number" min="1" id="chairs-qty" placeholder="Qty" style="width:100%;">
-            </div>
             <div class="field-row" style="margin-bottom:12px;">
               <div class="field-group">
                 <label class="field-label" for="chairs-qty">Estimated chairs needed</label>
@@ -1249,10 +1245,6 @@
           </label>
           <div class="followup-panel" id="panel-pa">
             <div class="followup-title">PA system &amp; sound details</div>
-            <div class="field-group" style="margin-bottom:10px; max-width:220px;">
-              <label class="field-label" for="pa-qty">Number of PA/sound setups</label>
-              <input type="number" min="1" id="pa-qty" placeholder="Qty" style="width:100%;">
-            </div>
             <div class="field-row" style="margin-bottom:12px;">
               <div class="field-group">
                 <label class="field-label" for="pa-type">Type of sound</label>
@@ -1672,12 +1664,12 @@
       const checked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c=>c.value).join(', ') || 'None';
 
       const services = [];
-      const qtyMap = { 'svc-tent':'tent-qty', 'svc-stage':'stage-qty', 'svc-chairs':'chairs-qty', 'svc-pa':'pa-qty' };
+      const qtyMap = { 'svc-tent':'tent-qty', 'svc-stage':'stage-qty', 'svc-chairs':'chairs-qty' };
       [{id:'svc-power',label:'Power & water'},{id:'svc-setup',label:'Setup & takedown'},
        {id:'svc-tent',label:'Tents'},
        {id:'svc-stage',label:'Stages & platforms'},{id:'svc-chairs',label:'Chairs & tables'},
        {id:'svc-pa',label:'PA / Sound'},
-       {id:'svc-waste',label:'Waste, recycling & custodial'},{id:'svc-signs',label:'Signs & fixtures'}
+       {id:'svc-waste',label:'Waste & recycling'},{id:'svc-signs',label:'Signs & fixtures'}
       ].forEach(s => {
         const el = document.getElementById(s.id);
         if (el && el.checked) {
@@ -1974,7 +1966,6 @@
         tentQty:          document.getElementById('tent-qty') ? document.getElementById('tent-qty').value : '',
         stageQty:         document.getElementById('stage-qty') ? document.getElementById('stage-qty').value : '',
         chairsQty:        document.getElementById('chairs-qty') ? document.getElementById('chairs-qty').value : '',
-        paQty:            document.getElementById('pa-qty') ? document.getElementById('pa-qty').value : '',
         crossesQty:       document.getElementById('crosses-qty') ? document.getElementById('crosses-qty').value : '',
         hubbaQty:         document.getElementById('hubba-qty') ? document.getElementById('hubba-qty').value : '',
         lecternQty:       document.getElementById('lectern-qty') ? document.getElementById('lectern-qty').value : '',
