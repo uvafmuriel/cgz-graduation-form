@@ -100,11 +100,42 @@
   @media (max-width:900px){.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr 1fr}}
   @media (max-width:560px){.cards{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr}.mast-meta{display:none}}
   @media print{
-    .tabbar,.toolbar,.masthead .mast-meta{display:none}
-    .zone-section{display:block !important;page-break-after:always}
+    /* Hide everything not part of the gameplan report */
+    .tabbar,.toolbar,.masthead,.accent,.cards,.grid2,.panel,.tbl-wrap,.zone-head{display:none !important}
     body{background:#fff}
-    .panel,.card,.tbl-wrap{box-shadow:none;border:1px solid #ccc}
     .detail-row{display:none}
+
+    /* When the gameplan modal is open, flatten it so ONLY the report prints, flowing across pages */
+    .gp-overlay{position:static !important;display:block !important;background:#fff !important;padding:0 !important;overflow:visible !important;inset:auto !important}
+    .gp-modal{box-shadow:none !important;max-width:100% !important;width:100% !important;border-radius:0 !important;margin:0 !important}
+    .gp-head,.gp-filters,.gp-actions,.gp-close{display:none !important}   /* hide title bar, filters, build button */
+    .gp-result{padding:0 !important}
+    .gp-report-head button{display:none !important}                        /* hide the on-screen Print button */
+
+    /* Let sections and tables break cleanly across pages */
+    .gp-sec{page-break-inside:auto;margin-top:18px}
+    .gp-sec h3{page-break-after:avoid}
+    .tl-day{page-break-inside:avoid}
+    .gp-tbl{page-break-inside:auto}
+    .gp-tbl tr{page-break-inside:avoid}
+    .gp-loc-group{page-break-inside:avoid}
+    .gp-report-head{page-break-after:avoid}
+    .gp-warn{page-break-inside:avoid}
+
+    /* Ensure timeline colors print (browsers strip backgrounds by default) */
+    .tl-seg,.tl-date,.gp-tbl th,.sw{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+
+    /* Timeline: fit to page width, keep segment colors */
+    .tl-day,.gantt,.tl-lanes{overflow:visible !important}
+    .tl-seg.setup{background:#9aa7c2 !important}
+    .tl-seg.event{background:#E57200 !important}
+    .tl-seg.teardown{background:#c8b199 !important}
+    .tl-loccol{background:#faf9f6 !important}
+    .gp-tbl th{background:#232D4B !important;color:#fff !important}
+    .tl-date{background:#232D4B !important;color:#fff !important}
+
+    @page{margin:0.5in}
   }
   /* Gameplan builder */
   .gp-overlay{position:fixed;inset:0;background:rgba(20,26,45,.55);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
