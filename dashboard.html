@@ -106,17 +106,72 @@
     .panel,.card,.tbl-wrap{box-shadow:none;border:1px solid #ccc}
     .detail-row{display:none}
   }
+  /* Gameplan builder */
+  .gp-overlay{position:fixed;inset:0;background:rgba(20,26,45,.55);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto}
+  .gp-modal{background:#fff;border-radius:14px;max-width:1080px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);margin:auto}
+  .gp-head{display:flex;align-items:center;justify-content:space-between;padding:20px 26px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0;z-index:2}
+  .gp-head h2{font-family:Georgia,serif;color:var(--navy);font-size:20px}
+  .gp-close{border:none;background:none;font-size:28px;color:var(--muted);cursor:pointer;line-height:1}
+  .gp-close:hover{color:var(--navy)}
+  .gp-filters{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:22px 26px}
+  .gp-fg label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:7px}
+  .gp-multi{border:1px solid var(--line);border-radius:8px;max-height:130px;overflow-y:auto;padding:6px}
+  .gp-multi label{display:flex;align-items:center;gap:8px;padding:5px 7px;font-size:13px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400;cursor:pointer;border-radius:5px;margin:0}
+  .gp-multi label:hover{background:#f5f6f8}
+  .gp-multi input{width:15px;height:15px;accent-color:var(--orange)}
+  .gp-date{display:flex;gap:8px}
+  .gp-date input{flex:1;padding:8px;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:13px}
+  .gp-actions{display:flex;align-items:center;gap:14px;padding:0 26px 18px}
+  .gp-hint{font-size:12px;color:var(--muted)}
+  .gp-result{padding:0 26px 30px}
+  .gp-empty{padding:40px;text-align:center;color:var(--muted)}
+  .gp-report-head{border-top:3px solid var(--navy);padding-top:16px;margin-top:8px}
+  .gp-report-head h1{font-family:Georgia,serif;color:var(--navy);font-size:22px}
+  .gp-report-head .meta{font-size:12px;color:var(--muted);margin-top:3px}
+  .gp-warn{background:#fbe6e3;border:1px solid #f0b3aa;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:13px;color:#8a2820}
+  .gp-warn b{color:#c0392b}
+  .gp-sec{margin-top:26px}
+  .gp-sec h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);font-weight:700;border-bottom:2px solid var(--line);padding-bottom:7px;margin-bottom:12px}
+  .gp-tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .gp-tbl th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+  .gp-tbl td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .gp-tbl tr.clash td{background:#fdeeec}
+  .gp-loc-group{margin-bottom:18px}
+  .gp-loc-group h4{background:#eef1f7;color:var(--navy);padding:7px 12px;border-radius:6px 6px 0 0;font-size:13px}
+  .tl-legend{display:flex;gap:18px;margin-bottom:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+  .tl-legend span{display:flex;align-items:center;gap:6px}
+  .tl-legend .sw{width:16px;height:12px;border-radius:3px;display:inline-block}
+  .sw.setup{background:#9aa7c2}.sw.event{background:var(--orange)}.sw.teardown{background:#c8b199}.sw.clashkey{background:#fff;outline:2px solid #c0392b;outline-offset:-2px}
+  .tl-day{margin-bottom:26px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .tl-date{background:var(--navy);color:#fff;padding:9px 16px;font-weight:700;font-size:13px;font-family:Georgia,serif}
+  .tl-grid{display:flex;border-top:1px solid var(--line)}
+  .tl-grid:first-of-type{border-top:none}
+  .tl-loccol{flex:0 0 160px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--navy);background:#faf9f6;border-right:2px solid var(--line);display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tl-lanes{flex:1;position:relative;min-height:34px;display:flex}
+  .tl-head{background:#f2f1ec}
+  .tl-head .tl-loccol{background:#f2f1ec}
+  .tl-head-lanes{min-height:26px}
+  .tl-hourcell{flex:1;border-left:1px solid #e9e7e0;font-size:10px;color:var(--muted);padding:5px 0 0 4px;position:relative}
+  .tl-hourcell:first-child{border-left:none}
+  .tl-gl{flex:1;border-left:1px solid #efeee8}
+  .tl-gl:first-child{border-left:none}
+  .tl-seg{position:absolute;height:24px;border-radius:4px;font-size:10px;color:#fff;display:flex;align-items:center;padding:0 5px;overflow:hidden;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .tl-seg.setup{background:#9aa7c2}
+  .tl-seg.event{background:var(--orange);font-weight:600;z-index:2}
+  .tl-seg.teardown{background:#c8b199}
+  .tl-seg.event.clash{outline:2px solid #c0392b;outline-offset:1px}
+  .tl-seg span{overflow:hidden;text-overflow:ellipsis}
+  @media(max-width:700px){.gp-filters{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-  <div id="errbar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#c0392b;color:#fff;padding:10px 16px;font-size:13px;font-family:monospace"></div>
   <div class="masthead">
     <div class="masthead-inner">
       <div class="brand">
         <div class="brand-mark">FM</div>
         <div>
           <h1>Graduation Requests</h1>
-          <p>Central Grounds Zone &middot; Facilities Management &middot; <span style="color:#f4a259">BUILD-190246</span></p>
+          <p>Central Grounds Zone &middot; Facilities Management</p>
         </div>
       </div>
       <div class="mast-meta">
@@ -134,18 +189,6 @@
   </div>
 
 <script>
-window.addEventListener('load',function(){
-  var ok = (typeof openGameplan==='function' && typeof buildGameplan==='function');
-  var b=document.getElementById('errbar');
-  if(b && ok){ b.style.display='block'; b.style.background='#2e7d54'; b.textContent='BUILD-190246 loaded OK — gameplan functions ready. Click Build schedule / gameplan.'; setTimeout(function(){b.style.display='none';},4000); }
-});
-
-window.onerror=function(msg,src,line,col,err){
-  var b=document.getElementById('errbar');
-  if(b){b.style.display='block';b.textContent='JS Error: '+msg+' (line '+line+')';}
-  return false;
-};
-
 /* ============================================================
    DATA SOURCE — the ONE place to change when moving to Azure.
    Today: returns embedded sample data.
@@ -236,7 +279,7 @@ function render(){
 
   c.innerHTML=
     '<div class="zone-head"><div><h2>'+esc(zoneName)+'</h2><div class="sub">'+subs.length+' request'+(subs.length>1?'s':'')+' &middot; '+att.toLocaleString()+' total expected attendance</div></div>'+
-    '<div class="toolbar"><button class="btn" onclick="clickBuild()">Build schedule / gameplan</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
+    '<div class="toolbar"><button class="btn" onclick="openGameplan()">Build schedule / gameplan</button><button class="btn primary" onclick="init()">Refresh</button></div></div>'+
     // cards
     '<div class="cards">'+
       card('Requests',subs.length,'in '+esc(zoneName))+
@@ -397,13 +440,7 @@ function windows(s){
   return {evStart,evEnd,setupStart:sStart,setupEnd:sEnd,teardownStart:tStart,teardownEnd:tEnd};
 }
 
-function clickBuild(){
-  var b=document.getElementById('errbar');
-  if(b){b.style.display='block';b.style.background='#2e7d54';b.textContent='CLICK REGISTERED - opening gameplan...';}
-  try{ openGameplan(); }catch(e){ if(b){b.style.background='#c0392b';b.textContent='openGameplan threw: '+e.message;} }
-}
 function openGameplan(){
-  try{
   document.getElementById('gpOverlay').style.display='flex';
   const locs=[...new Set(ALL.map(s=>s.location).filter(Boolean))].sort();
   const zones=[...new Set(ALL.map(s=>s.departmentZone||'Unassigned'))].sort();
@@ -416,7 +453,6 @@ function openGameplan(){
     fg('Date from', '<div class="gp-date"><input type="date" id="gpFrom"><input type="date" id="gpTo"></div>')+
     fg('&nbsp;', '<div style="font-size:12px;color:var(--muted);line-height:1.5">Filters combine. Empty = include all. Resource filter keeps only events needing at least one selected resource.</div>');
   document.getElementById('gpResult').innerHTML='';
-  }catch(e){var b=document.getElementById('errbar');b.style.display='block';b.textContent='openGameplan error: '+e.message;}
 }
 function fg(label,inner){ return '<div class="gp-fg"><label>'+label+'</label>'+inner+'</div>'; }
 function multi(id,opts){ return '<div class="gp-multi" id="'+id+'">'+opts.map(o=>'<label><input type="checkbox" value="'+esc(o)+'"> '+esc(o)+'</label>').join('')+'</div>'; }
