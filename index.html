@@ -1653,33 +1653,6 @@
       el.classList.add(val === 'yes' ? 'yes' : val === 'no' ? 'no' : 'inprogress');
       const _grpEl = document.getElementById(group); if (_grpEl) _grpEl.value = val;
 
-      // Conditional warnings
-      if (group === 'tent-safety') {
-        if(document.getElementById('tent-safety-warning')) document.getElementById('tent-safety-warning').style.display = (val === 'no') ? 'block' : 'none';
-      }
-      if (group === 'food-license') {
-        const _fw = document.getElementById('food-license-warning'); if (_fw) _fw.style.display = (val === 'no') ? 'block' : 'none';
-      }
-      if (group === 'food-kitchen') {
-        // Only show Fire & Safety license question if trucks have a kitchen
-        const licenseSection = document.getElementById('food-license-section');
-        if (licenseSection) licenseSection.classList.toggle('show', val === 'yes' || val === 'some');
-        if (val === 'no') {
-          const fl = document.getElementById('food-license'); if (fl) fl.value = '';
-          const fw = document.getElementById('food-license-warning'); if (fw) fw.style.display = 'none';
-          document.querySelectorAll('[data-group="food-license"]').forEach(p => p.className = 'status-pill');
-        }
-      }
-      if (group === 'stage-power') {
-        const n = document.getElementById('stage-power-note'); if (n) n.style.display = (val === 'yes') ? 'block' : 'none';
-      }
-      // Per-service power/water toggle
-      [].forEach(svc => {
-        if (group === svc + '-power') {
-          const sec = document.getElementById(svc + '-power-notes-section');
-          if (sec) sec.classList.toggle('show', val === 'yes');
-        }
-      });
       if (group === 'zero-waste') {
         const sec = document.getElementById('zero-waste-section');
         if (sec) sec.classList.toggle('show', val === 'yes');
@@ -1688,18 +1661,6 @@
         // Show the request link only if they haven't requested passes yet
         const link = document.getElementById('parking-request-link');
         if (link) link.classList.toggle('show', val === 'no');
-      }
-      if (group === 'alcohol') {
-        const _as = document.getElementById('alcohol-section'); if (_as) _as.classList.toggle('show', val === 'yes');
-        if (val === 'no') {
-          const _ua = document.getElementById('upd-approval'); if (_ua) _ua.value = '';
-          if(document.getElementById('security-staff')) document.getElementById('security-staff').value = '';
-          if(document.getElementById('upd-warning')) document.getElementById('upd-warning').style.display = 'none';
-          document.querySelectorAll('[data-group="upd-approval"],[data-group="security-staff"]').forEach(p => p.className = 'status-pill');
-        }
-      }
-      if (group === 'upd-approval') {
-        const _uw = document.getElementById('upd-warning'); if (_uw) _uw.style.display = (val === 'no') ? 'block' : 'none';
       }
           if(typeof updateProgress==='function') updateProgress();
     }
@@ -2072,8 +2033,6 @@
         description:      document.getElementById('event-desc').value.trim(),
         fmServices:       getServices(),
         fmNotes:          document.getElementById('fm-notes').value.trim(),
-        // Power
-        powerNotes:       document.getElementById('power-notes') ? document.getElementById('power-notes').value.trim() : '',
         // Setup
         setupTime:        document.getElementById('setup-time').value,
         teardownTime:     document.getElementById('teardown-time').value,
@@ -2090,14 +2049,11 @@
         paVendor:         document.getElementById('pa-vendor') ? document.getElementById('pa-vendor').value.trim() : '',
         paPower:          document.getElementById('pa-power') ? document.getElementById('pa-power').value : '',
         paNotes:          document.getElementById('pa-notes') ? document.getElementById('pa-notes').value.trim() : '',
-        paPowerNotes:     document.getElementById('pa-power-notes') ? document.getElementById('pa-power-notes').value.trim() : '',
         // Food vendor
         // Per-service power
         // Chairs
         // Waste & custodial
         wasteServices:    Array.from(document.querySelectorAll('input[name="waste-services"]:checked')).map(c=>c.value).join(', '),
-        custodialNotes:   document.getElementById('custodial-notes') ? document.getElementById('custodial-notes').value.trim() : '',
-        majorEvent:       document.getElementById('major-event') ? document.getElementById('major-event').value : '',
         signsServices:    Array.from(document.querySelectorAll('input[name="signs-services"]:checked')).map(c=>c.value).join(', '),
         signsNotes:       document.getElementById('signs-notes') ? document.getElementById('signs-notes').value.trim() : '',
         crossesQty:       document.getElementById('crosses-qty') ? document.getElementById('crosses-qty').value : '',
@@ -2105,10 +2061,6 @@
         lecternQty:       document.getElementById('lectern-qty') ? document.getElementById('lectern-qty').value : '',
         podiumQty:        document.getElementById('podium-qty') ? document.getElementById('podium-qty').value : '',
         wasteNotes:       document.getElementById('waste-notes').value.trim(),
-        // Alcohol & security
-        alcoholServed:    document.getElementById('alcohol') ? document.getElementById('alcohol').value : '',
-        updApproval:      document.getElementById('upd-approval') ? document.getElementById('upd-approval').value : '',
-        securityStaff:    document.getElementById('security-staff') ? document.getElementById('security-staff').value : '',
         // Parking
         mapPins:          getMapPinData(),
         mapScreenshot:    window._mapScreenshot || '',
