@@ -1651,14 +1651,14 @@
     function selectStatus(el, group, val) {
       document.querySelectorAll(`[data-group="${group}"]`).forEach(p => p.className = 'status-pill');
       el.classList.add(val === 'yes' ? 'yes' : val === 'no' ? 'no' : 'inprogress');
-      document.getElementById(group).value = val;
+      const _grpEl = document.getElementById(group); if (_grpEl) _grpEl.value = val;
 
       // Conditional warnings
       if (group === 'tent-safety') {
         if(document.getElementById('tent-safety-warning')) document.getElementById('tent-safety-warning').style.display = (val === 'no') ? 'block' : 'none';
       }
       if (group === 'food-license') {
-        document.getElementById('food-license-warning').style.display = (val === 'no') ? 'block' : 'none';
+        const _fw = document.getElementById('food-license-warning'); if (_fw) _fw.style.display = (val === 'no') ? 'block' : 'none';
       }
       if (group === 'food-kitchen') {
         // Only show Fire & Safety license question if trucks have a kitchen
@@ -1690,16 +1690,16 @@
         if (link) link.classList.toggle('show', val === 'no');
       }
       if (group === 'alcohol') {
-        document.getElementById('alcohol-section').classList.toggle('show', val === 'yes');
+        const _as = document.getElementById('alcohol-section'); if (_as) _as.classList.toggle('show', val === 'yes');
         if (val === 'no') {
-          document.getElementById('upd-approval').value = '';
+          const _ua = document.getElementById('upd-approval'); if (_ua) _ua.value = '';
           if(document.getElementById('security-staff')) document.getElementById('security-staff').value = '';
           if(document.getElementById('upd-warning')) document.getElementById('upd-warning').style.display = 'none';
           document.querySelectorAll('[data-group="upd-approval"],[data-group="security-staff"]').forEach(p => p.className = 'status-pill');
         }
       }
       if (group === 'upd-approval') {
-        document.getElementById('upd-warning').style.display = (val === 'no') ? 'block' : 'none';
+        const _uw = document.getElementById('upd-warning'); if (_uw) _uw.style.display = (val === 'no') ? 'block' : 'none';
       }
           if(typeof updateProgress==='function') updateProgress();
     }
