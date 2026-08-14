@@ -272,6 +272,7 @@ function parseEquip(sub){
 async function init(){
   try{ ALL = await loadData(); }
   catch(e){ document.getElementById('content').innerHTML='<div class="empty">Could not load requests. '+esc(e.message)+'</div>'; return; }
+  if(!Array.isArray(ALL)){ document.getElementById('content').innerHTML='<div class="empty">Received unexpected data format from the server.</div>'; return; }
   ALL.forEach(s=>s._eq=parseEquip(s));
   const zset=[...new Set(ALL.map(s=>s.departmentZone||'Unassigned'))].sort();
   ZONES=zset;
