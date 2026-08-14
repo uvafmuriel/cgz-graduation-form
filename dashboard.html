@@ -100,41 +100,54 @@
   @media (max-width:900px){.cards{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr 1fr}}
   @media (max-width:560px){.cards{grid-template-columns:1fr}.detail-inner{grid-template-columns:1fr}.mast-meta{display:none}}
   @media print{
-    /* Hide everything not part of the gameplan report */
-    .tabbar,.toolbar,.masthead,.accent,.cards,.grid2,.panel,.tbl-wrap,.zone-head{display:none !important}
     body{background:#fff}
-    .detail-row{display:none}
+    /* Default: hide the empty print zone */
+    #printZone{display:none}
 
-    /* When the gameplan modal is open, flatten it so ONLY the report prints, flowing across pages */
-    .gp-overlay{position:static !important;display:block !important;background:#fff !important;padding:0 !important;overflow:visible !important;inset:auto !important}
-    .gp-modal{box-shadow:none !important;max-width:100% !important;width:100% !important;border-radius:0 !important;margin:0 !important}
-    .gp-head,.gp-filters,.gp-actions,.gp-close{display:none !important}   /* hide title bar, filters, build button */
-    .gp-result{padding:0 !important}
-    .gp-report-head button{display:none !important}                        /* hide the on-screen Print button */
+    /* When printing the gameplan: hide EVERYTHING except the print zone */
+    body.printing-gameplan > *{display:none !important}
+    body.printing-gameplan #printZone{display:block !important}
 
-    /* Let sections and tables break cleanly across pages */
-    .gp-sec{page-break-inside:auto;margin-top:18px}
-    .gp-sec h3{page-break-after:avoid}
-    .tl-day{page-break-inside:avoid}
-    .gp-tbl{page-break-inside:auto}
-    .gp-tbl tr{page-break-inside:avoid}
-    .gp-loc-group{page-break-inside:avoid}
-    .gp-report-head{page-break-after:avoid}
-    .gp-warn{page-break-inside:avoid}
+    /* Report styling in the print zone */
+    #printZone .gp-report-head{border-top:3px solid #232D4B;padding-top:12px}
+    #printZone .gp-report-head h1{font-family:Georgia,serif;color:#232D4B;font-size:22px}
+    #printZone .gp-report-head .meta{font-size:11px;color:#666;margin-top:3px}
+    #printZone .gp-warn{background:#fbe6e3;border:1px solid #f0b3aa;border-radius:8px;padding:10px 14px;margin:14px 0;font-size:12px;color:#8a2820}
+    #printZone .gp-sec{margin-top:20px;page-break-inside:auto}
+    #printZone .gp-sec h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#232D4B;font-weight:700;border-bottom:2px solid #ddd;padding-bottom:6px;margin-bottom:10px;page-break-after:avoid}
+    #printZone .gp-tbl{width:100%;border-collapse:collapse;font-size:11px}
+    #printZone .gp-tbl th{background:#232D4B !important;color:#fff !important;text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase}
+    #printZone .gp-tbl td{padding:6px 8px;border-bottom:1px solid #ddd}
+    #printZone .gp-tbl tr{page-break-inside:avoid}
+    #printZone .gp-tbl tr.clash td{background:#fdeeec !important}
+    #printZone .gp-loc-group{page-break-inside:avoid;margin-bottom:14px}
+    #printZone .gp-loc-group h4{background:#eef1f7 !important;color:#232D4B;padding:6px 10px;font-size:12px}
+    /* Timeline in print */
+    #printZone .tl-legend{display:flex;gap:16px;margin-bottom:12px;font-size:11px;color:#666}
+    #printZone .tl-legend span{display:flex;align-items:center;gap:5px}
+    #printZone .tl-legend .sw{width:14px;height:11px;border-radius:2px;display:inline-block}
+    #printZone .sw.setup{background:#9aa7c2 !important}
+    #printZone .sw.event{background:#E57200 !important}
+    #printZone .sw.teardown{background:#c8b199 !important}
+    #printZone .sw.clashkey{background:#fff;outline:2px solid #c0392b;outline-offset:-2px}
+    #printZone .tl-day{margin-bottom:20px;border:1px solid #ccc;border-radius:8px;overflow:hidden;page-break-inside:avoid}
+    #printZone .tl-date{background:#232D4B !important;color:#fff !important;padding:7px 14px;font-weight:700;font-size:12px;font-family:Georgia,serif}
+    #printZone .tl-grid{display:flex;border-top:1px solid #ddd}
+    #printZone .tl-grid:first-of-type{border-top:none}
+    #printZone .tl-loccol{flex:0 0 140px;padding:6px 10px;font-size:11px;font-weight:600;color:#232D4B;background:#faf9f6 !important;border-right:2px solid #ddd;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
+    #printZone .tl-lanes{flex:1;position:relative;min-height:30px;display:flex}
+    #printZone .tl-head-lanes{min-height:22px}
+    #printZone .tl-hourcell{flex:1;border-left:1px solid #e9e7e0;font-size:9px;color:#666;padding:4px 0 0 3px}
+    #printZone .tl-hourcell:first-child{border-left:none}
+    #printZone .tl-gl{flex:1;border-left:1px solid #efeee8}
+    #printZone .tl-gl:first-child{border-left:none}
+    #printZone .tl-seg{position:absolute;height:22px;border-radius:3px;font-size:9px;color:#fff;display:flex;align-items:center;padding:0 4px;overflow:hidden;white-space:nowrap}
+    #printZone .tl-seg.setup{background:#9aa7c2 !important}
+    #printZone .tl-seg.event{background:#E57200 !important;font-weight:600}
+    #printZone .tl-seg.teardown{background:#c8b199 !important}
+    #printZone .tl-seg.event.clash{outline:2px solid #c0392b;outline-offset:1px}
 
-    /* Ensure timeline colors print (browsers strip backgrounds by default) */
-    .tl-seg,.tl-date,.gp-tbl th,.sw{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-
-
-    /* Timeline: fit to page width, keep segment colors */
-    .tl-day,.gantt,.tl-lanes{overflow:visible !important}
-    .tl-seg.setup{background:#9aa7c2 !important}
-    .tl-seg.event{background:#E57200 !important}
-    .tl-seg.teardown{background:#c8b199 !important}
-    .tl-loccol{background:#faf9f6 !important}
-    .gp-tbl th{background:#232D4B !important;color:#fff !important}
-    .tl-date{background:#232D4B !important;color:#fff !important}
-
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
     @page{margin:0.5in}
   }
   /* Gameplan builder */
@@ -490,6 +503,19 @@ function multi(id,opts){ return '<div class="gp-multi" id="'+id+'">'+opts.map(o=
 function closeGameplan(){ document.getElementById('gpOverlay').style.display='none'; }
 function getMulti(id){ return Array.from(document.querySelectorAll('#'+id+' input:checked')).map(c=>c.value); }
 
+function printGameplan(){
+  var result=document.getElementById('gpResult');
+  var zone=document.getElementById('printZone');
+  if(!result||!zone) { window.print(); return; }
+  // Move the report content into the standalone print zone
+  zone.innerHTML=result.innerHTML;
+  // Remove the on-screen Print button from the copy
+  var btns=zone.querySelectorAll('button'); btns.forEach(function(b){b.remove();});
+  document.body.classList.add('printing-gameplan');
+  window.print();
+  // Restore after printing
+  setTimeout(function(){ document.body.classList.remove('printing-gameplan'); zone.innerHTML=''; },500);
+}
 function buildGameplan(){
   const fLoc=getMulti('gpLoc'), fRes=getMulti('gpRes'), fZone=getMulti('gpZone'), fComp=getMulti('gpComp');
   const from=document.getElementById('gpFrom').value, to=document.getElementById('gpTo').value;
@@ -533,7 +559,7 @@ function buildGameplan(){
 
   res.innerHTML=
     '<div class="gp-report-head"><h1>Operations Gameplan</h1><div class="meta">Filters: '+esc(filterDesc)+' &middot; '+subs.length+' events &middot; generated '+new Date().toLocaleString()+'</div>'+
-      '<button class="btn primary" style="margin-top:12px" onclick="window.print()">Print this gameplan</button></div>'+
+      '<button class="btn primary" style="margin-top:12px" onclick="printGameplan()">Print this gameplan</button></div>'+
     (clashCount?'<div class="gp-warn"><b>\u26a0 '+clashCount+' event(s) overlap</b> on the same location and time (including setup/teardown). Check the timeline and resolve before the day.</div>':'')+
     ganttView(subs)+
     chronoView(subs)+
@@ -681,5 +707,6 @@ init();
     </div>
   </div>
 
+  <div id="printZone" style="display:none"></div>
 </body>
 </html>
