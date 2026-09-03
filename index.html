@@ -2439,9 +2439,8 @@
         try {
         map=L.map('map-container',{ zoomSnap:0.5, attributionControl:false, doubleClickZoom:false });
         // Light base layer under the FM buildings
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',{
-          maxZoom:21
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19, crossOrigin: true, attribution: '&copy; OpenStreetMap contributors'}).addTo(map);
         // UVA FM GIS building footprints (authoritative facility outlines)
         if (typeof L.esri !== 'undefined') {
           try {
