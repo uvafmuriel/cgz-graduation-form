@@ -912,9 +912,10 @@
     .dept-combo-caret { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #888780; pointer-events: none; font-size: 12px; }
     .dept-list { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #d0cec7; border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 50; box-shadow: 0 6px 20px rgba(35,45,75,0.12); }
     .dept-list.open { display: block; }
-    .dept-option { padding: 9px 12px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f0eeea; }
+    .dept-option { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 12px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #f0eeea; }
     .dept-option:hover, .dept-option.active { background: #f0f3f9; }
-    .dept-option.zone-tag { color: #888780; font-size: 11px; float: right; font-weight: normal; }
+    .dept-option .dept-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dept-option .zone-tag { flex: 0 0 auto; color: var(--muted); font-size: 11px; font-weight: normal; background: #f0eeea; border-radius: var(--r-pill); padding: 2px 9px; }
     .dept-list-empty { padding: 12px; font-size: 13px; color: #888780; text-align: center; }
 
     .rain-plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -1447,7 +1448,7 @@
       }
       list.innerHTML = deptFiltered.map(({ s, i }, pos) =>
         '<div class="dept-option' + (pos === deptActiveIdx ? ' active' : '') + '" data-idx="' + i + '" data-pos="' + pos + '" onmousedown="pickDept(' + i + ')">' +
-          escHtml(s.name) +
+          '<span class="dept-name">' + escHtml(s.name) + '</span>' +
           (s.zone ? '<span class="zone-tag">' + escHtml(s.zone) + '</span>' : '') +
         '</div>'
       ).join('');
